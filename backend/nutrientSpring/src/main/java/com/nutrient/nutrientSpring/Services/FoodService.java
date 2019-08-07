@@ -132,9 +132,9 @@ public class FoodService {
             Long id = food.getId();
             HashMap<String, Object> tmp = new HashMap<String, Object>();
             tmp.put("food", food);
-            tmp.put("mineral", mineralRepo.findByFood_id(id));
-            tmp.put("vitamin", vitaminRepo.findByFood_id(id));
-            tmp.put("acid", acidsRepo.findByFood_id(id));
+            tmp.put("mineral", mineralRepo.findByFood_id(id).get());
+            tmp.put("vitamin", vitaminRepo.findByFood_id(id).get());
+            tmp.put("acid", acidsRepo.findByFood_id(id).get());
             foodNutrients.put(id, tmp);
         }
         return foodNutrients;

@@ -15,8 +15,6 @@ public class NutrientRestController {
 
     @PostMapping
     public Response getCombinations(@RequestBody DietInfo dietInfo){
-        System.out.println("Пришёл запрос на расчёт");
-        System.out.println(dietInfo);
         Response r = new Response();
         r.setCombinations(calculations.getEfficientCombinations(
                 dietInfo.getGender(),

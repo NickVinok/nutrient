@@ -93,11 +93,10 @@ public class Combination{
         combination.add((Food)food.get("food"));
 
         pfcOverall.sum((Food)food.get("food"));
-        vitaminOverall.sum(((Vitamin)((Optional)food.get("vitamin")).get()));
-        mineralOverall.sum((Mineral)((Optional)food.get("mineral")).get());
+        vitaminOverall.sum((Vitamin)food.get("vitamin"));
+        mineralOverall.sum((Mineral)food.get("mineral"));
 
-        combinationEfficiency += (Float)((HashMap<String, Object>)food.get("pfcEfficiency"))
-                .get("overallPfcEfficiency");//(Float)food.get("overallEfficiency");
+        combinationEfficiency += (Float)food.get("overallEfficiency");
         pfcOverallEfficiency += (Float)((HashMap<String, Object>)food.get("pfcEfficiency"))
                 .get("overallPfcEfficiency");
         vitaminOverallEfficiency += (Float)((HashMap<String, Object>)food.get("vitaminEfficiency"))

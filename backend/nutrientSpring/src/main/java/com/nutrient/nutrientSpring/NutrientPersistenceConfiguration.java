@@ -42,7 +42,7 @@ public class NutrientPersistenceConfiguration {
                 .build();
     }
 
-    @Bean(name="nutrientTransactionManagerFactory")
+    @Bean(name="transactionManager")
     public PlatformTransactionManager nutrientTransactionManager(
             @Qualifier("nutrientEntityManagerFactory") EntityManagerFactory nutrientEntityManagerFactory
     ) {

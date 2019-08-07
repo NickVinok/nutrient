@@ -26,10 +26,10 @@ public class NutrientService {
         return nutrientHasGenderRepo.findByNutritionCompositeKey_Gender(id);
     }
 
-    public Float getValueOfCertainMineral(Long id, String gender){
-        return nutrientHasGenderRepo.findById(
-                new NutritionCompositeKey(genderRepo.findByName(gender).get().getId(), id))
-                .get().getValue();
+    public Float getValueOfCertainNutrient(String nutrientName, String gender){
+        NutritionCompositeKey key = new NutritionCompositeKey(nutrientRepo.findByName(nutrientName).get().getId(),
+                genderRepo.findByName(gender).get().getId());
+        return nutrientHasGenderRepo.findById(key).get().getValue();
     }
 
     public Float getMineralsSum(String gender, List<Long> ids){

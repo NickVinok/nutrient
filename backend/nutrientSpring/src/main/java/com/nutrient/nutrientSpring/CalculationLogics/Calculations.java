@@ -49,11 +49,8 @@ public class Calculations {
 
         //Рассчитываем эффективность каждого из продуктов (пока просто по максимуму - дальше - можно поиграться с коэффициентами и
         //записать всё в бд отдельным скриптом
-        try {
-            productOverallEfficiency(foodWithNutrientsList, pfcNorms, nutrientLimitationsList, gender);
-        } catch (NoSuchFieldException e){
+        productOverallEfficiency(foodWithNutrientsList, pfcNorms, nutrientLimitationsList, gender);
 
-        }
 
         //Получаем список категорий, превращаем в словарь, где значение - допустимое количество оставшихся использований
         //Делаем 2 списка: один локальный, другой глобальный для выполнения требований к максимальному количеству продуктов из одной группы внутри комбинации
@@ -68,8 +65,7 @@ public class Calculations {
     }
 
     //Добавляем к оригинальной мапе проценты эффективности по бжу и прочему говну
-    private void productOverallEfficiency(HashMap<Long, HashMap<String, Object>> productsNutrients, List<Float> pfcNorms, List<NutrientHasGender> nutrientNorms, String gender)
-    throws NoSuchFieldException{
+    private void productOverallEfficiency(HashMap<Long, HashMap<String, Object>> productsNutrients, List<Float> pfcNorms, List<NutrientHasGender> nutrientNorms, String gender) {
         //Еда:объект еды, Минералы: объект минералов, Витамины:объект витаминов, Кислоты: объект кислот
         /*Здесь добавляем к этому следующую конструкцию
         {
@@ -96,33 +92,33 @@ public class Calculations {
                    pfcEfficiency.put("waterEfficiency", ((Food)foodNutrient).getWater()/ pfcNorms.get(4));
                    pfcEfficiency.put("sugarEfficiency", 1-((Food)foodNutrient).getSugares()/ pfcNorms.get(6));
                    pfcEfficiency.put("starchEfficiency", ((Food)foodNutrient).getStarch()/ pfcNorms.get(7));
-                   pfcEfficiency.put("fatransEfficiency", 1-((Food)foodNutrient).getFat_trans()/ pfcNorms.get(8));
-                   pfcEfficiency.put("cholesterolEfficiency", 1-((Food)foodNutrient).getFat_trans()/ pfcNorms.get(9));
+                   pfcEfficiency.put("fatransEfficiency", ((Food)foodNutrient).getFat_trans()/ pfcNorms.get(8));
+                   pfcEfficiency.put("cholesterolEfficiency", ((Food)foodNutrient).getFat_trans()/ pfcNorms.get(9));
 
                }
                else if(foodNutrient instanceof Mineral){
                    mineralEfficiency.put("calcium", ((Mineral)foodNutrient).getCalcium()/
-                           nutrientService.getValueOfCertainMineral(mapper.getNutrientsId(Mineral.class.getField("calcium")),gender));
+                           nutrientService.getValueOfCertainNutrient("calcium", gender));
                    mineralEfficiency.put("iron",((Mineral)foodNutrient).getIron()/
-                           nutrientService.getValueOfCertainMineral(mapper.getNutrientsId(Mineral.class.getField("iron")),gender));
+                           nutrientService.getValueOfCertainNutrient("ferrum" ,gender));
                    mineralEfficiency.put("magnesium", ((Mineral)foodNutrient).getMagnesium()/
-                           nutrientService.getValueOfCertainMineral(mapper.getNutrientsId(Mineral.class.getField("magnesium")),gender));
+                           nutrientService.getValueOfCertainNutrient("magnesum",gender));
                    mineralEfficiency.put("phosphorus",((Mineral)foodNutrient).getPhosphorus()/
-                           nutrientService.getValueOfCertainMineral(mapper.getNutrientsId(Mineral.class.getField("phosphorus")),gender));
+                           nutrientService.getValueOfCertainNutrient("phosphorus",gender));
                    mineralEfficiency.put("potassium",((Mineral)foodNutrient).getPotassium()/
-                           nutrientService.getValueOfCertainMineral(mapper.getNutrientsId(Mineral.class.getField("potassium")),gender));
+                           nutrientService.getValueOfCertainNutrient("kalium",gender));
                    mineralEfficiency.put("sodium",((Mineral)foodNutrient).getSodium()/
-                           nutrientService.getValueOfCertainMineral(mapper.getNutrientsId(Mineral.class.getField("sodium")),gender));
+                           nutrientService.getValueOfCertainNutrient("natrium",gender));
                    mineralEfficiency.put("zinc",((Mineral)foodNutrient).getZinc()/
-                           nutrientService.getValueOfCertainMineral(mapper.getNutrientsId(Mineral.class.getField("zinc")),gender));
+                           nutrientService.getValueOfCertainNutrient("zincum",gender));
                    mineralEfficiency.put("copper",((Mineral)foodNutrient).getCopper()/
-                           nutrientService.getValueOfCertainMineral(mapper.getNutrientsId(Mineral.class.getField("copper")),gender));
+                           nutrientService.getValueOfCertainNutrient("cuprum",gender));
                    mineralEfficiency.put("manganese",((Mineral)foodNutrient).getManganese()/
-                           nutrientService.getValueOfCertainMineral(mapper.getNutrientsId(Mineral.class.getField("manganese")),gender));
+                           nutrientService.getValueOfCertainNutrient("manganum",gender));
                    mineralEfficiency.put("selenium",((Mineral)foodNutrient).getSelenium()/
-                           nutrientService.getValueOfCertainMineral(mapper.getNutrientsId(Mineral.class.getField("selenium")),gender));
+                           nutrientService.getValueOfCertainNutrient("selenum",gender));
                    mineralEfficiency.put("fluoride",((Mineral)foodNutrient).getFluoride()/
-                           nutrientService.getValueOfCertainMineral(mapper.getNutrientsId(Mineral.class.getField("fluoride")),gender));
+                           nutrientService.getValueOfCertainNutrient("fluorum",gender));
                    Float ash = ((((Mineral)foodNutrient).getCalcium() + ((Mineral)foodNutrient).getIron() + ((Mineral)foodNutrient).getMagnesium() +
                            ((Mineral)foodNutrient).getPhosphorus() + ((Mineral)foodNutrient).getPotassium() + ((Mineral)foodNutrient).getSodium() +
                            ((Mineral)foodNutrient).getZinc() + ((Mineral)foodNutrient).getCopper() + ((Mineral)foodNutrient).getManganese() +
@@ -131,35 +127,35 @@ public class Calculations {
                }
                else if(foodNutrient instanceof Vitamin){
                    vitaminEfficiency.put("vitamin_c", ((Vitamin)foodNutrient).getVitamin_c()/
-                           nutrientService.getValueOfCertainMineral(mapper.getNutrientsId(Mineral.class.getField("vitamin_c")),gender));
+                           nutrientService.getValueOfCertainNutrient("c",gender));
                    vitaminEfficiency.put("vitamin_b1",((Vitamin)foodNutrient).getVitamin_b1()/
-                           nutrientService.getValueOfCertainMineral(mapper.getNutrientsId(Mineral.class.getField("vitamin_b1")),gender));
+                           nutrientService.getValueOfCertainNutrient("b1",gender));
                    vitaminEfficiency.put("vitamin_b2", ((Vitamin)foodNutrient).getVitamin_b2()/
-                           nutrientService.getValueOfCertainMineral(mapper.getNutrientsId(Mineral.class.getField("vitamin_b2")),gender));
+                           nutrientService.getValueOfCertainNutrient("b2",gender));
                    vitaminEfficiency.put("vitamin_b6",((Vitamin)foodNutrient).getVitamin_b6()/
-                           nutrientService.getValueOfCertainMineral(mapper.getNutrientsId(Mineral.class.getField("vitamin_b6")),gender));
+                           nutrientService.getValueOfCertainNutrient("b6",gender));
                    vitaminEfficiency.put("vitamin_b3",((Vitamin)foodNutrient).getVitamin_b3()/
-                           nutrientService.getValueOfCertainMineral(mapper.getNutrientsId(Mineral.class.getField("vitamin_b3")),gender));
+                           nutrientService.getValueOfCertainNutrient("b3",gender));
                    vitaminEfficiency.put("vitamin_b12",((Vitamin)foodNutrient).getVitamin_b12()/
-                           nutrientService.getValueOfCertainMineral(mapper.getNutrientsId(Mineral.class.getField("vitamin_b12")),gender));
+                           nutrientService.getValueOfCertainNutrient("b12",gender));
                    vitaminEfficiency.put("vitamin_b9",((Vitamin)foodNutrient).getVitamin_b9()/
-                           nutrientService.getValueOfCertainMineral(mapper.getNutrientsId(Mineral.class.getField("vitamin_b9")),gender));
+                           nutrientService.getValueOfCertainNutrient("b9",gender));
                    vitaminEfficiency.put("vitamin_b5",((Vitamin)foodNutrient).getVitamin_b5()/
-                           nutrientService.getValueOfCertainMineral(mapper.getNutrientsId(Mineral.class.getField("vitamin_b5")),gender));
+                           nutrientService.getValueOfCertainNutrient("b5",gender));
                    //mineralEfficiency.put("vitamin_b7",((Vitamin)foodNutrient).getVitamin_b7()/
                           // nutrientService.getValueOfCertainMineral(mapper.getNutrientsId(Mineral.class.getField("vitamin_b7")),gender));
                    vitaminEfficiency.put("vitamin_a",((Vitamin)foodNutrient).getVitamin_a()/
-                           nutrientService.getValueOfCertainMineral(mapper.getNutrientsId(Mineral.class.getField("vitamin_a")),gender));
+                           nutrientService.getValueOfCertainNutrient("a",gender));
                    vitaminEfficiency.put("beta_carotene",((Vitamin)foodNutrient).getBeta_carotene()/
-                           nutrientService.getValueOfCertainMineral(mapper.getNutrientsId(Mineral.class.getField("beta_carotene")),gender));
+                           nutrientService.getValueOfCertainNutrient("beta-carotin",gender));
                    vitaminEfficiency.put("vitamin_e",((Vitamin)foodNutrient).getVitamin_e()/
-                           nutrientService.getValueOfCertainMineral(mapper.getNutrientsId(Mineral.class.getField("vitamin_e")),gender));
+                           nutrientService.getValueOfCertainNutrient("e",gender));
                    vitaminEfficiency.put("vitamin_d",((Vitamin)foodNutrient).getVitamin_d()/
-                           nutrientService.getValueOfCertainMineral(mapper.getNutrientsId(Mineral.class.getField("vitamin_d")),gender));
+                           nutrientService.getValueOfCertainNutrient("d",gender));
                    vitaminEfficiency.put("vitamin_k",((Vitamin)foodNutrient).getVitamin_k()/
-                           nutrientService.getValueOfCertainMineral(mapper.getNutrientsId(Mineral.class.getField("vitamin_k")),gender));
+                           nutrientService.getValueOfCertainNutrient("k",gender));
                    vitaminEfficiency.put("vitamin_b4",((Vitamin)foodNutrient).getVitamin_b4()/
-                           nutrientService.getValueOfCertainMineral(mapper.getNutrientsId(Mineral.class.getField("vitamin_b4")),gender));
+                           nutrientService.getValueOfCertainNutrient("b4",gender));
                }
            }
 
@@ -203,8 +199,18 @@ public class Calculations {
         //сортируем мапу по общей эффективности продукта
         HashMap<Long, HashMap<String, Object>> sortedFoodWithNutrientsList = new HashMap<>();
         foodWithNutrientsList.entrySet().stream()
-                .sorted((x, y) -> Float.compare((float)x.getValue().get("overallEfficiency"), (float)y.getValue().get("overallEfficiency")))
-                .forEach(x -> sortedFoodWithNutrientsList.put(x.getKey(), x.getValue()));
+                .sorted((x, y) -> Float.compare((float)y.getValue().get("overallEfficiency"), (float)x.getValue().get("overallEfficiency")))
+                .forEach(x -> {
+                    if((float)x.getValue().get("overallEfficiency") <= 0.4) {
+                        sortedFoodWithNutrientsList.put(x.getKey(), x.getValue());
+                    }
+                });
+
+        HashMap<Long, Long> overallCounter = new HashMap<>();
+        //Делаем общий счётчик категорий
+        for(Map.Entry<Long, Long> oc : categoryCounter.entrySet()){
+            overallCounter.put(oc.getKey(), 1L);
+        }
 
         for(int i = 0; i< 12; i++) {
             Combination combinationToAdd = new Combination();
@@ -218,12 +224,13 @@ public class Calculations {
             //Составляем комбинацию из продуктов, смотря на категории
             for (Map.Entry<Long, HashMap<String, Object>> foodList : sortedFoodWithNutrientsList.entrySet()) {
                 Long categoryId = ((Food)foodList.getValue().get("food")).getCategory().getId();
-                if(newCounter.get(categoryId) > 0){
+                if(newCounter.get(categoryId) > 0 && overallCounter.get(categoryId)>0){
                     if(!combinationToAdd.addFoodToCombination(foodList.getValue())){
                         break;
                     }
                     else{
                         newCounter.put(categoryId, (Long)newCounter.get(categoryId) - 1);
+                        overallCounter.put(categoryId, (Long)overallCounter.get(categoryId)-1);
                     }
                 }else{
                     continue;

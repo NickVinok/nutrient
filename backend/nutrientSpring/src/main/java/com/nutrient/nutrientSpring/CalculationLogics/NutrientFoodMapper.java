@@ -2,6 +2,7 @@ package com.nutrient.nutrientSpring.CalculationLogics;
 
 import com.nutrient.nutrientSpring.Model.FoodModel.Mineral;
 import com.nutrient.nutrientSpring.Model.FoodModel.Vitamin;
+import lombok.Data;
 import org.springframework.stereotype.Service;
 
 import javax.websocket.server.ServerEndpoint;
@@ -12,6 +13,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
+@Data
 public class NutrientFoodMapper {
     private HashMap<Field, Long> mapper = new HashMap<Field, Long>();
 
