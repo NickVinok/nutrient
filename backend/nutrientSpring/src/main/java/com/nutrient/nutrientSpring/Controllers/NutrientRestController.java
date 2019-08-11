@@ -18,7 +18,7 @@ public class NutrientRestController {
         Response r = new Response();
         r.setCombinations(calculations.getEfficientCombinations(
                 dietInfo.getGender(),
-                "Их нет",
+                dietInfo.getWorkingGroup(),
                 dietInfo.getAge(),
                 dietInfo.getMass(),
                 dietInfo.getHeight(),

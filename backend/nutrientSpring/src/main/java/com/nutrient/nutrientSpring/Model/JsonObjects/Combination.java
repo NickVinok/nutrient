@@ -1,5 +1,6 @@
 package com.nutrient.nutrientSpring.Model.JsonObjects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.nutrient.nutrientSpring.Model.FoodModel.Food;
 import com.nutrient.nutrientSpring.Model.FoodModel.Mineral;
 import com.nutrient.nutrientSpring.Model.FoodModel.Vitamin;
@@ -22,9 +23,12 @@ public class Combination{
     private Float pfcOverallEfficiency = 0f;
     private Float vitaminOverallEfficiency = 0f;
     private Float mineralOverallEfficiency = 0f;
+    @JsonIgnore
+    private int foodCounter = 5;
 
     public boolean addFoodToCombination(HashMap<String, Object> food){
-        int count = 3;
+        //Счётчик для нутриентов, которые выходят за нормы
+        int acceptableNumberOfOverFlowingNutrients = 3;
 
         HashMap<String, Float> tmpPfc = new HashMap<>();
         HashMap<String, Float> tmpVit = new HashMap<>();
@@ -42,12 +46,26 @@ public class Combination{
 
         for(Map.Entry<String, Object> map : ((HashMap<String, Object>)food.get("pfcEfficiency")).entrySet()){
             if(pfcEfficiency.containsKey(map.getKey())){
-                if(pfcEfficiency.get(map.getKey())+(Float)map.getValue() > 1.1f && count >0)
-                {
-                    count--;
+                //Смотрим не содержит ли продукт чересчур много какого-либо из БЖУ
+                if((Float)map.getValue() > 1 ){
+                    if(foodCounter>0){
+                        return true;
+                    }else{
+                        return false;
+                    }
                 }
-                else if(pfcEfficiency.get(map.getKey())+(Float)map.getValue() > 1.1f && count ==0){
-                    return false;
+
+                //Смотрим, не является ли сумма БЖУ комбинации чересчур большой
+                if(pfcEfficiency.get(map.getKey())+(Float)map.getValue() > 1.1f && acceptableNumberOfOverFlowingNutrients >0)
+                {
+                    acceptableNumberOfOverFlowingNutrients--;
+                }
+                else if(pfcEfficiency.get(map.getKey())+(Float)map.getValue() > 1.1f && acceptableNumberOfOverFlowingNutrients == 0){
+                    if(foodCounter == 0) {
+                        return false;
+                    } else {
+                        return true;
+                    }
                 }
                 tmpPfc.put(map.getKey(), pfcEfficiency.get(map.getKey())+(Float)map.getValue());
             }
@@ -56,13 +74,28 @@ public class Combination{
             }
         }
 
-        count = 3;
+        acceptableNumberOfOverFlowingNutrients = 3;
         for(Map.Entry<String, Object> map : ((HashMap<String, Object>)food.get("mineralEfficiency")).entrySet()){
             if(mineralEfficiency.containsKey(map.getKey())){
-                if(mineralEfficiency.get(map.getKey())+(Float)map.getValue() > 1.15f && count>0){
-                    count--;
-                }else if(mineralEfficiency.get(map.getKey())+(Float)map.getValue() > 1.15f && count==0){
-                    return false;
+                //Смотрим не содержит ли продукт чересчур много какого-либо из минералов
+                //System.out.print(((Food)food.get("food")).getName());
+                //System.out.println(": "+map.getKey() + ":" + map.getValue());
+                if((Float)map.getValue() > 1 ){
+                    if(foodCounter>0){
+                        return true;
+                    }else{
+                        return false;
+                    }
+                }
+                //Смотрим, не является ли сумма минералов комбинации чересчур большой
+                if(mineralEfficiency.get(map.getKey())+(Float)map.getValue() > 1.15f && acceptableNumberOfOverFlowingNutrients>0){
+                    acceptableNumberOfOverFlowingNutrients--;
+                }else if(mineralEfficiency.get(map.getKey())+(Float)map.getValue() > 1.15f && acceptableNumberOfOverFlowingNutrients==0){
+                    if(foodCounter == 0) {
+                        return false;
+                    } else {
+                        return true;
+                    }
                 }
                 tmpMin.put(map.getKey(), mineralEfficiency.get(map.getKey())+(Float)map.getValue());
             }
@@ -71,13 +104,26 @@ public class Combination{
             }
         }
 
-        count = 3;
+        acceptableNumberOfOverFlowingNutrients = 3;
         for(Map.Entry<String, Object> map : ((HashMap<String, Object>)food.get("vitaminEfficiency")).entrySet()){
             if(vitaminEfficiency.containsKey(map.getKey())){
-                if(vitaminEfficiency.get(map.getKey())+(Float)map.getValue() < 1.15f && count>0){
-                    count--;
-                } else if(vitaminEfficiency.get(map.getKey())+(Float)map.getValue() > 1.15f && count==0){
-                    return false;
+                //Смотрим не содержит ли продукт чересчур много какого-либо из витамнов
+                if((Float)map.getValue() > 1 ){
+                    if(foodCounter>0){
+                        return true;
+                    }else{
+                        return false;
+                    }
+                }
+                //Смотрим, не является ли сумма витаминов комбинации чересчур большой
+                if(vitaminEfficiency.get(map.getKey())+(Float)map.getValue() < 1.15f && acceptableNumberOfOverFlowingNutrients>0){
+                    acceptableNumberOfOverFlowingNutrients--;
+                } else if(vitaminEfficiency.get(map.getKey())+(Float)map.getValue() > 1.15f && acceptableNumberOfOverFlowingNutrients==0){
+                    if(foodCounter == 0) {
+                        return false;
+                    } else {
+                        return true;
+                    }
                 }
                 tmpVit.put(map.getKey(), vitaminEfficiency.get(map.getKey())+(Float)map.getValue());
             }
@@ -103,6 +149,7 @@ public class Combination{
                 .get("overallVitaminEfficiency");
         mineralOverallEfficiency += (Float)((HashMap<String, Object>)food.get("mineralEfficiency"))
                 .get("overallMineralEfficiency");
+        foodCounter--;
 
         return true;
     }

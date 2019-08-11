@@ -10,4 +10,5 @@ public class DietInfo {
     private float age;
     private String diet_type;
     private String group;
+    private int workingGroup;
 }

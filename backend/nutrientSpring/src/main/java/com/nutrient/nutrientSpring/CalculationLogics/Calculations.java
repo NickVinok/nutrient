@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class Calculations {
@@ -29,7 +30,7 @@ public class Calculations {
 
     private float CaloriesCoefficient = 1.4f;
 
-    public Combinations getEfficientCombinations(String gender, String dietLimitations, float age, float weight, float height, String dietType){
+    public Combinations getEfficientCombinations(String gender, int workingGroup, float age, float weight, float height, String dietType){
         Combinations combinations = new Combinations();
 
         //Получаем список словарей, где ключом выступает id еды, а значениями являются объекты еды, витаминов, минералов, кислот)
@@ -39,7 +40,7 @@ public class Calculations {
         List<NutrientHasGender> nutrientLimitationsList = nutrientService.getNutrientsValueForGender(gender);
 
         //Рассчитываем Нрмы БЖУ, исходя из роста, веса, пола и т.д.)
-        pfcNormsCalculation = new PfcNormsCalculation(gender, age, weight, height, dietType);
+        pfcNormsCalculation = new PfcNormsCalculation(gender, age, weight, height, dietType, workingGroup);
         //Рассчитываем норму золы
         List<Long> mineralIds = mapper.getMineralsId();
         pfcNormsCalculation.setAsh(nutrientService.getMineralsSum(gender, mineralIds));
@@ -200,17 +201,16 @@ public class Calculations {
         HashMap<Long, HashMap<String, Object>> sortedFoodWithNutrientsList = new HashMap<>();
         foodWithNutrientsList.entrySet().stream()
                 .sorted((x, y) -> Float.compare((float)y.getValue().get("overallEfficiency"), (float)x.getValue().get("overallEfficiency")))
-                .forEach(x -> {
-                    if((float)x.getValue().get("overallEfficiency") <= 0.4) {
-                        sortedFoodWithNutrientsList.put(x.getKey(), x.getValue());
-                    }
-                });
+                .forEach(x -> sortedFoodWithNutrientsList.put(x.getKey(), x.getValue()));
 
         HashMap<Long, Long> overallCounter = new HashMap<>();
         //Делаем общий счётчик категорий
         for(Map.Entry<Long, Long> oc : categoryCounter.entrySet()){
-            overallCounter.put(oc.getKey(), 1L);
+            overallCounter.put(oc.getKey(), 3L);
         }
+        //Чтобы не было повторений
+        ArrayList<Long> usedIds = new ArrayList<>();
+        HashMap<Long, Long> usedIds2 = new HashMap<>();
 
         for(int i = 0; i< 12; i++) {
             Combination combinationToAdd = new Combination();
@@ -220,24 +220,42 @@ public class Calculations {
             for(Map.Entry<Long, Long> old : categoryCounter.entrySet()){
                 newCounter.put(old.getKey(), old.getValue());
             }
-
             //Составляем комбинацию из продуктов, смотря на категории
             for (Map.Entry<Long, HashMap<String, Object>> foodList : sortedFoodWithNutrientsList.entrySet()) {
-                Long categoryId = ((Food)foodList.getValue().get("food")).getCategory().getId();
-                if(newCounter.get(categoryId) > 0 && overallCounter.get(categoryId)>0){
-                    if(!combinationToAdd.addFoodToCombination(foodList.getValue())){
-                        break;
+                Food tmpFood = ((Food)foodList.getValue().get("food"));
+
+                if(usedIds2.containsValue(0)){
+                    for(Map.Entry <Long, Long> keyVal: usedIds2.entrySet()){
+                        if(keyVal.getValue() == 0){
+                            usedIds2.remove(keyVal.getKey());
+                        }
                     }
-                    else{
-                        newCounter.put(categoryId, (Long)newCounter.get(categoryId) - 1);
-                        overallCounter.put(categoryId, (Long)overallCounter.get(categoryId)-1);
+                }
+
+                Long categoryId = tmpFood.getCategory().getId();
+                if(newCounter.containsKey(categoryId) && overallCounter.containsKey(categoryId)) {
+                    if (newCounter.get(categoryId) > 0 && overallCounter.get(categoryId) > 0) {
+                        if(!usedIds2.containsKey(tmpFood.getId())) {
+                            if (!combinationToAdd.addFoodToCombination(foodList.getValue())) {
+                                break;
+                            } else {
+                                if (Math.random() > 0.5) {
+                                    usedIds2.put(tmpFood.getId(), (long)(1+Math.random()*3));
+                                }
+                                newCounter.put(categoryId, (Long) newCounter.get(categoryId) - 1);
+                                overallCounter.put(categoryId, (Long) overallCounter.get(categoryId) - 1);
+                            }
+                        }
                     }
-                }else{
-                    continue;
                 }
             }
             finalCombinations.addCombination(combinationToAdd);
         }
+        finalCombinations.setCombinationList(
+                finalCombinations.getCombinationList().stream()
+                .sorted((x,y) -> Float.compare((float)y.getCombinationEfficiency(), (float)x.getCombinationEfficiency()))
+                .collect(Collectors.toList())
+        );
         return finalCombinations;
     }
 

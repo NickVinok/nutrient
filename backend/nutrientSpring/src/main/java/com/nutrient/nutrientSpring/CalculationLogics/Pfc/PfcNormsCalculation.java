@@ -10,15 +10,16 @@ import java.util.stream.Stream;
 @EqualsAndHashCode(callSuper = false)
 @Data
 public class PfcNormsCalculation extends PfcNorms {
+    private float[] coefs= {1.4f, 1.6f, 1.9f, 2.2f, 2.5f};
 
-    public PfcNormsCalculation(String gender, float age, float weight, float height, String dietType){
-        float energyLoss = this.energyLossCalculation(gender,age, weight, height, dietType);
+    public PfcNormsCalculation(String gender, float age, float weight, float height, String dietType, int workingGroup){
+        float energyLoss = this.energyLossCalculation(gender,age, weight, height, dietType, workingGroup);
         calculatePfc(dietType, energyLoss);
     }
 
-    private float energyLossCalculation(String gender, float age, float weight, float height, String dietType){
+    private float energyLossCalculation(String gender, float age, float weight, float height, String dietType, int workingGroup){
         float mainEnergyExchange = 0;
-        float CaloriesCoefficient = 1.4f;
+        float CaloriesCoefficient = coefs[workingGroup-1];
         /*
         При расчёте калорий используются 2 алгоритма:
         алгоритм Харриса-Бенедикта используется при похудении
