@@ -1,6 +1,7 @@
 package com.nutrient.nutrientSpring.Model.JsonObjects;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.nutrient.nutrientSpring.Model.FoodModel.Acid;
 import com.nutrient.nutrientSpring.Model.FoodModel.Food;
 import com.nutrient.nutrientSpring.Model.FoodModel.Mineral;
 import com.nutrient.nutrientSpring.Model.FoodModel.Vitamin;
@@ -15,6 +16,7 @@ public class Combination{
     private Food pfcOverall = new Food(-1L, "combination", 0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f ,null);
     private Vitamin vitaminOverall = new Vitamin(-1L, 0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,null);
     private Mineral mineralOverall = new Mineral(-1L, 0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,null);
+    private Acid acidOverall = new Acid(-1L, 0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,null);
     private HashMap<String, Float> vitaminEfficiency = new HashMap<>();
     private HashMap<String, Float> mineralEfficiency = new HashMap<>();
     private HashMap<String, Float> pfcEfficiency = new HashMap<>();;
@@ -141,6 +143,7 @@ public class Combination{
         pfcOverall.sum((Food)food.get("food"));
         vitaminOverall.sum((Vitamin)food.get("vitamin"));
         mineralOverall.sum((Mineral)food.get("mineral"));
+        acidOverall.sum((Acid)food.get("acid"));
 
         combinationEfficiency += (Float)food.get("overallEfficiency");
         pfcOverallEfficiency += (Float)((HashMap<String, Object>)food.get("pfcEfficiency"))

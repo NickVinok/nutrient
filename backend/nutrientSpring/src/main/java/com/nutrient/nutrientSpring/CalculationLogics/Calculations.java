@@ -30,11 +30,11 @@ public class Calculations {
 
     private float CaloriesCoefficient = 1.4f;
 
-    public Combinations getEfficientCombinations(String gender, int workingGroup, float age, float weight, float height, String dietType){
+    public Combinations getEfficientCombinations(String gender, int workingGroup, float age, float weight, float height, String dietType, int dietRestrictions){
         Combinations combinations = new Combinations();
 
         //Получаем список словарей, где ключом выступает id еды, а значениями являются объекты еды, витаминов, минералов, кислот)
-        HashMap<Long, HashMap<String, Object>> foodWithNutrientsList = foodService.getListOfFoodsNutrients(foodService.getFoodWOProhibitedCategories());
+        HashMap<Long, HashMap<String, Object>> foodWithNutrientsList = foodService.getListOfFoodsNutrients(foodService.getFoodWOProhibitedCategories(dietRestrictions));
 
         //Получаем список объектов значений нутриентов для конкретного пола
         List<NutrientHasGender> nutrientLimitationsList = nutrientService.getNutrientsValueForGender(gender);
@@ -51,7 +51,6 @@ public class Calculations {
         //Рассчитываем эффективность каждого из продуктов (пока просто по максимуму - дальше - можно поиграться с коэффициентами и
         //записать всё в бд отдельным скриптом
         productOverallEfficiency(foodWithNutrientsList, pfcNorms, nutrientLimitationsList, gender);
-
 
         //Получаем список категорий, превращаем в словарь, где значение - допустимое количество оставшихся использований
         //Делаем 2 списка: один локальный, другой глобальный для выполнения требований к максимальному количеству продуктов из одной группы внутри комбинации

@@ -22,7 +22,8 @@ public class NutrientRestController {
                 dietInfo.getAge(),
                 dietInfo.getMass(),
                 dietInfo.getHeight(),
-                dietInfo.getDiet_type()
+                dietInfo.getDiet_type(),
+                dietInfo.getDietRestrictions()
                 ));
         r.setNorms(calculations.getPfcNorms());
         return r;

@@ -27,58 +27,214 @@ public class FoodService {
     private VitaminRepo vitaminRepo;
 
     //Возвращаем список еды, которая пододит под требования к категории
-    public List<Food> getFoodWOProhibitedCategories(){
-        List<String> notNeededCategories = Stream.of(
-                "Крупы и злаки (рис)",
-                "Лапша в сухом виде",
-                "Яйца и яичные продукты",
-                "Протеин порошок",
-                "Рыба (сырая)",
-                "Свинина (сырая)",
-                "Свиные субпродукты (сырые)",
-                "Говядина (сырая)",
-                "Говяжьи субпродукты сырые",
-                "Курица сырая",
-                "Куриные субпродукты сырые",
-                "Индейка сырая",
-                "Мясо другое сырое ",
-                "Специи",
-                "Соки, нектары, морсы",
-                "Животные жиры",
-                "Алкогольные напитки",
-                "Безалкогольные напитки",
-                "Уксус",
-                "Фастфуд",
-                "Моллюски сырые",
-                "Майонез",
-                "Раки, крабы, креветки сырые",
-                "Свинина (приготовленная)",
-                "Свиные субпродукты (приготовленные)",
-                "Говядина (приготовленная)",
-                "Говяжьи субпродукты (приготовленные)",
-                "Курица (приготовленная)",
-                "Куриные субпродукты (приготовленные)",
-                "Индейка (приготовленная)",
-                "Мясо другое (приготовленное)",
-                "Мясные продукты",
-                "Кондитерские изделия, печенье, сладости",
-                "Сахар и заменители",
-                "Шоколад"
+    public List<Food> getFoodWOProhibitedCategories(int dietRestrictions){
+        List<String> notNeededCategories = new ArrayList<>();
+        List<Category> notNeededCategoriesIds1 = new ArrayList<>();
+        List<Food> foodLList = new ArrayList<>();
+        switch (dietRestrictions){
+            case 1: {
+                notNeededCategories = Stream.of(
+                        "Крупы и злаки (рис)",
+                        "Лапша",
+                        "Яйца и яичные продукты",
+                        "Протеин порошок",
+                        "Рыба (сырая)",
+                        "Свинина (сырая)",
+                        "Свиные субпродукты (сырые)",
+                        "Говядина (сырая)",
+                        "Говяжьи субпродукты сырые",
+                        "Курица сырая",
+                        "Куриные субпродукты сырые",
+                        "Индейка сырая",
+                        "Мясо другое сырое ",
+                        "Специи",
+                        "Соки, нектары, морсы",
+                        "Животные жиры",
+                        "Алкогольные напитки",
+                        "Безалкогольные напитки",
+                        "Уксус",
+                        "Фастфуд",
+                        "Моллюски сырые",
+                        "Майонез",
+                        "Раки, крабы, креветки сырые",
+                        "Свинина (приготовленная)",
+                        "Свиные субпродукты (приготовленные)",
+                        "Говядина (приготовленная)",
+                        "Говяжьи субпродукты (приготовленные)",
+                        "Курица (приготовленная)",
+                        "Куриные субпродукты (приготовленные)",
+                        "Индейка (приготовленная)",
+                        "Мясо другое (приготовленное)",
+                        "Мясные продукты",
+                        "Кондитерские изделия, печенье, сладости",
+                        "Сахар и заменители",
+                        "Шоколад"
                 )
-                .collect(Collectors.toList());
+                        .collect(Collectors.toList());
+                notNeededCategoriesIds1 = categoryRepo.findByNameIn(notNeededCategories);
+                List<Long> notNeededCategoriesIds = new ArrayList<>();
+                for(Category category : notNeededCategoriesIds1) {
+                    notNeededCategoriesIds.add(category.getId());
+                }
+                foodLList = foodRepo.findByCategory_IdNotIn(notNeededCategoriesIds);
+                break;
+            }
+            case 2: {
+                notNeededCategories = Stream.of(
+                        "Овощи (клубнеплоды)",
+                        "Овощи (конеплоды, коренья)",
+                        "Овощи (луковичные)",
+                        "Овощи (паслёновые)",
+                        "Овощи (бахчевые)",
+                        "Овощи (бобовые)",
+                        "Овощи (бобовые - соя и соевые продукты)",
+                        "Овощи (капустные)",
+                        "Овощи (салатные)",
+                        "Овощи (разные)",
+                        "Мука, отруби, крахмал",
+                        "Орехи",
+                        "Хлеб, лепёшки и др.",
+                        "Лапша",
+                        "Яйца и яичные продукты",
+                        "Сыры",
+                        "Молоко и молочные продукты (кроме сыров)",
+                        "Масла",
+                        "Безалкогольные напитки",
+                        "Майонез",
+                        "Морские водоросли",
+                        "Зелень, травы, листья, пряные овощи",
+                        "Семена",
+                        "Специи",
+                        "Проростки",
+                        "Грибы",
+                        "Фрукты",
+                        "Ягоды",
+                        "Экзотические фрукты, ягоды и плоды",
+                        "Кокос и продукты из кокоса",
+                        "Сухофрукты",
+                        "Соки, нектары, морсы",
+                        "Крупы и злаки (в сухом виде)",
+                        "Крупы и злаки (приготовленные)",
+                        "Крупы и злаки (рис)"
 
-        List<Category> notNeededCategoriesIds1 = categoryRepo.findByNameIn(notNeededCategories);
+                ).collect(Collectors.toList());
+                notNeededCategoriesIds1 = categoryRepo.findByNameIn(notNeededCategories);
+                List<Long> categorieIds = new ArrayList<>();
+                for(Category category : notNeededCategoriesIds1) {
+                    categorieIds.add(category.getId());
+                }
+                foodLList = foodRepo.findByCategory_IdIn(categorieIds);
+                break;
+            }
+            case 3: {
+                notNeededCategories = Stream.of(
+                        "Овощи (клубнеплоды)",
+                        "Овощи (конеплоды, коренья)",
+                        "Овощи (луковичные)",
+                        "Овощи (паслёновые)",
+                        "Овощи (бахчевые)",
+                        "Овощи (бобовые)",
+                        "Овощи (бобовые - соя и соевые продукты)",
+                        "Овощи (капустные)",
+                        "Овощи (салатные)",
+                        "Овощи (разные)",
+                        "Мука, отруби, крахмал",
+                        "Орехи",
+                        "Хлеб, лепёшки и др.",
+                        "Лапша",
+                        "Масла",
+                        "Безалкогольные напитки",
+                        "Майонез",
+                        "Морские водоросли",
+                        "Зелень, травы, листья, пряные овощи",
+                        "Семена",
+                        "Специи",
+                        "Проростки",
+                        "Грибы",
+                        "Фрукты",
+                        "Ягоды",
+                        "Экзотические фрукты, ягоды и плоды",
+                        "Кокос и продукты из кокоса",
+                        "Сухофрукты",
+                        "Соки, нектары, морсы",
+                        "Крупы и злаки (в сухом виде)",
+                        "Крупы и злаки (приготовленные)",
+                        "Крупы и злаки (рис)"
 
-        List<Long> notNeededCategoriesIds = new ArrayList<>();
-        for(Category category : notNeededCategoriesIds1) {
-            notNeededCategoriesIds.add(category.getId());
+                ).collect(Collectors.toList());
+                notNeededCategoriesIds1 = categoryRepo.findByNameIn(notNeededCategories);
+                List<Long> categorieIds = new ArrayList<>();
+                for(Category category : notNeededCategoriesIds1) {
+                    categorieIds.add(category.getId());
+                }
+                foodLList = foodRepo.findByCategory_IdIn(categorieIds);
+                break;
+            }
+            case 4: {
+                notNeededCategories = Stream.of(
+                        "Овощи (клубнеплоды)",
+                        "Овощи (конеплоды, коренья)",
+                        "Овощи (луковичные)",
+                        "Овощи (паслёновые)",
+                        "Овощи (бахчевые)",
+                        "Овощи (бобовые)",
+                        "Овощи (бобовые - соя и соевые продукты)",
+                        "Овощи (капустные)",
+                        "Овощи (салатные)",
+                        "Овощи (разные)",
+                        "Мука, отруби, крахмал",
+                        "Орехи",
+                        "Масла",
+                        "Морские водоросли",
+                        "Зелень, травы, листья, пряные овощи",
+                        "Семена",
+                        "Специи",
+                        "Проростки",
+                        "Грибы",
+                        "Фрукты",
+                        "Ягоды",
+                        "Экзотические фрукты, ягоды и плоды",
+                        "Кокос и продукты из кокоса",
+                        "Сухофрукты",
+                        "Соки, нектары, морсы",
+                        "Крупы и злаки (в сухом виде)",
+                        "Крупы и злаки (рис)"
+
+                ).collect(Collectors.toList());
+                notNeededCategoriesIds1 = categoryRepo.findByNameIn(notNeededCategories);
+                List<Long> categorieIds = new ArrayList<>();
+                for(Category category : notNeededCategoriesIds1) {
+                    categorieIds.add(category.getId());
+                }
+                foodLList = foodRepo.findByCategory_IdIn(categorieIds);
+                break;
+            }
+            case 5: {
+                notNeededCategories = Stream.of(
+                        "Овощи (клубнеплоды)",
+                        "Овощи (конеплоды, коренья)",
+                        "Овощи (луковичные)",
+                        "Овощи (паслёновые)",
+                        "Овощи (бахчевые)",
+                        "Овощи (бобовые)",
+                        "Овощи (бобовые - соя и соевые продукты)",
+                        "Овощи (капустные)",
+                        "Овощи (салатные)",
+                        "Овощи (разные)",
+                        "Фрукты",
+                        "Ягоды",
+                        "Экзотические фрукты, ягоды и плоды"
+                ).collect(Collectors.toList());
+                notNeededCategoriesIds1 = categoryRepo.findByNameIn(notNeededCategories);
+                List<Long> categorieIds = new ArrayList<>();
+                for(Category category : notNeededCategoriesIds1) {
+                    categorieIds.add(category.getId());
+                }
+                foodLList = foodRepo.findByCategory_IdIn(categorieIds);
+                break;
+            }
         }
-
-        System.out.println(notNeededCategoriesIds.size());
-
-        List<Food> tmp = foodRepo.findByCategory_IdNotIn(notNeededCategoriesIds);
-        System.out.println(tmp.size());
-        return foodRepo.findByCategory_IdNotIn(notNeededCategoriesIds);
+        return foodLList;
     }
 
     public List<Category> getCategories(){
@@ -141,6 +297,7 @@ public class FoodService {
     }
 
     public HashMap<Long, Long> getCategoriesCounter(){
+
         HashMap<Long, Long> categoriesCounter = new HashMap<>();
         List<String> notNeededCategories = Stream.of(
                 "Рис в сухом виде",

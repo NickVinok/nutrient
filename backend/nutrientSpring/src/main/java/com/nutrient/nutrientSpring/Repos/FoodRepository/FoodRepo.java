@@ -15,4 +15,5 @@ import java.util.List;
 public interface FoodRepo extends JpaRepository<Food, Long>{
     //Убираем всю еду, которая не подпадает под подходящие для комбинирования категории
     List<Food> findByCategory_IdNotIn(Collection<Long> categories);
+    List<Food> findByCategory_IdIn(Collection<Long> categories);
 }

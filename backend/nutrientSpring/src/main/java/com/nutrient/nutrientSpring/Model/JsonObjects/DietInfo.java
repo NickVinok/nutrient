@@ -11,4 +11,5 @@ public class DietInfo {
     private String diet_type;
     private String group;
     private int workingGroup;
+    private int dietRestrictions;
 }
