@@ -19,12 +19,14 @@ public class Combination{
     private Acid acidOverall = new Acid(-1L, 0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,null);
     private HashMap<String, Float> vitaminEfficiency = new HashMap<>();
     private HashMap<String, Float> mineralEfficiency = new HashMap<>();
+    private HashMap<String, Float> acidEfficiency = new HashMap<>();
     private HashMap<String, Float> pfcEfficiency = new HashMap<>();;
 
     private Float combinationEfficiency = 0f;
     private Float pfcOverallEfficiency = 0f;
     private Float vitaminOverallEfficiency = 0f;
     private Float mineralOverallEfficiency = 0f;
+    private Float acidOverallEfficiency = 0f;
     @JsonIgnore
     private int foodCounter = 5;
 
@@ -35,6 +37,7 @@ public class Combination{
         HashMap<String, Float> tmpPfc = new HashMap<>();
         HashMap<String, Float> tmpVit = new HashMap<>();
         HashMap<String, Float> tmpMin = new HashMap<>();
+        HashMap<String, Float> tmpAcid = new HashMap<>();
 
         for(Map.Entry<String, Float> old : pfcEfficiency.entrySet()){
             tmpPfc.put(old.getKey(), old.getValue());
@@ -44,6 +47,10 @@ public class Combination{
         }
         for(Map.Entry<String, Float> old : mineralEfficiency.entrySet()){
             tmpMin.put(old.getKey(), old.getValue());
+        }
+
+        for(Map.Entry<String, Float> old : acidEfficiency.entrySet()){
+            tmpAcid.put(old.getKey(), old.getValue());
         }
 
         for(Map.Entry<String, Object> map : ((HashMap<String, Object>)food.get("pfcEfficiency")).entrySet()){
@@ -134,9 +141,38 @@ public class Combination{
             }
         }
 
+        acceptableNumberOfOverFlowingNutrients = 3;
+        for(Map.Entry<String, Object> map : ((HashMap<String, Object>)food.get("acidEfficiency")).entrySet()){
+            if(acidEfficiency.containsKey(map.getKey())){
+                //Смотрим не содержит ли продукт чересчур много какого-либо из витамнов
+                if((Float)map.getValue() > 1 ){
+                    if(foodCounter>0){
+                        return true;
+                    }else{
+                        return false;
+                    }
+                }
+                //Смотрим, не является ли сумма витаминов комбинации чересчур большой
+                if(acidEfficiency.get(map.getKey())+(Float)map.getValue() < 1.15f && acceptableNumberOfOverFlowingNutrients>0){
+                    acceptableNumberOfOverFlowingNutrients--;
+                } else if(acidEfficiency.get(map.getKey())+(Float)map.getValue() > 1.15f && acceptableNumberOfOverFlowingNutrients==0){
+                    if(foodCounter == 0) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }
+                tmpAcid.put(map.getKey(), acidEfficiency.get(map.getKey())+(Float)map.getValue());
+            }
+            else{
+                tmpAcid.put(map.getKey(), (Float)map.getValue());
+            }
+        }
+
         pfcEfficiency = tmpPfc;
         vitaminEfficiency = tmpVit;
         mineralEfficiency = tmpMin;
+        acidEfficiency = tmpAcid;
 
         combination.add((Food)food.get("food"));
 
@@ -152,6 +188,9 @@ public class Combination{
                 .get("overallVitaminEfficiency");
         mineralOverallEfficiency += (Float)((HashMap<String, Object>)food.get("mineralEfficiency"))
                 .get("overallMineralEfficiency");
+        acidOverallEfficiency += (Float)((HashMap<String, Object>)food.get("acidEfficiency"))
+                .get("overallAcidEfficiency");
+
         foodCounter--;
 
         return true;
