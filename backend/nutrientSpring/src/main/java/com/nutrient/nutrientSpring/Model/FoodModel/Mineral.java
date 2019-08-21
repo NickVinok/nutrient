@@ -1,5 +1,6 @@
 package com.nutrient.nutrientSpring.Model.FoodModel;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -7,6 +8,9 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Data
 @AllArgsConstructor
@@ -46,5 +50,11 @@ public class Mineral {
         this.manganese+= m1.getManganese();
         this.selenium += m1.getSelenium();
         this.fluoride +=m1.getFluoride();
+    }
+    @JsonIgnore
+    public List<Float> getValues(){
+        return Stream.of(this.calcium, this.phosphorus, this.magnesium, this.potassium,
+                this.sodium, this.iron, this.zinc, this.copper, this.manganese, this.selenium, this.fluoride)
+                .collect(Collectors.toList());
     }
 }

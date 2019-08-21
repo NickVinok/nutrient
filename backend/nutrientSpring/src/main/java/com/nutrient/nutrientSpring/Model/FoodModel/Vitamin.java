@@ -1,5 +1,6 @@
 package com.nutrient.nutrientSpring.Model.FoodModel;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -7,6 +8,9 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Data
 @AllArgsConstructor
@@ -58,5 +62,12 @@ public class Vitamin {
         this.vitamin_b6+=v1.getVitamin_b6();
         this.vitamin_b9+=v1.getVitamin_b9();
         this.vitamin_b12+=v1.getVitamin_b12();
+    }
+    @JsonIgnore
+    public List<Float> getValues(){
+        return Stream.of(vitamin_c, vitamin_b1, vitamin_b2, vitamin_b6, vitamin_b3,
+                vitamin_b12, vitamin_b9, vitamin_b5, alpha_carotene, vitamin_a, beta_carotene,
+                vitamin_e, vitamin_d, vitamin_k, vitamin_b4)
+                .collect(Collectors.toList());
     }
 }

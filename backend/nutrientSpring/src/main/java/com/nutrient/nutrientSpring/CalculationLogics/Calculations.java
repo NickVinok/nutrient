@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class Calculations {
@@ -36,7 +37,7 @@ public class Calculations {
         //Получаем список словарей, где ключом выступает id еды, а значениями являются объекты еды, витаминов, минералов, кислот)
         HashMap<Long, HashMap<String, Object>> foodWithNutrientsList = foodService.getListOfFoodsNutrients(foodService.getFoodWOProhibitedCategories(dietRestrictions));
         //Получаем список объектов значений нутриентов для конкретного пола
-        List<NutrientHasGender> nutrientLimitationsList = nutrientService.getNutrientsValueForGender(gender);
+        nutrientService.getNutrientsValueForGender(gender);
         //Рассчитываем Нрмы БЖУ, исходя из роста, веса, пола и т.д.)
         pfcNormsCalculation = new PfcNormsCalculation(gender, age, weight, height, dietType, workingGroup);
         //Рассчитываем норму золы
@@ -47,7 +48,7 @@ public class Calculations {
         pfcNormsToController = pfcNormsCalculation.getNorms();
         //Рассчитываем эффективность каждого из продуктов (пока просто по максимуму - дальше - можно поиграться с коэффициентами и
         //записать всё в бд отдельным скриптом
-        productOverallEfficiency(foodWithNutrientsList, pfcNorms, nutrientLimitationsList, gender);
+        productOverallEfficiency(foodWithNutrientsList, pfcNorms, nutrientService.getVitaminNorms(), nutrientService.getMineralNorms(), nutrientService.getAcidNorms());
         //Получаем список категорий, превращаем в словарь, где значение - допустимое количество оставшихся использований
         //Делаем 2 списка: один локальный, другой глобальный для выполнения требований к максимальному количеству продуктов из одной группы внутри комбинации
         //и во всех комбинациях
@@ -60,7 +61,8 @@ public class Calculations {
     }
 
     //Добавляем к оригинальной мапе проценты эффективности по бжу и прочему говну
-    private void productOverallEfficiency(HashMap<Long, HashMap<String, Object>> productsNutrients, List<Float> pfcNorms, List<NutrientHasGender> nutrientNorms, String gender) {
+    private void productOverallEfficiency(HashMap<Long, HashMap<String, Object>> productsNutrients, List<Float> pfcNorms,
+                                          List<NutrientHasGender> vitaminNorms, List<NutrientHasGender> mineralNorms, List<NutrientHasGender> acidNorms) {
         //Еда:объект еды, Минералы: объект минералов, Витамины:объект витаминов, Кислоты: объект кислот
         /*Здесь добавляем к этому следующую конструкцию
         {
@@ -70,6 +72,17 @@ public class Calculations {
             Общая эффективность 100гр. продукта : Значение
         }
         */
+        List<String> tmpMineralsNames = Stream.of("calcium ", "phosphorus", "magnesium ", "potassium",
+                "sodium", "iron", "zinc ", "copper", "manganese", "selenium", "fluoride")
+                .collect(Collectors.toList());
+        List<String> tmpVitaminNames = Stream.of("vitamin_c", "vitamin_b1", "vitamin_b2", "vitamin_b6",
+                "vitamin_b3","vitamin_b12", "vitamin_b9", "vitamin_b5", "alpha-carotin",
+                "vitamin_a", "beta-carotin", "vitamin_e", "vitamin_d", "vitamin_k", "vitamin_b4")
+                .collect(Collectors.toList());
+        List<String> tmpAcidNames = Stream.of("tryptophan","threonine","isoleucine","leucine","lysine",
+                "methionine", "cystine", "phenylalanine","tyrosine","valine","arginine","histidine",
+                "alanine","aspartic_acid","glutamic_acid","glycine","proline","serine")
+                .collect(Collectors.toList());
        for(Map.Entry<Long, HashMap<String, Object>> entry : productsNutrients.entrySet()){
            HashMap<String, Object> food = entry.getValue();
 
@@ -79,6 +92,10 @@ public class Calculations {
            HashMap<String, Float> acidEfficiency = new HashMap<>();
 
            Float overallEfficiency;
+           Float avgMineralEfficiency = 0f;
+           Float avgVitaminEfficiency = 0f;
+           Float avgAcidEfficiency = 0f;
+           Float avgPcfEfficiency = 0f;
 
            for(Object foodNutrient : food.values()){
                if(foodNutrient instanceof Food){
@@ -96,18 +113,28 @@ public class Calculations {
                }
                else if(foodNutrient instanceof Mineral){
                    Mineral tmpMineral = (Mineral)foodNutrient;
-                   mineralEfficiency.put("calcium", tmpMineral.getCalcium()/
+                   List<Float> mineralValues = tmpMineral.getValues();
+                   for(int i = 0; i<mineralValues.size(); i++){
+                       mineralEfficiency.put(tmpMineralsNames.get(i), mineralValues.get(i)/mineralNorms.get(i).getValue());
+                   }
+
+                   for(Float mineralVal : mineralEfficiency.values()){
+                       avgMineralEfficiency+=mineralVal;
+                   }
+                   avgMineralEfficiency=avgMineralEfficiency/mineralEfficiency.size();
+
+                   /*mineralEfficiency.put("calcium", tmpMineral.getCalcium()/
                            nutrientService.getValueOfCertainNutrient("calcium", gender));
-                   mineralEfficiency.put("iron",tmpMineral.getIron()/
-                           nutrientService.getValueOfCertainNutrient("ferrum" ,gender));
-                   mineralEfficiency.put("magnesium", tmpMineral.getMagnesium()/
-                           nutrientService.getValueOfCertainNutrient("magnesum",gender));
                    mineralEfficiency.put("phosphorus",tmpMineral.getPhosphorus()/
                            nutrientService.getValueOfCertainNutrient("phosphorus",gender));
+                   mineralEfficiency.put("magnesium", tmpMineral.getMagnesium()/
+                           nutrientService.getValueOfCertainNutrient("magnesum",gender));
                    mineralEfficiency.put("potassium",tmpMineral.getPotassium()/
                            nutrientService.getValueOfCertainNutrient("kalium",gender));
                    mineralEfficiency.put("sodium",tmpMineral.getSodium()/
                            nutrientService.getValueOfCertainNutrient("natrium",gender));
+                   mineralEfficiency.put("iron",tmpMineral.getIron()/
+                           nutrientService.getValueOfCertainNutrient("ferrum" ,gender));
                    mineralEfficiency.put("zinc",tmpMineral.getZinc()/
                            nutrientService.getValueOfCertainNutrient("zincum",gender));
                    mineralEfficiency.put("copper",tmpMineral.getCopper()/
@@ -117,16 +144,27 @@ public class Calculations {
                    mineralEfficiency.put("selenium",tmpMineral.getSelenium()/
                            nutrientService.getValueOfCertainNutrient("selenum",gender));
                    mineralEfficiency.put("fluoride",tmpMineral.getFluoride()/
-                           nutrientService.getValueOfCertainNutrient("fluorum",gender));
-                   Float ash = ((((Mineral)foodNutrient).getCalcium() + ((Mineral)foodNutrient).getIron() + ((Mineral)foodNutrient).getMagnesium() +
-                           ((Mineral)foodNutrient).getPhosphorus() + ((Mineral)foodNutrient).getPotassium() + ((Mineral)foodNutrient).getSodium() +
-                           ((Mineral)foodNutrient).getZinc() + ((Mineral)foodNutrient).getCopper() + ((Mineral)foodNutrient).getManganese() +
-                           ((Mineral)foodNutrient).getSelenium() + ((Mineral)foodNutrient).getFluoride())/11)/pfcNorms.get(5);
+                           nutrientService.getValueOfCertainNutrient("fluorum",gender));*/
+
+                   Float ash = ((tmpMineral.getCalcium() + tmpMineral.getIron() + tmpMineral.getMagnesium() +
+                           tmpMineral.getPhosphorus() + tmpMineral.getPotassium() + tmpMineral.getSodium() +
+                           tmpMineral.getZinc() + tmpMineral.getCopper() + tmpMineral.getManganese() +
+                           tmpMineral.getSelenium() + tmpMineral.getFluoride())/11)/pfcNorms.get(5);
                    pfcEfficiency.put("ashEfficiency", ash);
                }
                else if(foodNutrient instanceof Vitamin){
                    Vitamin tmpVitamin = (Vitamin)foodNutrient;
-                   vitaminEfficiency.put("vitamin_c", tmpVitamin.getVitamin_c()/
+                   List<Float> vitaminValues = tmpVitamin.getValues();
+                   for(int i = 0; i<vitaminValues.size(); i++){
+                       vitaminEfficiency.put(tmpVitaminNames.get(i), vitaminValues.get(i)/vitaminNorms.get(i).getValue());
+                   }
+
+                   for(Float vitaminVal : vitaminEfficiency.values()){
+                       avgVitaminEfficiency+=vitaminVal;
+                   }
+                   avgVitaminEfficiency=avgVitaminEfficiency/vitaminEfficiency.size();
+
+                   /*vitaminEfficiency.put("vitamin_c", tmpVitamin.getVitamin_c()/
                            nutrientService.getValueOfCertainNutrient("c",gender));
                    vitaminEfficiency.put("vitamin_b1",tmpVitamin.getVitamin_b1()/
                            nutrientService.getValueOfCertainNutrient("b1",gender));
@@ -155,10 +193,20 @@ public class Calculations {
                    vitaminEfficiency.put("vitamin_k",tmpVitamin.getVitamin_k()/
                            nutrientService.getValueOfCertainNutrient("k",gender));
                    vitaminEfficiency.put("vitamin_b4",tmpVitamin.getVitamin_b4()/
-                           nutrientService.getValueOfCertainNutrient("b4",gender));
+                           nutrientService.getValueOfCertainNutrient("b4",gender));*/
                } else if(foodNutrient instanceof Acid){
                    Acid tmpAcid = (Acid)foodNutrient;
-                   acidEfficiency.put("tryptophan", tmpAcid.getTryptophan()/
+                   List<Float> acidValues = tmpAcid.getValues();
+                   for(int i = 0; i<acidValues.size(); i++){
+                       acidEfficiency.put(tmpAcidNames.get(i), acidValues.get(i)/acidNorms.get(i).getValue());
+                   }
+
+                   for(Float acidVal : acidEfficiency.values()){
+                       avgAcidEfficiency+=acidVal;
+                   }
+                   avgAcidEfficiency=avgAcidEfficiency/acidEfficiency.size();
+
+                   /*acidEfficiency.put("tryptophan", tmpAcid.getTryptophan()/
                            nutrientService.getValueOfCertainNutrient("tryptophan", gender));
                    acidEfficiency.put("threonine", tmpAcid.getThreonine()/
                            nutrientService.getValueOfCertainNutrient("threonine", gender));
@@ -193,33 +241,15 @@ public class Calculations {
                    acidEfficiency.put("proline", tmpAcid.getProline()/
                            nutrientService.getValueOfCertainNutrient("proline", gender));
                    acidEfficiency.put("serine", tmpAcid.getSerine()/
-                           nutrientService.getValueOfCertainNutrient("serine", gender));
+                           nutrientService.getValueOfCertainNutrient("serine", gender));*/
                }
            }
 
-           Float avgMineralEfficiency = 0f;
-           for(Float mineralVal : mineralEfficiency.values()){
-               avgMineralEfficiency+=mineralVal;
-           }
-           avgMineralEfficiency=avgMineralEfficiency/mineralEfficiency.size();
-
-           Float avgVitaminEfficiency = 0f;
-           for(Float vitaminVal : vitaminEfficiency.values()){
-               avgVitaminEfficiency+=vitaminVal;
-           }
-           avgVitaminEfficiency=avgVitaminEfficiency/vitaminEfficiency.size();
-
-           Float avgPcfEfficiency = 0f;
+           avgPcfEfficiency = 0f;
            for(Float pfcVal : pfcEfficiency.values()){
                avgPcfEfficiency+=pfcVal;
            }
            avgPcfEfficiency=avgPcfEfficiency/pfcEfficiency.size();
-
-           Float avgAcidEfficiency = 0f;
-           for(Float acidVal : acidEfficiency.values()){
-               avgAcidEfficiency+=acidVal;
-           }
-           avgAcidEfficiency=avgAcidEfficiency/acidEfficiency.size();
 
            pfcEfficiency.put("overallPfcEfficiency", avgPcfEfficiency);
            mineralEfficiency.put("overallMineralEfficiency", avgMineralEfficiency);
