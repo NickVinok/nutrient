@@ -9,6 +9,11 @@ import lombok.RequiredArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 @Data
 @Entity
 @Table(name = "food")
@@ -47,5 +52,10 @@ public class Food {
         this.starch+=f1.getStarch();
         this.cholesterol+=f1.getCholesterol();
         this.fat_trans+=f1.getFat_trans();
+    }
+
+    public List<Float> getValues(){
+        return Stream.of(energy, fat, protein, carbohydrate, water, ash, sugares, fiber, starch, cholesterol, fat_trans)
+                .collect(Collectors.toList());
     }
 }

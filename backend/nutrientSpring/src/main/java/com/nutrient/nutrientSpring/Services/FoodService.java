@@ -26,6 +26,21 @@ public class FoodService {
     @Autowired
     private VitaminRepo vitaminRepo;
 
+    private final List<String> MineralsNames = Stream.of("calcium", "phosphorus", "magnesium", "potassium",
+            "sodium", "iron", "zinc", "copper", "manganese", "selenium", "fluoride")
+            .collect(Collectors.toList());
+    private final List<String> VitaminNames = Stream.of("vitamin_c", "vitamin_b1", "vitamin_b2", "vitamin_b6",
+            "vitamin_b3","vitamin_b12", "vitamin_b9", "vitamin_b5", "alpha-carotin",
+            "vitamin_a", "beta-carotin", "vitamin_e", "vitamin_d", "vitamin_k", "vitamin_b4")
+            .collect(Collectors.toList());
+    private final List<String> AcidNames = Stream.of("tryptophan","threonine","isoleucine","leucine","lysine",
+            "methionine", "cystine", "phenylalanine","tyrosine","valine","arginine","histidine",
+            "alanine","aspartic_acid","glutamic_acid","glycine","proline","serine")
+            .collect(Collectors.toList());
+    private final List<String> PFC = Stream.of("energy", "fat", "protein", "carbohydrate",
+            "water","ash", "sugares", "fiber", "starch", "cholesterol", "fat_trans")
+            .collect(Collectors.toList());
+
     //Возвращаем список еды, которая пододит под требования к категории
     public List<Food> getFoodWOProhibitedCategories(int dietRestrictions){
         List<String> notNeededCategories = new ArrayList<>();
@@ -371,4 +386,23 @@ public class FoodService {
         return categoriesCounter;
     }
 
+    public List<Food> getAllFood(){
+        return foodRepo.findAll();
+    }
+
+    public List<String> getMineralsNames() {
+        return MineralsNames;
+    }
+
+    public List<String> getVitaminNames() {
+        return VitaminNames;
+    }
+
+    public List<String> getAcidNames() {
+        return AcidNames;
+    }
+
+    public List<String> getPFC() {
+        return PFC;
+    }
 }

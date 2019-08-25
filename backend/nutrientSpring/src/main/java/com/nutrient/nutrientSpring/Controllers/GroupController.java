@@ -1,7 +1,6 @@
 package com.nutrient.nutrientSpring.Controllers;
 
 import com.nutrient.nutrientSpring.Model.FoodModel.Category;
-import com.nutrient.nutrientSpring.Model.JsonObjects.Categories;
 import com.nutrient.nutrientSpring.Services.FoodService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -19,10 +18,8 @@ public class GroupController {
     FoodService foodService;
 
     @GetMapping
-    public Categories getCategories(){
+    public List<Category> getCategories(){
         List<Category> tmp = foodService.getCategories();
-        Categories categories = new Categories();
-        categories.setCategories(tmp);
-        return categories;
+        return tmp;
     }
 }

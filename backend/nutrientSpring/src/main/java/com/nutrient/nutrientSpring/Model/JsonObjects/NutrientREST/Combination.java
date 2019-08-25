@@ -1,4 +1,4 @@
-package com.nutrient.nutrientSpring.Model.JsonObjects;
+package com.nutrient.nutrientSpring.Model.JsonObjects.NutrientREST;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.nutrient.nutrientSpring.Model.FoodModel.Acid;

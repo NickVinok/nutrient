@@ -2,12 +2,12 @@ package com.nutrient.nutrientSpring.CalculationLogics;
 
 import com.nutrient.nutrientSpring.CalculationLogics.Pfc.PfcNorms;
 import com.nutrient.nutrientSpring.Model.FoodModel.Acid;
-import com.nutrient.nutrientSpring.Model.JsonObjects.Combination;
+import com.nutrient.nutrientSpring.Model.JsonObjects.NutrientREST.Combination;
 import com.nutrient.nutrientSpring.CalculationLogics.Pfc.PfcNormsCalculation;
 import com.nutrient.nutrientSpring.Model.FoodModel.Food;
 import com.nutrient.nutrientSpring.Model.FoodModel.Mineral;
 import com.nutrient.nutrientSpring.Model.FoodModel.Vitamin;
-import com.nutrient.nutrientSpring.Model.JsonObjects.Combinations;
+import com.nutrient.nutrientSpring.Model.JsonObjects.NutrientREST.Combinations;
 import com.nutrient.nutrientSpring.Model.NutrientModel.NutrientHasGender;
 import com.nutrient.nutrientSpring.Services.FoodService;
 import com.nutrient.nutrientSpring.Services.NutrientService;
@@ -72,17 +72,6 @@ public class Calculations {
             Общая эффективность 100гр. продукта : Значение
         }
         */
-        List<String> tmpMineralsNames = Stream.of("calcium ", "phosphorus", "magnesium ", "potassium",
-                "sodium", "iron", "zinc ", "copper", "manganese", "selenium", "fluoride")
-                .collect(Collectors.toList());
-        List<String> tmpVitaminNames = Stream.of("vitamin_c", "vitamin_b1", "vitamin_b2", "vitamin_b6",
-                "vitamin_b3","vitamin_b12", "vitamin_b9", "vitamin_b5", "alpha-carotin",
-                "vitamin_a", "beta-carotin", "vitamin_e", "vitamin_d", "vitamin_k", "vitamin_b4")
-                .collect(Collectors.toList());
-        List<String> tmpAcidNames = Stream.of("tryptophan","threonine","isoleucine","leucine","lysine",
-                "methionine", "cystine", "phenylalanine","tyrosine","valine","arginine","histidine",
-                "alanine","aspartic_acid","glutamic_acid","glycine","proline","serine")
-                .collect(Collectors.toList());
        for(Map.Entry<Long, HashMap<String, Object>> entry : productsNutrients.entrySet()){
            HashMap<String, Object> food = entry.getValue();
 
@@ -115,36 +104,13 @@ public class Calculations {
                    Mineral tmpMineral = (Mineral)foodNutrient;
                    List<Float> mineralValues = tmpMineral.getValues();
                    for(int i = 0; i<mineralValues.size(); i++){
-                       mineralEfficiency.put(tmpMineralsNames.get(i), mineralValues.get(i)/mineralNorms.get(i).getValue());
+                       mineralEfficiency.put(foodService.getMineralsNames().get(i), mineralValues.get(i)/mineralNorms.get(i).getValue());
                    }
 
                    for(Float mineralVal : mineralEfficiency.values()){
                        avgMineralEfficiency+=mineralVal;
                    }
                    avgMineralEfficiency=avgMineralEfficiency/mineralEfficiency.size();
-
-                   /*mineralEfficiency.put("calcium", tmpMineral.getCalcium()/
-                           nutrientService.getValueOfCertainNutrient("calcium", gender));
-                   mineralEfficiency.put("phosphorus",tmpMineral.getPhosphorus()/
-                           nutrientService.getValueOfCertainNutrient("phosphorus",gender));
-                   mineralEfficiency.put("magnesium", tmpMineral.getMagnesium()/
-                           nutrientService.getValueOfCertainNutrient("magnesum",gender));
-                   mineralEfficiency.put("potassium",tmpMineral.getPotassium()/
-                           nutrientService.getValueOfCertainNutrient("kalium",gender));
-                   mineralEfficiency.put("sodium",tmpMineral.getSodium()/
-                           nutrientService.getValueOfCertainNutrient("natrium",gender));
-                   mineralEfficiency.put("iron",tmpMineral.getIron()/
-                           nutrientService.getValueOfCertainNutrient("ferrum" ,gender));
-                   mineralEfficiency.put("zinc",tmpMineral.getZinc()/
-                           nutrientService.getValueOfCertainNutrient("zincum",gender));
-                   mineralEfficiency.put("copper",tmpMineral.getCopper()/
-                           nutrientService.getValueOfCertainNutrient("cuprum",gender));
-                   mineralEfficiency.put("manganese",tmpMineral.getManganese()/
-                           nutrientService.getValueOfCertainNutrient("manganum",gender));
-                   mineralEfficiency.put("selenium",tmpMineral.getSelenium()/
-                           nutrientService.getValueOfCertainNutrient("selenum",gender));
-                   mineralEfficiency.put("fluoride",tmpMineral.getFluoride()/
-                           nutrientService.getValueOfCertainNutrient("fluorum",gender));*/
 
                    Float ash = ((tmpMineral.getCalcium() + tmpMineral.getIron() + tmpMineral.getMagnesium() +
                            tmpMineral.getPhosphorus() + tmpMineral.getPotassium() + tmpMineral.getSodium() +
@@ -156,7 +122,7 @@ public class Calculations {
                    Vitamin tmpVitamin = (Vitamin)foodNutrient;
                    List<Float> vitaminValues = tmpVitamin.getValues();
                    for(int i = 0; i<vitaminValues.size(); i++){
-                       vitaminEfficiency.put(tmpVitaminNames.get(i), vitaminValues.get(i)/vitaminNorms.get(i).getValue());
+                       vitaminEfficiency.put(foodService.getVitaminNames().get(i), vitaminValues.get(i)/vitaminNorms.get(i).getValue());
                    }
 
                    for(Float vitaminVal : vitaminEfficiency.values()){
@@ -164,84 +130,17 @@ public class Calculations {
                    }
                    avgVitaminEfficiency=avgVitaminEfficiency/vitaminEfficiency.size();
 
-                   /*vitaminEfficiency.put("vitamin_c", tmpVitamin.getVitamin_c()/
-                           nutrientService.getValueOfCertainNutrient("c",gender));
-                   vitaminEfficiency.put("vitamin_b1",tmpVitamin.getVitamin_b1()/
-                           nutrientService.getValueOfCertainNutrient("b1",gender));
-                   vitaminEfficiency.put("vitamin_b2", tmpVitamin.getVitamin_b2()/
-                           nutrientService.getValueOfCertainNutrient("b2",gender));
-                   vitaminEfficiency.put("vitamin_b6",tmpVitamin.getVitamin_b6()/
-                           nutrientService.getValueOfCertainNutrient("b6",gender));
-                   vitaminEfficiency.put("vitamin_b3",tmpVitamin.getVitamin_b3()/
-                           nutrientService.getValueOfCertainNutrient("b3",gender));
-                   vitaminEfficiency.put("vitamin_b12",tmpVitamin.getVitamin_b12()/
-                           nutrientService.getValueOfCertainNutrient("b12",gender));
-                   vitaminEfficiency.put("vitamin_b9",tmpVitamin.getVitamin_b9()/
-                           nutrientService.getValueOfCertainNutrient("b9",gender));
-                   vitaminEfficiency.put("vitamin_b5",tmpVitamin.getVitamin_b5()/
-                           nutrientService.getValueOfCertainNutrient("b5",gender));
-                   vitaminEfficiency.put("alpha-carotin",tmpVitamin.getAlpha_carotene()/
-                          nutrientService.getValueOfCertainNutrient("alpha-carotin",gender));
-                   vitaminEfficiency.put("vitamin_a",tmpVitamin.getVitamin_a()/
-                           nutrientService.getValueOfCertainNutrient("a",gender));
-                   vitaminEfficiency.put("beta_carotene",tmpVitamin.getBeta_carotene()/
-                           nutrientService.getValueOfCertainNutrient("beta-carotin",gender));
-                   vitaminEfficiency.put("vitamin_e",tmpVitamin.getVitamin_e()/
-                           nutrientService.getValueOfCertainNutrient("e",gender));
-                   vitaminEfficiency.put("vitamin_d",tmpVitamin.getVitamin_d()/
-                           nutrientService.getValueOfCertainNutrient("d",gender));
-                   vitaminEfficiency.put("vitamin_k",tmpVitamin.getVitamin_k()/
-                           nutrientService.getValueOfCertainNutrient("k",gender));
-                   vitaminEfficiency.put("vitamin_b4",tmpVitamin.getVitamin_b4()/
-                           nutrientService.getValueOfCertainNutrient("b4",gender));*/
                } else if(foodNutrient instanceof Acid){
                    Acid tmpAcid = (Acid)foodNutrient;
                    List<Float> acidValues = tmpAcid.getValues();
                    for(int i = 0; i<acidValues.size(); i++){
-                       acidEfficiency.put(tmpAcidNames.get(i), acidValues.get(i)/acidNorms.get(i).getValue());
+                       acidEfficiency.put(foodService.getAcidNames().get(i), acidValues.get(i)/acidNorms.get(i).getValue());
                    }
 
                    for(Float acidVal : acidEfficiency.values()){
                        avgAcidEfficiency+=acidVal;
                    }
                    avgAcidEfficiency=avgAcidEfficiency/acidEfficiency.size();
-
-                   /*acidEfficiency.put("tryptophan", tmpAcid.getTryptophan()/
-                           nutrientService.getValueOfCertainNutrient("tryptophan", gender));
-                   acidEfficiency.put("threonine", tmpAcid.getThreonine()/
-                           nutrientService.getValueOfCertainNutrient("threonine", gender));
-                   acidEfficiency.put("isoleucine", tmpAcid.getIsoleucine()/
-                           nutrientService.getValueOfCertainNutrient("isoleucine", gender));
-                   acidEfficiency.put("leucine", tmpAcid.getLeucine()/
-                           nutrientService.getValueOfCertainNutrient("leucine", gender));
-                   acidEfficiency.put("lysine", tmpAcid.getLysine()/
-                           nutrientService.getValueOfCertainNutrient("lysine", gender));
-                   acidEfficiency.put("methionine", tmpAcid.getMethionine()/
-                           nutrientService.getValueOfCertainNutrient("methionine", gender));
-                   acidEfficiency.put("cystine", tmpAcid.getCystine()/
-                           nutrientService.getValueOfCertainNutrient("cystine", gender));
-                   acidEfficiency.put("phenylalanine", tmpAcid.getPhenylalanine()/
-                           nutrientService.getValueOfCertainNutrient("phenylalanine", gender));
-                   acidEfficiency.put("tyrosine", tmpAcid.getTyrosine()/
-                           nutrientService.getValueOfCertainNutrient("tyrosine", gender));
-                   acidEfficiency.put("valine", tmpAcid.getValine()/
-                           nutrientService.getValueOfCertainNutrient("valine", gender));
-                   acidEfficiency.put("arginine", tmpAcid.getArginine()/
-                           nutrientService.getValueOfCertainNutrient("arginine", gender));
-                   acidEfficiency.put("histidine", tmpAcid.getHistidine()/
-                           nutrientService.getValueOfCertainNutrient("histidine", gender));
-                   acidEfficiency.put("alanine", tmpAcid.getAlanine()/
-                           nutrientService.getValueOfCertainNutrient("alanine", gender));
-                   acidEfficiency.put("aspartic_acid", tmpAcid.getAspartic_acid()/
-                           nutrientService.getValueOfCertainNutrient("aspartic_acid", gender));
-                   acidEfficiency.put("glutamic_acid", tmpAcid.getGlutamic_acid()/
-                           nutrientService.getValueOfCertainNutrient("glutamic_acid", gender));
-                   acidEfficiency.put("glycine", tmpAcid.getGlycine()/
-                           nutrientService.getValueOfCertainNutrient("glycine", gender));
-                   acidEfficiency.put("proline", tmpAcid.getProline()/
-                           nutrientService.getValueOfCertainNutrient("proline", gender));
-                   acidEfficiency.put("serine", tmpAcid.getSerine()/
-                           nutrientService.getValueOfCertainNutrient("serine", gender));*/
                }
            }
 

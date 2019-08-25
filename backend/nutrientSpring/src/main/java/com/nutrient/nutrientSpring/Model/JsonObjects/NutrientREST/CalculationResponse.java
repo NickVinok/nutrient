@@ -1,10 +1,10 @@
-package com.nutrient.nutrientSpring.Model.JsonObjects;
+package com.nutrient.nutrientSpring.Model.JsonObjects.NutrientREST;
 
 import com.nutrient.nutrientSpring.CalculationLogics.Pfc.PfcNorms;
 import lombok.Data;
 
 @Data
-public class Response {
+public class CalculationResponse {
     private PfcNorms norms;
     private Combinations combinations;
 
