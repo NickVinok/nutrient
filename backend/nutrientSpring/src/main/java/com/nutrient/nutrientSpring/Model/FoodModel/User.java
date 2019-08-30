@@ -1,4 +1,4 @@
-package com.nutrient.nutrientSpring.Model.User;
+package com.nutrient.nutrientSpring.Model.FoodModel;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,7 +16,8 @@ import org.hibernate.annotations.OnDeleteAction;
 @NoArgsConstructor
 public class User{
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Integer id;
     private String login;
     private String password;
@@ -59,8 +60,8 @@ public class User{
     }
 
     public void setPassword(String password) {
-//        this.password = org.apache.commons.codec.digest.DigestUtils.sha256Hex(password);
-        this.password = password;
+        this.password = org.apache.commons.codec.digest.DigestUtils.sha256Hex(password);
+//        this.password = password;
 
     }
 

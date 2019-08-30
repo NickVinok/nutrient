@@ -1,23 +1,33 @@
 package com.nutrient.nutrientSpring.Controllers;
 
-import com.nutrient.nutrientSpring.Model.User.User;
-import com.nutrient.nutrientSpring.Repos.User.UserRepository;
+import com.nutrient.nutrientSpring.Model.FoodModel.User;
+import com.nutrient.nutrientSpring.Model.JsonObjects.UserInfo;
+import com.nutrient.nutrientSpring.Repos.FoodRepository.UserRepo;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequestMapping("/api/users")
 public class UserController {
-    @Autowired
-    private UserRepository userRepository;
+    @Autowired()
+    private UserRepo userRepo;
 
-    @GetMapping
-    public Iterable<User> getAllUsers() {
-        return userRepository.findAll();
+    @PostMapping("create")
+    public @ResponseBody String create(@RequestBody UserInfo usrInfo){
+        User user = new User();
+        user.setPassword(usrInfo.getPassword());
+        user.setEmail(usrInfo.getEmail());
+        user.setLogin(usrInfo.getLogin());
+        user.setName(usrInfo.getName());
+        userRepo.save(user);
+        return user.getPassword();
+    }
+
+    @GetMapping("all")
+    public @ResponseBody Iterable<User> getAllUsers() {
+        System.out.println("user");
+        return userRepo.findAll();
     }
 }
