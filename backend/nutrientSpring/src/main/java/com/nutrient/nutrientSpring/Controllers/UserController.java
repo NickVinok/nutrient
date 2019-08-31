@@ -7,12 +7,23 @@ import com.nutrient.nutrientSpring.Repos.FoodRepository.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.web.context.request.WebRequest;
+import java.util.*;
+
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequestMapping("/api/users")
 public class UserController {
+
+
     @Autowired()
     private UserRepo userRepo;
+
+    @GetMapping("auth/vk")
+    public @ResponseBody Map<String, String[]> auth(WebRequest webRequest){
+        Map<String, String[]> params = webRequest.getParameterMap();
+        return params;
+    }
 
     @PostMapping("create")
     public @ResponseBody String create(@RequestBody UserInfo usrInfo){
