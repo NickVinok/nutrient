@@ -8,6 +8,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;

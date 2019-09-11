@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class Calculations {
@@ -30,19 +29,11 @@ public class Calculations {
     private PfcNormsCalculation pfcNormsCalculation;
     private PfcNorms pfcNormsToController;
 
-    private float CaloriesCoefficient = 1.4f;
-
     public Combinations getEfficientCombinations(String gender, int workingGroup, float age, float weight, float height, String dietType, int dietRestrictions){
         Combinations combinations = new Combinations();
         //Получаем список словарей, где ключом выступает id еды, а значениями являются объекты еды, витаминов, минералов, кислот)
         HashMap<Long, HashMap<String, Object>> foodWithNutrientsUnsortedList = foodService.getListOfFoodsNutrients(
                 foodService.getFoodWOProhibitedCategories(dietRestrictions));
-        HashMap<Long, HashMap<String, Object>> foodWithNutrientsList = new HashMap<>();
-        
-        //Сортируем еду по эффективности
-        foodWithNutrientsUnsortedList.entrySet().stream()
-                .sorted((x, y) -> Float.compare((float)y.getValue().get("overallEfficiency"), (float)x.getValue().get("overallEfficiency")))
-                .forEach(x -> foodWithNutrientsList.put(x.getKey(), x.getValue()));
 
         //Получаем список объектов значений нутриентов для конкретного пола
         nutrientService.getNutrientsValueForGender(gender);
@@ -56,13 +47,18 @@ public class Calculations {
         pfcNormsToController = pfcNormsCalculation.getNorms();
         //Рассчитываем эффективность каждого из продуктов (пока просто по максимуму - дальше - можно поиграться с коэффициентами и
         //записать всё в бд отдельным скриптом
-        productOverallEfficiency(foodWithNutrientsList, pfcNorms, nutrientService.getVitaminNorms(), nutrientService.getMineralNorms(), nutrientService.getAcidNorms());
+        productOverallEfficiency(foodWithNutrientsUnsortedList, pfcNorms, nutrientService.getVitaminNorms(), nutrientService.getMineralNorms(), nutrientService.getAcidNorms());
         //Получаем список категорий, превращаем в словарь, где значение - допустимое количество оставшихся использований
         //Делаем 2 списка: один локальный, другой глобальный для выполнения требований к максимальному количеству продуктов из одной группы внутри комбинации
         //и во всех комбинациях
         HashMap<Long, Long> categoryCounter = foodService.getCategoriesCounter();
+        //Сортируем еду по эффективности
+        HashMap<Long, HashMap<String, Object>> foodWithNutrientsList = new HashMap<>();
+        foodWithNutrientsUnsortedList.entrySet().stream()
+                .sorted((x, y) -> Float.compare((float)y.getValue().get("overallEfficiency"), (float)x.getValue().get("overallEfficiency")))
+                .forEach(x -> foodWithNutrientsList.put(x.getKey(), x.getValue()));
         //Непосредственный расчёт: передаём список допустимой еды, нормы БЖУ, нормы нутриентов
-        //Возвращаем 3 комбинации
+        //Возвращаем 12 комбинации
         combinations = calculateEfficientCombinations(categoryCounter, foodWithNutrientsList);
 
         return combinations;
@@ -242,8 +238,46 @@ public class Calculations {
     public Combinations optimizeCombinations(
             HashMap<Long, Long> categoryCounter, HashMap<Long, HashMap<String, Object>> foodWithNutrientsList, Combinations unOptimizedCombinations){
         for(Combination comb: unOptimizedCombinations.getCombinationList()){
+            List<List<Integer>> listOfOverflowingNutrients = comb.doesCombinationHasOverflowingNutrients();
+            List<Long> foodIds = comb.getFoods().stream()
+                    .map(Food::getId)
+                    .collect(Collectors.toList());
+            //Пока вообще не будет категорий с избыточными нутриентами
+            while(listOfOverflowingNutrients.get(0).size() != 0 && listOfOverflowingNutrients.get(1).size() != 0 &&
+                    listOfOverflowingNutrients.get(2).size() != 0 && listOfOverflowingNutrients.get(3).size() != 0){
 
+
+                listOfOverflowingNutrients = comb.doesCombinationHasOverflowingNutrients();
+            }
         }
         return null;
+    }
+    public Combination calculateCustomCombination(String gender, int workingGroup, float age, float weight, float height, String dietType,
+                                                  int dietRestrictions, HashMap<Integer, Integer> idsWithGrams){
+        List<Long> ids = new ArrayList<>();
+        for(Map.Entry<Integer, Integer> kv: idsWithGrams.entrySet()){
+            ids.add(kv.getKey().longValue());
+        }
+        HashMap<Long, HashMap<String, Object>> foodWithNutrientsUnsortedList = foodService.getFoodNutrientsForCustomCombination(ids);
+        //Получаем список объектов значений нутриентов для конкретного пола
+        nutrientService.getNutrientsValueForGender(gender);
+        //Рассчитываем Нрмы БЖУ, исходя из роста, веса, пола и т.д.)
+        pfcNormsCalculation = new PfcNormsCalculation(gender, age, weight, height, dietType, workingGroup);
+        //Рассчитываем норму золы
+        List<Long> mineralIds = mapper.getMineralsId();
+        pfcNormsCalculation.setAsh(nutrientService.getMineralsSum(gender, mineralIds));
+        //Получаем список норм БЖУ
+        List<Float> pfcNorms = pfcNormsCalculation.getPfc();
+        pfcNormsToController = pfcNormsCalculation.getNorms();
+        //Рассчитываем эффективность каждого из продуктов
+        productOverallEfficiency(foodWithNutrientsUnsortedList, pfcNorms,
+                nutrientService.getVitaminNorms(), nutrientService.getMineralNorms(), nutrientService.getAcidNorms());
+
+        Combination result = new Combination();
+        for(Map.Entry<Long, HashMap<String, Object>> food : foodWithNutrientsUnsortedList.entrySet()){
+            result.addFoodToCustomCombination(food.getValue());
+        }
+
+        return result;
     }
 }

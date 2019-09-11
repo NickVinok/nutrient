@@ -1,5 +1,6 @@
 package com.nutrient.nutrientSpring.Model.FoodModel;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import javax.persistence.*;
@@ -10,6 +11,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -53,9 +55,10 @@ public class Food {
         this.cholesterol+=f1.getCholesterol();
         this.fat_trans+=f1.getFat_trans();
     }
-
+    @JsonIgnore
     public List<Float> getValues(){
         return Stream.of(energy, fat, protein, carbohydrate, water, ash, sugares, fiber, starch, cholesterol, fat_trans)
                 .collect(Collectors.toList());
     }
+
 }
