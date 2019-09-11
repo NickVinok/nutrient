@@ -35,7 +35,15 @@ public class Calculations {
     public Combinations getEfficientCombinations(String gender, int workingGroup, float age, float weight, float height, String dietType, int dietRestrictions){
         Combinations combinations = new Combinations();
         //Получаем список словарей, где ключом выступает id еды, а значениями являются объекты еды, витаминов, минералов, кислот)
-        HashMap<Long, HashMap<String, Object>> foodWithNutrientsList = foodService.getListOfFoodsNutrients(foodService.getFoodWOProhibitedCategories(dietRestrictions));
+        HashMap<Long, HashMap<String, Object>> foodWithNutrientsUnsortedList = foodService.getListOfFoodsNutrients(
+                foodService.getFoodWOProhibitedCategories(dietRestrictions));
+        HashMap<Long, HashMap<String, Object>> foodWithNutrientsList = new HashMap<>();
+        
+        //Сортируем еду по эффективности
+        foodWithNutrientsUnsortedList.entrySet().stream()
+                .sorted((x, y) -> Float.compare((float)y.getValue().get("overallEfficiency"), (float)x.getValue().get("overallEfficiency")))
+                .forEach(x -> foodWithNutrientsList.put(x.getKey(), x.getValue()));
+
         //Получаем список объектов значений нутриентов для конкретного пола
         nutrientService.getNutrientsValueForGender(gender);
         //Рассчитываем Нрмы БЖУ, исходя из роста, веса, пола и т.д.)
@@ -171,12 +179,6 @@ public class Calculations {
             HashMap<Long, Long> categoryCounter, HashMap<Long, HashMap<String, Object>> foodWithNutrientsList){
         Combinations finalCombinations = new Combinations();
 
-        //сортируем мапу по общей эффективности продукта
-        HashMap<Long, HashMap<String, Object>> sortedFoodWithNutrientsList = new HashMap<>();
-        foodWithNutrientsList.entrySet().stream()
-                .sorted((x, y) -> Float.compare((float)y.getValue().get("overallEfficiency"), (float)x.getValue().get("overallEfficiency")))
-                .forEach(x -> sortedFoodWithNutrientsList.put(x.getKey(), x.getValue()));
-
         HashMap<Long, Long> overallCounter = new HashMap<>();
         //Делаем общий счётчик категорий
         for(Map.Entry<Long, Long> oc : categoryCounter.entrySet()){
@@ -195,7 +197,7 @@ public class Calculations {
                 newCounter.put(old.getKey(), old.getValue());
             }
             //Составляем комбинацию из продуктов, смотря на категории
-            for (Map.Entry<Long, HashMap<String, Object>> foodList : sortedFoodWithNutrientsList.entrySet()) {
+            for (Map.Entry<Long, HashMap<String, Object>> foodList : foodWithNutrientsList.entrySet()) {
                 Food tmpFood = ((Food)foodList.getValue().get("food"));
 
                 if(usedIds2.containsValue(0)){
@@ -235,5 +237,13 @@ public class Calculations {
 
     public PfcNorms getPfcNorms() {
         return pfcNormsToController;
+    }
+
+    public Combinations optimizeCombinations(
+            HashMap<Long, Long> categoryCounter, HashMap<Long, HashMap<String, Object>> foodWithNutrientsList, Combinations unOptimizedCombinations){
+        for(Combination comb: unOptimizedCombinations.getCombinationList()){
+
+        }
+        return null;
     }
 }

@@ -195,4 +195,22 @@ public class Combination{
 
         return true;
     }
+
+    public boolean doesCombinationHasOverflowingNutrients(){
+        for(Float value: vitaminEfficiency.values()){
+
+        }
+
+        for(Float vale: mineralEfficiency.values()){
+
+        }
+
+        for(Float value: acidEfficiency.values()){
+
+        }
+
+        for(Float vale: pfcEfficiency.values()){
+
+        }
+    }
 }
