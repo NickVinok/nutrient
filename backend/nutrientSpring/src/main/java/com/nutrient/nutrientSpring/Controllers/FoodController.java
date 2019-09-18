@@ -32,7 +32,7 @@ public class FoodController {
     public CalculationResponse postFood(@RequestBody FoodPost post){
         CalculationResponse r = new CalculationResponse();
         DietInfo dietInfo = post.getDietInfo();
-        
+
         List<Combination> calculationResult = new ArrayList<>();
         calculationResult.add(calculations.calculateCustomCombination(
                 dietInfo.getGender(),
