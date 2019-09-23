@@ -198,6 +198,8 @@ public class Combination{
     }
 
     public void addFoodToCustomCombination(HashMap<String, Object> food){
+        System.out.println(food.get("pfcEfficiency"));
+
         HashMap<String, Float> tmpPfc = new HashMap<>();
         HashMap<String, Float> tmpVit = new HashMap<>();
         HashMap<String, Float> tmpMin = new HashMap<>();
@@ -265,6 +267,7 @@ public class Combination{
         acidOverall.sum((Acid)food.get("acid"));
 
         combinationEfficiency += (Float)food.get("overallEfficiency");
+        System.out.println(food.get("pfcEfficiency"));
         pfcOverallEfficiency += (Float)((HashMap<String, Object>)food.get("pfcEfficiency"))
                 .get("overallPfcEfficiency");
         vitaminOverallEfficiency += (Float)((HashMap<String, Object>)food.get("vitaminEfficiency"))
@@ -273,6 +276,11 @@ public class Combination{
                 .get("overallMineralEfficiency");
         acidOverallEfficiency += (Float)((HashMap<String, Object>)food.get("acidEfficiency"))
                 .get("overallAcidEfficiency");
+        try{
+            Thread.sleep(10000);
+        } catch (Exception e){
+
+        }
     }
 
     public void deleteFoodFromCombination(Long foodId, HashMap<String, Object> food){
@@ -335,7 +343,7 @@ public class Combination{
         mineralEfficiency = tmpMin;
         acidEfficiency = tmpAcid;
 
-        foods.remove((Food)food.get("food"));
+        foods.remove(food.get("food"));
         pfcOverall.substract((Food)food.get("food"));
         vitaminOverall.substract((Vitamin)food.get("vitamin"));
         mineralOverall.substract((Mineral)food.get("mineral"));
@@ -353,8 +361,9 @@ public class Combination{
     }
 
     public List<List<Integer>> doesCombinationHasOverflowingNutrients(){
-        return Stream.of(doesPFCOverflow(), doesVitaminsOverflow(), doesMineralsOverflow(), doesAcidsOverflow())
+        List<List<Integer>> tmp = Stream.of(doesPFCOverflow(), doesVitaminsOverflow(), doesMineralsOverflow(), doesAcidsOverflow())
                 .collect(Collectors.toList());
+        return tmp;
     }
 
     private List<Integer> doesPFCOverflow(){

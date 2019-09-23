@@ -62,9 +62,9 @@ public class Calculations {
         //Непосредственный расчёт: передаём список допустимой еды, нормы БЖУ, нормы нутриентов
         //Возвращаем 12 комбинации
         combinations = calculateEfficientCombinations(categoryCounter, foodWithNutrientsList);
-        combinations = optimizeCombinations(categoryCounter, foodWithNutrientsList, combinations);
+        Combinations newCombinations = optimizeCombinations(categoryCounter, foodWithNutrientsList, combinations);
 
-        return combinations;
+        return newCombinations;
     }
 
     //Добавляем к оригинальной мапе проценты эффективности по бжу и прочему говну
@@ -240,6 +240,7 @@ public class Calculations {
 
     public Combinations optimizeCombinations(
             HashMap<Long, Long> categoryCounter, HashMap<Long, HashMap<String, Object>> foodWithNutrientsList, Combinations unOptimizedCombinations){
+        int i = 0;
         for(Combination comb: unOptimizedCombinations.getCombinationList()){
             List<List<Integer>> listOfOverflowingNutrients = comb.doesCombinationHasOverflowingNutrients();
             List<Long> foodIds = comb.getFoods().stream()
@@ -254,12 +255,15 @@ public class Calculations {
             acidOverflow = listOfOverflowingNutrients.get(3);
 
             //Пока вообще не будет категорий с избыточными нутриентами
-            while((pfcOverflow.size() != 0) && (vitaminOverflow.size() != 0) &&
-                    (mineralOverflow.size() != 0) && (acidOverflow.size() != 0)){
+            while((pfcOverflow.size() != 0) || (vitaminOverflow.size() != 0) ||
+                    (mineralOverflow.size() != 0) || (acidOverflow.size() != 0)){
+                System.out.println("Комбинация " + i + " До: ");
+                System.out.println(comb);
+
                 HashMap<Long, HashMap<Integer, Float>> mostOverFlowingNutrient =  new HashMap<>();
                 Float valueOfMostOverflowingNutrientInComb = 1f;
                 if(pfcOverflow.size() > 0){
-                    mostOverFlowingNutrient = getMostOverflowingNutrient(foodWithNutrientsList, foodIds, pfcOverflow, "foodEfficiency");
+                    mostOverFlowingNutrient = getMostOverflowingNutrient(foodWithNutrientsList, foodIds, pfcOverflow, "pfcEfficiency");
                     valueOfMostOverflowingNutrientInComb = new ArrayList<Float>(comb.getPfcEfficiency().values()).get(pfcOverflow.get(0));
                 }
                 else if(vitaminOverflow.size() > 0){
@@ -275,6 +279,7 @@ public class Calculations {
                     valueOfMostOverflowingNutrientInComb = new ArrayList<Float>(comb.getAcidEfficiency().values()).get(acidOverflow.get(0));
                 }
 
+
                 Long idOfFoodToBeModified = mostOverFlowingNutrient.entrySet().stream().findFirst().get().getKey();
                 comb.deleteFoodFromCombination(idOfFoodToBeModified, foodWithNutrientsList.get(idOfFoodToBeModified));
                 Float gramFixCoef = getNutrientFixCoefficient(mostOverFlowingNutrient, valueOfMostOverflowingNutrientInComb);
@@ -285,7 +290,12 @@ public class Calculations {
                 vitaminOverflow = listOfOverflowingNutrients.get(1);
                 mineralOverflow = listOfOverflowingNutrients.get(2);
                 acidOverflow = listOfOverflowingNutrients.get(3);
+
+                System.out.print("После: ");
+                System.out.println(listOfOverflowingNutrients);
+                System.out.println(comb);
             }
+            i++;
         }
         return unOptimizedCombinations;
     }
@@ -338,9 +348,9 @@ public class Calculations {
         }
 
         Long idOfMaxOverflow = efficiencyOnSingleNutrient.entrySet().stream()
-                .max((f1, f2) -> Float.compare(f2.getValue().get(index), f1.getValue().get(index))).get().getKey();
+                .max((f1, f2) -> Float.compare(f1.getValue().get(index), f2.getValue().get(index))).get().getKey();
         HashMap<Integer, Float> efficiencyOfMaxOverflow = efficiencyOnSingleNutrient.entrySet().stream()
-                .max((f1, f2) -> Float.compare(f2.getValue().get(index), f1.getValue().get(index))).get().getValue();
+                .max((f1, f2) -> Float.compare(f1.getValue().get(index), f2.getValue().get(index))).get().getValue();
 
         HashMap<Long, HashMap<Integer, Float>> result = new HashMap<>();
         result.put(idOfMaxOverflow, efficiencyOfMaxOverflow);
@@ -385,6 +395,9 @@ public class Calculations {
         Acid a = (Acid)foodNutrients.get("acid");
         Vitamin v = (Vitamin)foodNutrients.get("vitamin");
 
+        System.out.println("Food before");
+        System.out.println(f);
+
         f.modify(gramFixCoef);
         m.modify(gramFixCoef);
         a.modify(gramFixCoef);
@@ -395,21 +408,43 @@ public class Calculations {
         foodNutrients.put("acid", a);
         foodNutrients.put("vitamin", v);
 
+        System.out.println("Food after");
+        System.out.println(f);
+
+        HashMap<String, Float> valueMap1 = new HashMap<>();
         for(Map.Entry<String, Float> foodEfficiency : ((HashMap<String, Float>)foodNutrients.get("pfcEfficiency")).entrySet()){
-            foodEfficiency.setValue(foodEfficiency.getValue()*gramFixCoef);
+            valueMap1.put(foodEfficiency.getKey(), gramFixCoef*foodEfficiency.getValue());
         }
+        System.out.println(foodNutrients.get("pfcEfficiency"));
+        foodNutrients.put("pfcEfficiency", valueMap1);
+        System.out.println(foodNutrients.get("pfcEfficiency"));
+
+        HashMap<String, Float> valueMap2 = new HashMap<>();
         for(Map.Entry<String, Float> foodEfficiency : ((HashMap<String, Float>)foodNutrients.get("mineralEfficiency")).entrySet()){
-            foodEfficiency.setValue(foodEfficiency.getValue()*gramFixCoef);
+            valueMap2.put(foodEfficiency.getKey(), gramFixCoef*foodEfficiency.getValue());
         }
+        foodNutrients.put("mineralEfficiency", valueMap2);
+
+        HashMap<String, Float> valueMap3 = new HashMap<>();
         for(Map.Entry<String, Float> foodEfficiency : ((HashMap<String, Float>)foodNutrients.get("vitaminEfficiency")).entrySet()){
-            foodEfficiency.setValue(foodEfficiency.getValue()*gramFixCoef);
+            valueMap3.put(foodEfficiency.getKey(), gramFixCoef*foodEfficiency.getValue());
         }
+        foodNutrients.put("vitaminEfficiency", valueMap3);
+
+        HashMap<String, Float> valueMap4 = new HashMap<>();
         for(Map.Entry<String, Float> foodEfficiency : ((HashMap<String, Float>)foodNutrients.get("acidEfficiency")).entrySet()){
-            foodEfficiency.setValue(foodEfficiency.getValue()*gramFixCoef);
+            valueMap4.put(foodEfficiency.getKey(), gramFixCoef*foodEfficiency.getValue());
         }
-        for(Map.Entry<String, Float> foodEfficiency : ((HashMap<String, Float>)foodNutrients.get("overallEfficiency")).entrySet()){
+        foodNutrients.put("acidEfficiency", valueMap4);
+        /*for(Map.Entry<String, Float> foodEfficiency : ((HashMap<String, Float>)foodNutrients.get("overallEfficiency")).entrySet()){
             foodEfficiency.setValue(foodEfficiency.getValue()*gramFixCoef);
-        }
+        }*/
+        /*try{
+            Thread.sleep(10000);
+        } catch (Exception e){
+
+        }*/
+        foodNutrients.put("overallEfficiency", (Float)foodNutrients.get("overallEfficiency")*gramFixCoef);
 
         return foodNutrients;
     }

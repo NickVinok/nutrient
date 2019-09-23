@@ -396,6 +396,7 @@ public class FoodService {
         for(Food f: foods){
             Long id = f.getId();
             HashMap<String, Object> tmp = new HashMap<String, Object>();
+            f.setGram(100);
             tmp.put("food", f);
             tmp.put("mineral", mineralRepo.findByFood_id(id).get());
             tmp.put("vitamin", vitaminRepo.findByFood_id(id).get());

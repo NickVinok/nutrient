@@ -42,7 +42,7 @@ public class Food {
     @Transient
     @JsonSerialize
     @JsonDeserialize
-    private int gram = 100;
+    private int gram=100;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "category", nullable = false)
