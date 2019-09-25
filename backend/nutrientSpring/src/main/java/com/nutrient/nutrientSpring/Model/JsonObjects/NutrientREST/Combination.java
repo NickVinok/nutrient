@@ -198,7 +198,7 @@ public class Combination{
     }
 
     public void addFoodToCustomCombination(HashMap<String, Object> food){
-        System.out.println(food.get("pfcEfficiency"));
+        //System.out.println(food.get("pfcEfficiency"));
 
         HashMap<String, Float> tmpPfc = new HashMap<>();
         HashMap<String, Float> tmpVit = new HashMap<>();
@@ -267,7 +267,7 @@ public class Combination{
         acidOverall.sum((Acid)food.get("acid"));
 
         combinationEfficiency += (Float)food.get("overallEfficiency");
-        System.out.println(food.get("pfcEfficiency"));
+        //System.out.println(food.get("pfcEfficiency"));
         pfcOverallEfficiency += (Float)((HashMap<String, Object>)food.get("pfcEfficiency"))
                 .get("overallPfcEfficiency");
         vitaminOverallEfficiency += (Float)((HashMap<String, Object>)food.get("vitaminEfficiency"))
@@ -276,11 +276,11 @@ public class Combination{
                 .get("overallMineralEfficiency");
         acidOverallEfficiency += (Float)((HashMap<String, Object>)food.get("acidEfficiency"))
                 .get("overallAcidEfficiency");
-        try{
+        /*try{
             Thread.sleep(10000);
         } catch (Exception e){
 
-        }
+        }*/
     }
 
     public void deleteFoodFromCombination(Long foodId, HashMap<String, Object> food){
@@ -363,6 +363,17 @@ public class Combination{
     public List<List<Integer>> doesCombinationHasOverflowingNutrients(){
         List<List<Integer>> tmp = Stream.of(doesPFCOverflow(), doesVitaminsOverflow(), doesMineralsOverflow(), doesAcidsOverflow())
                 .collect(Collectors.toList());
+        System.out.println(tmp);
+        System.out.println(pfcEfficiency);
+        System.out.println(acidEfficiency);
+        System.out.println(vitaminEfficiency);
+        System.out.println(mineralEfficiency);
+        System.out.println(pfcOverall);
+        /*try{
+            Thread.sleep(50000);
+        } catch(Exception e){
+
+        }*/
         return tmp;
     }
 
@@ -371,6 +382,7 @@ public class Combination{
         List<Float> nutrientPercentages = new ArrayList<>(pfcEfficiency.values());
         for(int i =0;i< nutrientPercentages.size();i++) {
             if(nutrientPercentages.get(i) > 1){
+                //System.out.println(new ArrayList<>(pfcEfficiency.entrySet()).get(i));
                 tmp.add(i);
             }
         }

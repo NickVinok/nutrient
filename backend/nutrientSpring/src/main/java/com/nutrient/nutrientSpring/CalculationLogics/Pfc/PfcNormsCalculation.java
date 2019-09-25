@@ -66,7 +66,7 @@ public class PfcNormsCalculation extends PfcNorms {
             this.fats = this.calories*0.3f/9;
         }
 
-        this.sugar = carbohydrates/10;
+        this.sugar = 50;
         this.transfats = calories/100;
         this.cholesterol = 300;
         this.starch = carbohydrates-this.sugar;
