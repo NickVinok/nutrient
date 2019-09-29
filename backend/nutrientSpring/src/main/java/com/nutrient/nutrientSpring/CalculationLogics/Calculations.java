@@ -302,10 +302,12 @@ public class Calculations {
     }
 
     public Combination calculateCustomCombination(String gender, int workingGroup, float age, float weight, float height, String dietType,
-                                                  int dietRestrictions, HashMap<Integer, Integer> idsWithGrams){
+                                                  int dietRestrictions, List<HashMap<String, Long>> idsWithGrams){
         List<Long> ids = new ArrayList<>();
-        for(Map.Entry<Integer, Integer> kv: idsWithGrams.entrySet()){
-            ids.add(kv.getKey().longValue());
+        HashMap<Long, Integer> actualIdsGrams = new HashMap<>();
+        for(HashMap<String, Long> hs: idsWithGrams){
+            ids.add(hs.get("id"));
+            actualIdsGrams.put(hs.get("id"), hs.get("gram").intValue());
         }
         HashMap<Long, HashMap<String, Object>> foodWithNutrientsUnsortedList = foodService.getFoodNutrientsForCustomCombination(ids);
         //Получаем список объектов значений нутриентов для конкретного пола
@@ -325,7 +327,7 @@ public class Calculations {
         Combination result = new Combination();
         for(Map.Entry<Long, HashMap<String, Object>> food : foodWithNutrientsUnsortedList.entrySet()){
             Long id = ((Food)food.getValue().get("food")).getId();
-            int numberOfGrams = idsWithGrams.get(id.intValue());
+            int numberOfGrams = actualIdsGrams.get(id);
             food.setValue(modifyFoodGrams(food.getValue(), (float)numberOfGrams/100));
             result.addFoodToCustomCombination(food.getValue());
         }
