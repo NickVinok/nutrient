@@ -390,6 +390,22 @@ public class FoodService {
         return foodRepo.findAll();
     }
 
+    public HashMap<Long, HashMap<String, Object>> getFoodNutrientsForCustomCombination(List<Long> ids){
+        List<Food> foods = foodRepo.findByIdIn(ids);
+        HashMap<Long, HashMap<String, Object>> foodNutrientsList = new HashMap<>();
+        for(Food f: foods){
+            Long id = f.getId();
+            HashMap<String, Object> tmp = new HashMap<String, Object>();
+            f.setGram(100);
+            tmp.put("food", f);
+            tmp.put("mineral", mineralRepo.findByFood_id(id).get());
+            tmp.put("vitamin", vitaminRepo.findByFood_id(id).get());
+            tmp.put("acid", acidsRepo.findByFood_id(id).get());
+            foodNutrientsList.put(id, tmp);
+        }
+        return  foodNutrientsList;
+    }
+
     public List<String> getMineralsNames() {
         return MineralsNames;
     }

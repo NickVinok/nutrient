@@ -6,14 +6,15 @@ import com.nutrient.nutrientSpring.Model.FoodModel.Food;
 import com.nutrient.nutrientSpring.Model.FoodModel.Mineral;
 import com.nutrient.nutrientSpring.Model.FoodModel.Vitamin;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Data
 public class Combination{
-    private List<Food> combination = new ArrayList<>();
-    private Food pfcOverall = new Food(-1L, "combination", 0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f ,null);
+    private List<Food> foods = new ArrayList<>();
+    private Food pfcOverall = new Food(-1L, "combination", 0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f, 0,null);
     private Vitamin vitaminOverall = new Vitamin(-1L, 0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,null);
     private Mineral mineralOverall = new Mineral(-1L, 0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,null);
     private Acid acidOverall = new Acid(-1L, 0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,null);
@@ -174,7 +175,7 @@ public class Combination{
         mineralEfficiency = tmpMin;
         acidEfficiency = tmpAcid;
 
-        combination.add((Food)food.get("food"));
+        foods.add((Food)food.get("food"));
 
         pfcOverall.sum((Food)food.get("food"));
         vitaminOverall.sum((Vitamin)food.get("vitamin"));
@@ -196,21 +197,228 @@ public class Combination{
         return true;
     }
 
-    public boolean doesCombinationHasOverflowingNutrients(){
-        for(Float value: vitaminEfficiency.values()){
+    public void addFoodToCustomCombination(HashMap<String, Object> food){
+        //System.out.println(food.get("pfcEfficiency"));
 
+        HashMap<String, Float> tmpPfc = new HashMap<>();
+        HashMap<String, Float> tmpVit = new HashMap<>();
+        HashMap<String, Float> tmpMin = new HashMap<>();
+        HashMap<String, Float> tmpAcid = new HashMap<>();
+
+        for(Map.Entry<String, Float> old : pfcEfficiency.entrySet()){
+            tmpPfc.put(old.getKey(), old.getValue());
+        }
+        for(Map.Entry<String, Float> old : vitaminEfficiency.entrySet()){
+            tmpVit.put(old.getKey(), old.getValue());
+        }
+        for(Map.Entry<String, Float> old : mineralEfficiency.entrySet()){
+            tmpMin.put(old.getKey(), old.getValue());
         }
 
-        for(Float vale: mineralEfficiency.values()){
-
+        for(Map.Entry<String, Float> old : acidEfficiency.entrySet()){
+            tmpAcid.put(old.getKey(), old.getValue());
         }
 
-        for(Float value: acidEfficiency.values()){
-
+        for(Map.Entry<String, Object> map : ((HashMap<String, Object>)food.get("pfcEfficiency")).entrySet()) {
+            if(pfcEfficiency.containsKey(map.getKey())){
+                tmpPfc.put(map.getKey(), pfcEfficiency.get(map.getKey())+(Float)map.getValue());
+            }
+            else{
+                tmpPfc.put(map.getKey(), (Float)map.getValue());
+            }
         }
 
-        for(Float vale: pfcEfficiency.values()){
-
+        for(Map.Entry<String, Object> map : ((HashMap<String, Object>)food.get("mineralEfficiency")).entrySet()) {
+            if(mineralEfficiency.containsKey(map.getKey())){
+                tmpMin.put(map.getKey(), mineralEfficiency.get(map.getKey())+(Float)map.getValue());
+            }
+            else{
+                tmpMin.put(map.getKey(), (Float)map.getValue());
+            }
         }
+
+        for(Map.Entry<String, Object> map : ((HashMap<String, Object>)food.get("acidEfficiency")).entrySet()) {
+            if(acidEfficiency.containsKey(map.getKey())){
+                tmpAcid.put(map.getKey(), acidEfficiency.get(map.getKey())+(Float)map.getValue());
+            }
+            else{
+                tmpAcid.put(map.getKey(), (Float)map.getValue());
+            }
+        }
+
+        for(Map.Entry<String, Object> map : ((HashMap<String, Object>)food.get("vitaminEfficiency")).entrySet()) {
+            if(vitaminEfficiency.containsKey(map.getKey())){
+                tmpVit.put(map.getKey(), vitaminEfficiency.get(map.getKey())+(Float)map.getValue());
+            }
+            else{
+                tmpVit.put(map.getKey(), (Float)map.getValue());
+            }
+        }
+        pfcEfficiency = tmpPfc;
+        vitaminEfficiency = tmpVit;
+        mineralEfficiency = tmpMin;
+        acidEfficiency = tmpAcid;
+
+        foods.add((Food)food.get("food"));
+
+        pfcOverall.sum((Food)food.get("food"));
+        vitaminOverall.sum((Vitamin)food.get("vitamin"));
+        mineralOverall.sum((Mineral)food.get("mineral"));
+        acidOverall.sum((Acid)food.get("acid"));
+
+        combinationEfficiency += (Float)food.get("overallEfficiency");
+        //System.out.println(food.get("pfcEfficiency"));
+        pfcOverallEfficiency += (Float)((HashMap<String, Object>)food.get("pfcEfficiency"))
+                .get("overallPfcEfficiency");
+        vitaminOverallEfficiency += (Float)((HashMap<String, Object>)food.get("vitaminEfficiency"))
+                .get("overallVitaminEfficiency");
+        mineralOverallEfficiency += (Float)((HashMap<String, Object>)food.get("mineralEfficiency"))
+                .get("overallMineralEfficiency");
+        acidOverallEfficiency += (Float)((HashMap<String, Object>)food.get("acidEfficiency"))
+                .get("overallAcidEfficiency");
+        /*try{
+            Thread.sleep(10000);
+        } catch (Exception e){
+
+        }*/
+    }
+
+    public void deleteFoodFromCombination(Long foodId, HashMap<String, Object> food){
+        HashMap<String, Float> tmpPfc = new HashMap<>();
+        HashMap<String, Float> tmpVit = new HashMap<>();
+        HashMap<String, Float> tmpMin = new HashMap<>();
+        HashMap<String, Float> tmpAcid = new HashMap<>();
+
+        for(Map.Entry<String, Float> old : pfcEfficiency.entrySet()){
+            tmpPfc.put(old.getKey(), old.getValue());
+        }
+        for(Map.Entry<String, Float> old : vitaminEfficiency.entrySet()){
+            tmpVit.put(old.getKey(), old.getValue());
+        }
+        for(Map.Entry<String, Float> old : mineralEfficiency.entrySet()){
+            tmpMin.put(old.getKey(), old.getValue());
+        }
+        for(Map.Entry<String, Float> old : acidEfficiency.entrySet()){
+            tmpAcid.put(old.getKey(), old.getValue());
+        }
+
+        for(Map.Entry<String, Object> map : ((HashMap<String, Object>)food.get("pfcEfficiency")).entrySet()) {
+            if(pfcEfficiency.containsKey(map.getKey())){
+                tmpPfc.put(map.getKey(), pfcEfficiency.get(map.getKey())-(Float)map.getValue());
+            }
+            else{
+                tmpPfc.put(map.getKey(), (Float)map.getValue());
+            }
+        }
+
+        for(Map.Entry<String, Object> map : ((HashMap<String, Object>)food.get("mineralEfficiency")).entrySet()) {
+            if(mineralEfficiency.containsKey(map.getKey())){
+                tmpMin.put(map.getKey(), mineralEfficiency.get(map.getKey())-(Float)map.getValue());
+            }
+            else{
+                tmpMin.put(map.getKey(), (Float)map.getValue());
+            }
+        }
+
+        for(Map.Entry<String, Object> map : ((HashMap<String, Object>)food.get("acidEfficiency")).entrySet()) {
+            if(acidEfficiency.containsKey(map.getKey())){
+                tmpAcid.put(map.getKey(), acidEfficiency.get(map.getKey())-(Float)map.getValue());
+            }
+            else{
+                tmpAcid.put(map.getKey(), (Float)map.getValue());
+            }
+        }
+
+        for(Map.Entry<String, Object> map : ((HashMap<String, Object>)food.get("vitaminEfficiency")).entrySet()) {
+            if(vitaminEfficiency.containsKey(map.getKey())){
+                tmpVit.put(map.getKey(), vitaminEfficiency.get(map.getKey())-(Float)map.getValue());
+            }
+            else{
+                tmpVit.put(map.getKey(), (Float)map.getValue());
+            }
+        }
+
+        pfcEfficiency = tmpPfc;
+        vitaminEfficiency = tmpVit;
+        mineralEfficiency = tmpMin;
+        acidEfficiency = tmpAcid;
+
+        foods.remove(food.get("food"));
+        pfcOverall.substract((Food)food.get("food"));
+        vitaminOverall.substract((Vitamin)food.get("vitamin"));
+        mineralOverall.substract((Mineral)food.get("mineral"));
+        acidOverall.substract((Acid)food.get("acid"));
+
+        combinationEfficiency -= (Float)food.get("overallEfficiency");
+        pfcOverallEfficiency -= (Float)((HashMap<String, Object>)food.get("pfcEfficiency"))
+                .get("overallPfcEfficiency");
+        vitaminOverallEfficiency -= (Float)((HashMap<String, Object>)food.get("vitaminEfficiency"))
+                .get("overallVitaminEfficiency");
+        mineralOverallEfficiency -= (Float)((HashMap<String, Object>)food.get("mineralEfficiency"))
+                .get("overallMineralEfficiency");
+        acidOverallEfficiency -= (Float)((HashMap<String, Object>)food.get("acidEfficiency"))
+                .get("overallAcidEfficiency");
+    }
+
+    public List<List<Integer>> doesCombinationHasOverflowingNutrients(){
+        List<List<Integer>> tmp = Stream.of(doesPFCOverflow(), doesVitaminsOverflow(), doesMineralsOverflow(), doesAcidsOverflow())
+                .collect(Collectors.toList());
+        System.out.println(tmp);
+        System.out.println(pfcEfficiency);
+        System.out.println(acidEfficiency);
+        System.out.println(vitaminEfficiency);
+        System.out.println(mineralEfficiency);
+        System.out.println(pfcOverall);
+        /*try{
+            Thread.sleep(50000);
+        } catch(Exception e){
+
+        }*/
+        return tmp;
+    }
+
+    private List<Integer> doesPFCOverflow(){
+        List<Integer> tmp = new ArrayList<>();
+        List<Float> nutrientPercentages = new ArrayList<>(pfcEfficiency.values());
+        for(int i =0;i< nutrientPercentages.size();i++) {
+            if(nutrientPercentages.get(i) > 1){
+                //System.out.println(new ArrayList<>(pfcEfficiency.entrySet()).get(i));
+                tmp.add(i);
+            }
+        }
+        return tmp;
+    }
+
+    private List<Integer> doesVitaminsOverflow(){
+        List<Integer> tmp = new ArrayList<>();
+        List<Float> nutrientPercentages = new ArrayList<>(vitaminEfficiency.values());
+        for(int i =0;i< nutrientPercentages.size();i++) {
+            if(nutrientPercentages.get(i) > 1){
+                tmp.add(i);
+            }
+        }
+        return tmp;
+    }
+
+    private List<Integer> doesMineralsOverflow(){
+        List<Integer> tmp = new ArrayList<>();
+        List<Float> nutrientPercentages = new ArrayList<>(mineralEfficiency.values());
+        for(int i =0;i< nutrientPercentages.size();i++) {
+            if(nutrientPercentages.get(i) > 1){
+                tmp.add(i);
+            }
+        }
+        return tmp;
+    }
+
+    private List<Integer> doesAcidsOverflow(){
+        List<Integer> tmp = new ArrayList<>();
+        List<Float> nutrientPercentages = new ArrayList<>(acidEfficiency.values());
+        for(int i =0;i< nutrientPercentages.size();i++) {
+            if(nutrientPercentages.get(i) > 1){
+                tmp.add(i);
+            }
+        }
+        return tmp;
     }
 }

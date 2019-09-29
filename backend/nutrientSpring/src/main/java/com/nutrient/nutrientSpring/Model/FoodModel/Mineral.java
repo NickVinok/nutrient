@@ -8,6 +8,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -51,6 +52,35 @@ public class Mineral {
         this.selenium += m1.getSelenium();
         this.fluoride +=m1.getFluoride();
     }
+
+    public void substract(Mineral m1){
+        this.calcium -= m1.getCalcium();
+        this.iron -= m1.getIron();
+        this.magnesium-= m1.getMagnesium();
+        this.phosphorus -= m1.getPhosphorus();
+        this.potassium -= m1.getPotassium();
+        this.sodium -= m1.getSodium();
+        this.zinc -= m1.getZinc();
+        this.copper -= m1.getCopper();
+        this.manganese-= m1.getManganese();
+        this.selenium -= m1.getSelenium();
+        this.fluoride -=m1.getFluoride();
+    }
+
+    public void modify(Float c){
+        this.calcium *= c;
+        this.iron *= c;
+        this.magnesium*= c;
+        this.phosphorus *= c;
+        this.potassium *= c;
+        this.sodium *= c;
+        this.zinc *= c;
+        this.copper *= c;
+        this.manganese*= c;
+        this.selenium *= c;
+        this.fluoride *=c;
+    }
+    
     @JsonIgnore
     public List<Float> getValues(){
         return Stream.of(this.calcium, this.phosphorus, this.magnesium, this.potassium,
