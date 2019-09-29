@@ -9,5 +9,5 @@ import java.util.List;
 @Data
 public class FoodPost {
     DietInfo dietInfo;
-    List<HashMap<String, Integer>> idsWithGrams;
+    List<HashMap<String, Long>> idsWithGrams;
 }

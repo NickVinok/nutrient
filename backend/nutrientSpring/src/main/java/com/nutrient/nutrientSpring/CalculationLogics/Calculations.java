@@ -240,7 +240,6 @@ public class Calculations {
 
     public Combinations optimizeCombinations(
             HashMap<Long, Long> categoryCounter, HashMap<Long, HashMap<String, Object>> foodWithNutrientsList, Combinations unOptimizedCombinations){
-        System.out.println(getPfcNorms());
         int i = 0;
         for(Combination comb: unOptimizedCombinations.getCombinationList()){
             List<List<Integer>> listOfOverflowingNutrients = comb.doesCombinationHasOverflowingNutrients();
@@ -258,8 +257,6 @@ public class Calculations {
             //Пока вообще не будет категорий с избыточными нутриентами
             while((pfcOverflow.size() != 0) || (vitaminOverflow.size() != 0) ||
                     (mineralOverflow.size() != 0) || (acidOverflow.size() != 0)){
-                System.out.println("Комбинация " + i + " До: ");
-                System.out.println(comb);
 
                 HashMap<Long, HashMap<Integer, Float>> mostOverFlowingNutrient =  new HashMap<>();
                 Float valueOfMostOverflowingNutrientInComb = 1f;
@@ -292,9 +289,6 @@ public class Calculations {
                 mineralOverflow = listOfOverflowingNutrients.get(2);
                 acidOverflow = listOfOverflowingNutrients.get(3);
 
-                System.out.print("После: ");
-                System.out.println(listOfOverflowingNutrients);
-                System.out.println(comb);
             }
             i++;
         }
@@ -393,8 +387,6 @@ public class Calculations {
         Acid a = (Acid)foodNutrients.get("acid");
         Vitamin v = (Vitamin)foodNutrients.get("vitamin");
 
-        System.out.println("Food before");
-        System.out.println(f);
 
         f.modify(gramFixCoef);
         m.modify(gramFixCoef);
@@ -406,16 +398,12 @@ public class Calculations {
         foodNutrients.put("acid", a);
         foodNutrients.put("vitamin", v);
 
-        System.out.println("Food after");
-        System.out.println(f);
 
         HashMap<String, Float> valueMap1 = new HashMap<>();
         for(Map.Entry<String, Float> foodEfficiency : ((HashMap<String, Float>)foodNutrients.get("pfcEfficiency")).entrySet()){
             valueMap1.put(foodEfficiency.getKey(), gramFixCoef*foodEfficiency.getValue());
         }
-        System.out.println(foodNutrients.get("pfcEfficiency"));
         foodNutrients.put("pfcEfficiency", valueMap1);
-        System.out.println(foodNutrients.get("pfcEfficiency"));
 
         HashMap<String, Float> valueMap2 = new HashMap<>();
         for(Map.Entry<String, Float> foodEfficiency : ((HashMap<String, Float>)foodNutrients.get("mineralEfficiency")).entrySet()){
