@@ -239,9 +239,9 @@ public class Calculations {
     }
 
     public Combinations optimizeCombinations(
-            HashMap<Long, Long> categoryCounter, HashMap<Long, HashMap<String, Object>> foodWithNutrientsList, Combinations unOptimizedCombinations){
-        int i = 0;
-        for(Combination comb: unOptimizedCombinations.getCombinationList()){
+            HashMap<Long, Long> categoryCounter, HashMap<Long, HashMap<String, Object>> foodWithNutrientsList, Combinations unOptimizedCombinations) {
+        for (Combination comb : unOptimizedCombinations.getCombinationList()) {
+            int counter = 5;
             List<List<Integer>> listOfOverflowingNutrients = comb.doesCombinationHasOverflowingNutrients();
             List<Long> foodIds = comb.getFoods().stream()
                     .map(Food::getId)
@@ -255,28 +255,26 @@ public class Calculations {
             acidOverflow = listOfOverflowingNutrients.get(3);
 
             //Пока вообще не будет категорий с избыточными нутриентами
-            while((pfcOverflow.size() != 0) || (vitaminOverflow.size() != 0) ||
-                    (mineralOverflow.size() != 0) || (acidOverflow.size() != 0)){
+            while ((pfcOverflow.size() != 0) || (vitaminOverflow.size() != 0) ||
+                    (mineralOverflow.size() != 0) || (acidOverflow.size() != 0)) {
+                List<List<Integer>> tmp = new ArrayList<>(listOfOverflowingNutrients);
 
-                HashMap<Long, HashMap<Integer, Float>> mostOverFlowingNutrient =  new HashMap<>();
+                HashMap<Long, HashMap<Integer, Float>> mostOverFlowingNutrient = new HashMap<>();
                 Float valueOfMostOverflowingNutrientInComb = 1f;
-                if(pfcOverflow.size() > 0){
+
+                if (pfcOverflow.size() > 0) {
                     mostOverFlowingNutrient = getMostOverflowingNutrient(foodWithNutrientsList, foodIds, pfcOverflow, "pfcEfficiency");
                     valueOfMostOverflowingNutrientInComb = new ArrayList<Float>(comb.getPfcEfficiency().values()).get(pfcOverflow.get(0));
-                }
-                else if(vitaminOverflow.size() > 0){
+                } else if (vitaminOverflow.size() > 0) {
                     mostOverFlowingNutrient = getMostOverflowingNutrient(foodWithNutrientsList, foodIds, vitaminOverflow, "vitaminEfficiency");
                     valueOfMostOverflowingNutrientInComb = new ArrayList<Float>(comb.getVitaminEfficiency().values()).get(vitaminOverflow.get(0));
-                }
-                else if(mineralOverflow.size() > 0){
+                } else if (mineralOverflow.size() > 0) {
                     mostOverFlowingNutrient = getMostOverflowingNutrient(foodWithNutrientsList, foodIds, mineralOverflow, "mineralEfficiency");
                     valueOfMostOverflowingNutrientInComb = new ArrayList<Float>(comb.getMineralEfficiency().values()).get(mineralOverflow.get(0));
-                }
-                else if(acidOverflow.size() > 0){
+                } else if (acidOverflow.size() > 0) {
                     mostOverFlowingNutrient = getMostOverflowingNutrient(foodWithNutrientsList, foodIds, acidOverflow, "acidEfficiency");
                     valueOfMostOverflowingNutrientInComb = new ArrayList<Float>(comb.getAcidEfficiency().values()).get(acidOverflow.get(0));
                 }
-
 
                 Long idOfFoodToBeModified = mostOverFlowingNutrient.entrySet().stream().findFirst().get().getKey();
                 comb.deleteFoodFromCombination(idOfFoodToBeModified, foodWithNutrientsList.get(idOfFoodToBeModified));
@@ -289,8 +287,16 @@ public class Calculations {
                 mineralOverflow = listOfOverflowingNutrients.get(2);
                 acidOverflow = listOfOverflowingNutrients.get(3);
 
+                boolean isCycled = true;
+                for (int i = 0; i < listOfOverflowingNutrients.size(); i++) {
+                    if (!tmp.get(i).equals(listOfOverflowingNutrients.get(i))) {
+                        isCycled = false;
+                        break;
+                    }
+                }
+                if (isCycled) counter--;
+                if (counter==0) break;
             }
-            i++;
         }
         return unOptimizedCombinations;
     }
