@@ -114,7 +114,6 @@ public class Vitamin {
     }
     
     public Vitamin(List<Float> norms){
-        System.out.println(norms);
         this.vitamin_a=norms.get(0);
         this.beta_carotene=norms.get(1);
         this.alpha_carotene=norms.get(2);
