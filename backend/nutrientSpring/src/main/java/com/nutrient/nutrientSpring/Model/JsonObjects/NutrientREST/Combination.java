@@ -88,8 +88,6 @@ public class Combination{
         for(Map.Entry<String, Object> map : ((HashMap<String, Object>)food.get("mineralEfficiency")).entrySet()){
             if(mineralEfficiency.containsKey(map.getKey())){
                 //Смотрим не содержит ли продукт чересчур много какого-либо из минералов
-                //System.out.print(((Food)food.get("food")).getName());
-                //System.out.println(": "+map.getKey() + ":" + map.getValue());
                 if((Float)map.getValue() > 1 ){
                     if(foodCounter>0){
                         return true;
@@ -345,7 +343,7 @@ public class Combination{
         pfcOverall.substract((Food)food.get("food"));
         vitaminOverall.substract((Vitamin)food.get("vitamin"));
         mineralOverall.substract((Mineral)food.get("mineral"));
-        acidOverall.substract((Acid)food.get("acid"));
+        acidOverall.subtract((Acid)food.get("acid"));
 
         combinationEfficiency -= (Float)food.get("overallEfficiency");
         pfcOverallEfficiency -= (Float)((HashMap<String, Object>)food.get("pfcEfficiency"))

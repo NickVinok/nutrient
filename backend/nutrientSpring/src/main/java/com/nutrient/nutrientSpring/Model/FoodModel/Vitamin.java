@@ -112,4 +112,29 @@ public class Vitamin {
                 vitamin_e, vitamin_d, vitamin_k, vitamin_b4)
                 .collect(Collectors.toList());
     }
+    
+    public Vitamin(List<Float> norms){
+        System.out.println(norms);
+        this.vitamin_a=norms.get(0);
+        this.beta_carotene=norms.get(1);
+        this.alpha_carotene=norms.get(2);
+        this.vitamin_d=norms.get(3);
+        //Так как их норм для них пока что нет
+        //this.vitamin_d2=norms.get(4);
+        //this.vitamin_d3=norms.get(5);
+        this.vitamin_e=norms.get(4);
+        this.vitamin_k=norms.get(5);
+        this.vitamin_c=norms.get(6);
+        this.vitamin_b1=norms.get(7);
+        this.vitamin_b2=norms.get(8);
+        this.vitamin_b3=norms.get(9);
+        this.vitamin_b4=norms.get(10);
+        this.vitamin_b5=norms.get(11);
+        this.vitamin_b6=norms.get(12);
+        this.vitamin_b9=norms.get(13);
+        this.vitamin_b12=norms.get(14);
+
+        this.id = -1L;
+        this.food = null;
+    }
 }

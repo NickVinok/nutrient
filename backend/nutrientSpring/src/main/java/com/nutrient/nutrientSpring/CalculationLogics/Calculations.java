@@ -30,6 +30,9 @@ public class Calculations {
 
     private PfcNormsCalculation pfcNormsCalculation;
     private PfcNorms pfcNormsToController;
+    private Acid acidNorms;
+    private Vitamin vitaminNorms;
+    private Mineral mineralNorms;
 
     public Combinations getEfficientCombinations(String gender, int workingGroup, float age, float weight, float height, String dietType, int dietRestrictions){
         Combinations combinations = new Combinations();
@@ -39,6 +42,17 @@ public class Calculations {
 
         //Получаем список объектов значений нутриентов для конкретного пола
         nutrientService.getNutrientsValueForGender(gender);
+
+        acidNorms = new Acid(nutrientService.getAcidNorms().stream()
+                .map(NutrientHasGender::getValue)
+                .collect(Collectors.toList()));
+        vitaminNorms = new Vitamin(nutrientService.getVitaminNorms().stream()
+                .map(NutrientHasGender::getValue)
+                .collect(Collectors.toList()));
+        mineralNorms = new Mineral(nutrientService.getMineralNorms().stream()
+                .map(NutrientHasGender::getValue)
+                .collect(Collectors.toList()));
+
         //Рассчитываем Нрмы БЖУ, исходя из роста, веса, пола и т.д.)
         pfcNormsCalculation = new PfcNormsCalculation(gender, age, weight, height, dietType, workingGroup);
         //Рассчитываем норму золы
@@ -312,6 +326,16 @@ public class Calculations {
         HashMap<Long, HashMap<String, Object>> foodWithNutrientsUnsortedList = foodService.getFoodNutrientsForCustomCombination(ids);
         //Получаем список объектов значений нутриентов для конкретного пола
         nutrientService.getNutrientsValueForGender(gender);
+
+        acidNorms = new Acid(nutrientService.getAcidNorms().stream()
+                .map(NutrientHasGender::getValue)
+                .collect(Collectors.toList()));
+        vitaminNorms = new Vitamin(nutrientService.getVitaminNorms().stream()
+                .map(NutrientHasGender::getValue)
+                .collect(Collectors.toList()));
+        mineralNorms = new Mineral(nutrientService.getMineralNorms().stream()
+                .map(NutrientHasGender::getValue)
+                .collect(Collectors.toList()));
         //Рассчитываем Нрмы БЖУ, исходя из роста, веса, пола и т.д.)
         pfcNormsCalculation = new PfcNormsCalculation(gender, age, weight, height, dietType, workingGroup);
         //Рассчитываем норму золы
@@ -434,5 +458,17 @@ public class Calculations {
         foodNutrients.put("overallEfficiency", (Float)foodNutrients.get("overallEfficiency")*gramFixCoef);
 
         return foodNutrients;
+    }
+
+    public Acid getAcidNorms() {
+        return acidNorms;
+    }
+
+    public Vitamin getVitaminNorms() {
+        return vitaminNorms;
+    }
+
+    public Mineral getMineralNorms() {
+        return mineralNorms;
     }
 }

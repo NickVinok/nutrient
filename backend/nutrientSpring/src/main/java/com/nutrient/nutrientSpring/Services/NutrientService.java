@@ -36,7 +36,7 @@ public class NutrientService {
                 "natrium ", "ferrum", "zincum ", "cuprum ", "manganum", "selenum", "fluorum")
                 .collect(Collectors.toList());
         List<String> tmpVitaminNames = Stream.of("c", "b1", "b2", "b6", "b3","b12", "b9", "b5",
-                "alpha-carotin","a", "beta-carotin", "e", "d", "k", "b4")
+                "alpha_carotene","a", "beta_carotene", "e", "d", "k", "b4")
                 .collect(Collectors.toList());
         List<String> tmpAcidNames = Stream.of("tryptophan","threonine","isoleucine","leucine","lysine",
                 "methionine", "cystine", "phenylalanine","tyrosine","valine","arginine","histidine",
@@ -67,7 +67,7 @@ public class NutrientService {
     public Float getMineralsSum(String gender, List<Long> ids) {
         List<NutrientHasGender> tmp = nutrientHasGenderRepo.findByNutritionCompositeKey_GenderAndNutritionCompositeKey_NutrientIn(
                 genderRepo.findByName(gender).get().getId(), ids);
-        Float sum = new Float(0);
+        Float sum =  0f;
         for (NutrientHasGender mineral : tmp) {
             sum += mineral.getValue();
         }

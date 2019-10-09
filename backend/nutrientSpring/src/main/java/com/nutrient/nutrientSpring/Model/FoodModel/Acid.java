@@ -68,7 +68,7 @@ public class Acid {
         this.serine+=a1.getSerine();
     }
 
-    public void substract(Acid a1){
+    public void subtract(Acid a1){
         this.tryptophan-=a1.getTryptophan();
         this.threonine-=a1.getThreonine();
         this.isoleucine-=a1.getIsoleucine();
@@ -119,4 +119,27 @@ public class Acid {
                 .collect(Collectors.toList());
     }
 
+    public Acid(List<Float> norms){
+        this.tryptophan=norms.get(0);
+        this.threonine=norms.get(1);
+        this.isoleucine=norms.get(2);
+        this.leucine=norms.get(3);
+        this.lysine=norms.get(4);
+        this.methionine=norms.get(5);
+        this.cystine=norms.get(6);
+        this.phenylalanine=norms.get(7);
+        this.tyrosine=norms.get(8);
+        this.valine=norms.get(9);
+        this.arginine=norms.get(10);
+        this.histidine=norms.get(11);
+        this.alanine=norms.get(12);
+        this.aspartic_acid=norms.get(13);
+        this.glutamic_acid=norms.get(14);
+        this.glycine=norms.get(15);
+        this.proline=norms.get(16);
+        this.serine=norms.get(17);
+
+        this.id = -1L;
+        this.food = null;
+    }
 }

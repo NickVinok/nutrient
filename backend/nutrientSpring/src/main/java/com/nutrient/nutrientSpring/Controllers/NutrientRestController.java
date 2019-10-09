@@ -3,6 +3,7 @@ package com.nutrient.nutrientSpring.Controllers;
 import com.nutrient.nutrientSpring.CalculationLogics.Calculations;
 import com.nutrient.nutrientSpring.Model.JsonObjects.NutrientREST.DietInfo;
 import com.nutrient.nutrientSpring.Model.JsonObjects.NutrientREST.CalculationResponse;
+import com.nutrient.nutrientSpring.Model.JsonObjects.NutrientREST.NutrientNorms;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +26,8 @@ public class NutrientRestController {
                 dietInfo.getDiet_type(),
                 dietInfo.getDietRestrictions()
                 ).getCombinationList());
-        r.setNorms(calculations.getPfcNorms());
+        r.setNorms(new NutrientNorms(calculations.getPfcNorms(),
+                calculations.getVitaminNorms(), calculations.getAcidNorms(), calculations.getMineralNorms()));
         return r;
     }
 }

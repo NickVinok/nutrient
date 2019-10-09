@@ -87,4 +87,21 @@ public class Mineral {
                 this.sodium, this.iron, this.zinc, this.copper, this.manganese, this.selenium, this.fluoride)
                 .collect(Collectors.toList());
     }
+
+    public Mineral(List<Float> norms){
+        this.calcium = norms.get(0);
+        this.iron = norms.get(1);
+        this.magnesium= norms.get(2);
+        this.phosphorus = norms.get(3);
+        this.potassium = norms.get(4);
+        this.sodium = norms.get(5);
+        this.zinc = norms.get(6);
+        this.copper = norms.get(7);
+        this.manganese= norms.get(8);
+        this.selenium = norms.get(9);
+        this.fluoride =norms.get(10);
+
+        this.id = -1L;
+        this.food = null;
+    }
 }

@@ -3,10 +3,7 @@ package com.nutrient.nutrientSpring.Controllers;
 import com.nutrient.nutrientSpring.CalculationLogics.Calculations;
 import com.nutrient.nutrientSpring.Model.JsonObjects.FoodRest.FoodPost;
 import com.nutrient.nutrientSpring.Model.JsonObjects.FoodRest.PackedJsonObject;
-import com.nutrient.nutrientSpring.Model.JsonObjects.NutrientREST.CalculationResponse;
-import com.nutrient.nutrientSpring.Model.JsonObjects.NutrientREST.Combination;
-import com.nutrient.nutrientSpring.Model.JsonObjects.NutrientREST.Combinations;
-import com.nutrient.nutrientSpring.Model.JsonObjects.NutrientREST.DietInfo;
+import com.nutrient.nutrientSpring.Model.JsonObjects.NutrientREST.*;
 import com.nutrient.nutrientSpring.Services.PackedFoodService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -44,7 +41,8 @@ public class FoodController {
                 post.getIdsWithGrams()));
 
         r.setCombinations(calculationResult);
-        r.setNorms(calculations.getPfcNorms());
+        r.setNorms(new NutrientNorms(calculations.getPfcNorms(),
+                calculations.getVitaminNorms(), calculations.getAcidNorms(), calculations.getMineralNorms()));
         return r;
     }
 }

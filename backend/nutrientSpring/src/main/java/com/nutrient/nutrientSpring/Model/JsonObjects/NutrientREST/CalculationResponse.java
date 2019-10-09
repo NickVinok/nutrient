@@ -7,6 +7,6 @@ import java.util.List;
 
 @Data
 public class CalculationResponse {
-    private PfcNorms norms;
+    private NutrientNorms norms;
     private List<Combination> combinations;
 }
