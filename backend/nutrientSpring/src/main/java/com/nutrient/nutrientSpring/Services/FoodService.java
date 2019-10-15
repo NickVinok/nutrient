@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -297,6 +299,19 @@ public class FoodService {
         for(Food food : foodList){
             Long id = food.getId();
             HashMap<String, Object> tmp = new HashMap<String, Object>();
+
+            Category cat = food.getCategory();
+            Pattern p = Pattern.compile("\\((.*)\\)");
+            Matcher match = p.matcher(cat.getName());
+            String status = "-";
+            if(match.find()){
+                status = match.group();
+                cat.setStatus(status.split("[\\(||//)]")[1]);
+            } else{
+                cat.setStatus(status);
+            }
+            food.setCategory(cat);
+
             tmp.put("food", food);
             tmp.put("mineral", mineralRepo.findByFood_id(id).get());
             tmp.put("vitamin", vitaminRepo.findByFood_id(id).get());
@@ -314,7 +329,7 @@ public class FoodService {
                 "Лапша в сухом виде",
                 "Яйца в сыром и сухом виде",
                 "Протеин порошок",
-                "Рыба сырая",
+                "Рыба (сырая)",
                 "Свинина (сырая)",
                 "Свиные субпродукты (сырые)",
                 "Говядина (сырая)",
@@ -397,6 +412,20 @@ public class FoodService {
             Long id = f.getId();
             HashMap<String, Object> tmp = new HashMap<String, Object>();
             f.setGram(100);
+
+            Category cat = f.getCategory();
+            Pattern p = Pattern.compile("\\((.*)\\)");
+            Matcher match = p.matcher(cat.getName());
+            String status = "-";
+            if(match.find()){
+                status = match.group();
+
+                cat.setStatus(status.split("[\\(||//)]")[1]);
+            } else{
+                cat.setStatus(status);
+            }
+            f.setCategory(cat);
+
             tmp.put("food", f);
             tmp.put("mineral", mineralRepo.findByFood_id(id).get());
             tmp.put("vitamin", vitaminRepo.findByFood_id(id).get());

@@ -33,7 +33,7 @@ public class PackedFoodService {
             for (int i = 0; i<nutrients.size(); i++){
                 packedFood.addAttribute(names.get(i), nutrients.get(i));
             }
-            packedFood.addAttribute("img", "/var/www/img/"+f.getImg()+".img");
+            packedFood.addAttribute("img", "img/"+f.getImg()+".img");
             packedFood.addAttribute("name", f.getName());
 
             //Заполняем минералы еды
