@@ -29,9 +29,20 @@ public class Combination{
     private Float mineralOverallEfficiency = 0f;
     private Float acidOverallEfficiency = 0f;
     @JsonIgnore
-    private int foodCounter = 5;
+    private int foodCounter = 12;
+    @JsonIgnore
+    private HashMap<Long, Long> categoryCounter = new HashMap<>();
 
-    public boolean addFoodToCombination(HashMap<String, Object> food){
+    public boolean isInCombination(Food food){
+        if(foods.contains(food)){
+            return true;
+        }
+        return false;
+    }
+
+    public boolean addFoodToCombination(HashMap<String, Object> food, HashMap<Long, Long> categoryCounter){
+        this.categoryCounter = categoryCounter;
+
         //Счётчик для нутриентов, которые выходят за нормы
         int acceptableNumberOfOverFlowingNutrients = 3;
 
@@ -39,6 +50,8 @@ public class Combination{
         HashMap<String, Float> tmpVit = new HashMap<>();
         HashMap<String, Float> tmpMin = new HashMap<>();
         HashMap<String, Float> tmpAcid = new HashMap<>();
+
+
 
         for(Map.Entry<String, Float> old : pfcEfficiency.entrySet()){
             tmpPfc.put(old.getKey(), old.getValue());

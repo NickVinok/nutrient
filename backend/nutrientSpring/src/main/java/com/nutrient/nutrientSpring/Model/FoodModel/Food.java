@@ -38,6 +38,7 @@ public class Food {
     private float starch;
     private float cholesterol;
     private float fat_trans;
+    @JsonIgnore
     private int img;
 
     @Transient

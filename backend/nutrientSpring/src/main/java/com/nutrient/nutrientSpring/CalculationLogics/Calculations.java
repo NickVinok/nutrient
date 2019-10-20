@@ -74,11 +74,21 @@ public class Calculations {
                 .sorted((x, y) -> Float.compare((float)y.getValue().get("overallEfficiency"), (float)x.getValue().get("overallEfficiency")))
                 .forEach(x -> foodWithNutrientsList.put(x.getKey(), x.getValue()));
         //Непосредственный расчёт: передаём список допустимой еды, нормы БЖУ, нормы нутриентов
-        //Возвращаем 12 комбинации
-        combinations = calculateEfficientCombinations(categoryCounter, foodWithNutrientsList);
-        Combinations newCombinations = optimizeCombinations(categoryCounter, foodWithNutrientsList, combinations);
 
-        return newCombinations;
+        combinations = calculateEfficientCombinations(categoryCounter, foodWithNutrientsList);
+        //combinations.getCombinationList()
+               //  .forEach(x -> x.setFoodCounter(15));
+        for(int i = 0;i<100;i++) {
+            
+            combinations = optimizeCombinations(foodWithNutrientsList, combinations);
+            combinations = addFoodToOptimizedCombination(combinations, foodWithNutrientsList);
+        }
+        combinations.setCombinationList(
+                combinations.getCombinationList().stream()
+                        .sorted((x,y) -> Float.compare((float)y.getCombinationEfficiency(), (float)x.getCombinationEfficiency()))
+                        .collect(Collectors.toList())
+        );
+        return combinations;
     }
 
     //Добавляем к оригинальной мапе проценты эффективности по бжу и прочему говну
@@ -198,7 +208,7 @@ public class Calculations {
             overallCounter.put(oc.getKey(), 3L);
         }
         //Чтобы не было повторений
-        ArrayList<Long> usedIds = new ArrayList<>();
+        //Т.е. в течение скольких циклов составления комбинаций данный ингридиент будет игнорироваться
         HashMap<Long, Long> usedIds2 = new HashMap<>();
 
         for(int i = 0; i< 12; i++) {
@@ -213,6 +223,9 @@ public class Calculations {
             for (Map.Entry<Long, HashMap<String, Object>> foodList : foodWithNutrientsList.entrySet()) {
                 Food tmpFood = ((Food)foodList.getValue().get("food"));
 
+                //Если данный ингридиент долго не использовался в комбинациях
+                //(т.е. счётчик игнорирования == 0)
+                //то мы возвращаем ингридиент в пулл
                 if(usedIds2.containsValue(0)){
                     for(Map.Entry <Long, Long> keyVal: usedIds2.entrySet()){
                         if(keyVal.getValue() == 0){
@@ -225,7 +238,8 @@ public class Calculations {
                 if(newCounter.containsKey(categoryId) && overallCounter.containsKey(categoryId)) {
                     if (newCounter.get(categoryId) > 0 && overallCounter.get(categoryId) > 0) {
                         if(!usedIds2.containsKey(tmpFood.getId())) {
-                            if (!combinationToAdd.addFoodToCombination(foodList.getValue())) {
+                            //внезависимости от добавления/недобавления будет обновлён счётчик
+                            if (!combinationToAdd.addFoodToCombination(foodList.getValue(), newCounter)) {
                                 break;
                             } else {
                                 if (Math.random() > 0.5) {
@@ -238,22 +252,66 @@ public class Calculations {
                     }
                 }
             }
+
             finalCombinations.addCombination(combinationToAdd);
         }
-        finalCombinations.setCombinationList(
-                finalCombinations.getCombinationList().stream()
-                .sorted((x,y) -> Float.compare((float)y.getCombinationEfficiency(), (float)x.getCombinationEfficiency()))
-                .collect(Collectors.toList())
-        );
+        finalCombinations.setOverallCategoryCounter(overallCounter);
         return finalCombinations;
+    }
+
+    private Combinations addFoodToOptimizedCombination(
+            Combinations combs, HashMap<Long, HashMap<String, Object>> foodWithNutrientsList){
+        HashMap<Long, Long> overallCounter = combs.getOverallCategoryCounter();
+        //в течение скольких циклов составления комбинаций данный ингридиент будет игнорироваться
+        HashMap<Long, Long> usedIds2 = new HashMap<>();
+        for(Combination comb : combs.getCombinationList()) {
+            HashMap<Long, Long> localCounter = comb.getCategoryCounter();
+            for (Map.Entry<Long, HashMap<String, Object>> foodList : foodWithNutrientsList.entrySet()) {
+                Food tmpFood = ((Food)foodList.getValue().get("food"));
+
+                if(comb.isInCombination(tmpFood)){
+                    continue;
+                }
+
+                //Если данный ингридиент долго не использовался в комбинациях
+                //(т.е. счётчик игнорирования == 0)
+                //то мы возвращаем ингридиент в пулл
+                /*if(usedIds2.containsValue(0)){
+                    for(Map.Entry <Long, Long> keyVal: usedIds2.entrySet()){
+                        if(keyVal.getValue() == 0){
+                            usedIds2.remove(keyVal.getKey());
+                        }
+                    }
+                }*/
+
+                Long categoryId = tmpFood.getCategory().getId();
+                if(localCounter.containsKey(categoryId) && overallCounter.containsKey(categoryId)){
+                    if(localCounter.get(categoryId) > 0 && overallCounter.get(categoryId) > 0){
+                        //if(!usedIds2.containsKey(tmpFood.getId())) {
+                            if(!comb.addFoodToCombination(foodList.getValue(), localCounter)){
+                                break;
+                            }
+                            /*else {
+                                if (Math.random() > 0.5) {
+                                    usedIds2.put(tmpFood.getId(), (long)(1+Math.random()*3));
+                                }
+                                localCounter.put(categoryId, (Long) localCounter.get(categoryId) - 1);
+                                overallCounter.put(categoryId, (Long) overallCounter.get(categoryId) - 1);
+                            }*/
+                        //}
+                    }
+                }
+
+            }
+        }
+        return combs;
     }
 
     public PfcNorms getPfcNorms() {
         return pfcNormsToController;
     }
 
-    public Combinations optimizeCombinations(
-            HashMap<Long, Long> categoryCounter, HashMap<Long, HashMap<String, Object>> foodWithNutrientsList, Combinations unOptimizedCombinations) {
+    public Combinations optimizeCombinations( HashMap<Long, HashMap<String, Object>> foodWithNutrientsList, Combinations unOptimizedCombinations) {
         for (Combination comb : unOptimizedCombinations.getCombinationList()) {
             int counter = 5;
             List<List<Integer>> listOfOverflowingNutrients = comb.doesCombinationHasOverflowingNutrients();

@@ -367,7 +367,7 @@ public class FoodService {
                 .collect(Collectors.toList());
 
         for(Long id : neededCategories){
-            categoriesCounter.put(id, 6L);
+            categoriesCounter.put(id, 10L);
         }
 
         List<String> namesOfRestrictedCategories = Stream.of(
@@ -394,7 +394,7 @@ public class FoodService {
                 .collect(Collectors.toList());
         for(Map.Entry<Long, Long> entry: categoriesCounter.entrySet()){
             if(categoriesWithRestrictions.contains(entry.getKey())){
-                entry.setValue(2L);
+                entry.setValue(6L);
             }
         }
 
