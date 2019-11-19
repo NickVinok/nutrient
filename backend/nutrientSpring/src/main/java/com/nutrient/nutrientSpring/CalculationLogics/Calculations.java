@@ -36,6 +36,8 @@ public class Calculations {
             String gender, int workingGroup, float age, float weight, float height, String dietType, int dietRestrictions, boolean pregnancy){
         Combinations combinations = new Combinations();
         //Получаем список словарей, где ключом выступает id еды, а значениями являются объекты еды, витаминов, минералов, кислот)
+        //List<Ingredient> ingredients = foodService.getListOfIngredients(foodService.getFoodWOProhibitedCategories(dietRestrictions));
+
         HashMap<Long, HashMap<String, Object>> foodWithNutrientsUnsortedList = foodService.getListOfFoodsNutrients(
                 foodService.getFoodWOProhibitedCategories(dietRestrictions));
 
@@ -60,6 +62,7 @@ public class Calculations {
         //Получаем список норм БЖУ
         List<Float> pfcNorms = pfcNormsCalculation.getPfc();
         pfcNormsToController = pfcNormsCalculation.getNorms();
+
         //Рассчитываем эффективность каждого из продуктов (пока просто по максимуму - дальше - можно поиграться с коэффициентами и
         //записать всё в бд отдельным скриптом
         productOverallEfficiency(foodWithNutrientsUnsortedList, pfcNorms, nutrientService.getVitaminNorms(), nutrientService.getMineralNorms(), nutrientService.getAcidNorms());

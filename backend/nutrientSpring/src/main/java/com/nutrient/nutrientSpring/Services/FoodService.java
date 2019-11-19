@@ -292,6 +292,35 @@ public class FoodService {
         return categoryRepo.findByNameNotIn(notNeededCategories);
     }
 
+    /*public List<Ingredient> getListOfIngredients(List<Food> foodList){
+        List<Ingredient> ingredients = new ArrayList<>();
+
+        for(Food food : foodList){
+            Long id = food.getId();
+
+            //вот здесь пытаемся вытащить категорию еды, но её назуй
+            //потом норм сделаю
+            Category cat = food.getCategory();
+            Pattern p = Pattern.compile("\\((.*)\\)");
+            Matcher match = p.matcher(cat.getName());
+            String status = "-";
+            if(match.find()){
+                status = match.group();
+                cat.setStatus(status.split("[\\(||//)]")[1]);
+            } else{
+                cat.setStatus(status);
+            }
+            food.setCategory(cat);
+
+            Ingredient ingredient = new Ingredient(food,
+                    vitaminRepo.findByFood_id(id).get(),
+                    mineralRepo.findByFood_id(id).get(),
+                    acidsRepo.findByFood_id(id).get());
+            ingredients.add(ingredient);
+        }
+        return ingredients;
+    }*/
+
     //Возвращаем список еды, с прикреплёнными значениями кислоты, минералов, витаминов и БЖУ
     public HashMap<Long, HashMap<String, Object>> getListOfFoodsNutrients(List<Food> foodList){
         HashMap<Long, HashMap<String, Object>> foodNutrients = new HashMap<Long, HashMap<String, Object>>();
