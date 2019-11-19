@@ -2,12 +2,12 @@ package com.nutrient.nutrientSpring.CalculationLogics;
 
 import com.nutrient.nutrientSpring.CalculationLogics.Pfc.PfcNorms;
 import com.nutrient.nutrientSpring.Model.FoodModel.Acid;
-import com.nutrient.nutrientSpring.Model.JsonObjects.NutrientREST.Combination;
+import com.nutrient.nutrientSpring.Utils.Combination;
 import com.nutrient.nutrientSpring.CalculationLogics.Pfc.PfcNormsCalculation;
 import com.nutrient.nutrientSpring.Model.FoodModel.Food;
 import com.nutrient.nutrientSpring.Model.FoodModel.Mineral;
 import com.nutrient.nutrientSpring.Model.FoodModel.Vitamin;
-import com.nutrient.nutrientSpring.Model.JsonObjects.NutrientREST.Combinations;
+import com.nutrient.nutrientSpring.JsonObjects.NutrientREST.Combinations;
 import com.nutrient.nutrientSpring.Model.NutrientModel.NutrientHasGender;
 import com.nutrient.nutrientSpring.Services.FoodService;
 import com.nutrient.nutrientSpring.Services.NutrientService;
@@ -15,9 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class Calculations {
@@ -34,7 +32,8 @@ public class Calculations {
     private Vitamin vitaminNorms;
     private Mineral mineralNorms;
 
-    public Combinations getEfficientCombinations(String gender, int workingGroup, float age, float weight, float height, String dietType, int dietRestrictions){
+    public Combinations getEfficientCombinations(
+            String gender, int workingGroup, float age, float weight, float height, String dietType, int dietRestrictions, boolean pregnancy){
         Combinations combinations = new Combinations();
         //Получаем список словарей, где ключом выступает id еды, а значениями являются объекты еды, витаминов, минералов, кислот)
         HashMap<Long, HashMap<String, Object>> foodWithNutrientsUnsortedList = foodService.getListOfFoodsNutrients(
@@ -79,7 +78,7 @@ public class Calculations {
         //combinations.getCombinationList()
                //  .forEach(x -> x.setFoodCounter(15));
         for(int i = 0;i<100;i++) {
-            
+
             combinations = optimizeCombinations(foodWithNutrientsList, combinations);
             combinations = addFoodToOptimizedCombination(combinations, foodWithNutrientsList);
         }
@@ -374,7 +373,7 @@ public class Calculations {
     }
 
     public Combination calculateCustomCombination(String gender, int workingGroup, float age, float weight, float height, String dietType,
-                                                  int dietRestrictions, List<HashMap<String, Long>> idsWithGrams){
+                                                  int dietRestrictions,boolean pregnancy, List<HashMap<String, Long>> idsWithGrams){
         List<Long> ids = new ArrayList<>();
         HashMap<Long, Integer> actualIdsGrams = new HashMap<>();
         for(HashMap<String, Long> hs: idsWithGrams){
@@ -418,8 +417,7 @@ public class Calculations {
     }
 
     private HashMap<Long, HashMap<Integer, Float>> getMostOverflowingNutrient(HashMap<Long, HashMap<String, Object>> foodWithNutrientsList,List<Long> foodIds,
-                                                            List<Integer> overflowingIndexes,String nutrientGroup)
-    {
+                                                            List<Integer> overflowingIndexes,String nutrientGroup) {
         HashMap<Long, HashMap<Integer, Float>> efficiencyOnSingleNutrient = new HashMap<>();
         Integer index = overflowingIndexes.get(0);
 

@@ -4,7 +4,7 @@ import com.nutrient.nutrientSpring.Model.FoodModel.Acid;
 import com.nutrient.nutrientSpring.Model.FoodModel.Food;
 import com.nutrient.nutrientSpring.Model.FoodModel.Mineral;
 import com.nutrient.nutrientSpring.Model.FoodModel.Vitamin;
-import com.nutrient.nutrientSpring.Model.JsonObjects.FoodRest.PackedJsonObject;
+import com.nutrient.nutrientSpring.JsonObjects.FoodRest.PackedJsonObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

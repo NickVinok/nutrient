@@ -1,4 +1,4 @@
-package com.nutrient.nutrientSpring.Model.JsonObjects.NutrientREST;
+package com.nutrient.nutrientSpring.JsonObjects.NutrientREST;
 
 import lombok.Data;
 
@@ -12,4 +12,5 @@ public class DietInfo {
     private String group;
     private int workingGroup;
     private int dietRestrictions;
+    private boolean pregnancy;
 }

@@ -1,11 +1,10 @@
-package com.nutrient.nutrientSpring.Model.JsonObjects.FoodRest;
+package com.nutrient.nutrientSpring.JsonObjects.FoodRest;
 
-import com.nutrient.nutrientSpring.Model.JsonObjects.NutrientREST.DietInfo;
+import com.nutrient.nutrientSpring.JsonObjects.NutrientREST.DietInfo;
 import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 @Data
 public class FoodPost {

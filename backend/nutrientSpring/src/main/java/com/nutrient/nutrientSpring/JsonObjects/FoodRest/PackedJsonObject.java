@@ -1,6 +1,4 @@
-package com.nutrient.nutrientSpring.Model.JsonObjects.FoodRest;
-
-import com.nutrient.nutrientSpring.Model.FoodModel.Food;
+package com.nutrient.nutrientSpring.JsonObjects.FoodRest;
 
 import java.util.HashMap;
 

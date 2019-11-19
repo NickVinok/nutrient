@@ -1,9 +1,9 @@
 package com.nutrient.nutrientSpring.Controllers;
 
 import com.nutrient.nutrientSpring.CalculationLogics.Calculations;
-import com.nutrient.nutrientSpring.Model.JsonObjects.NutrientREST.DietInfo;
-import com.nutrient.nutrientSpring.Model.JsonObjects.NutrientREST.CalculationResponse;
-import com.nutrient.nutrientSpring.Model.JsonObjects.NutrientREST.NutrientNorms;
+import com.nutrient.nutrientSpring.JsonObjects.NutrientREST.DietInfo;
+import com.nutrient.nutrientSpring.JsonObjects.NutrientREST.CalculationResponse;
+import com.nutrient.nutrientSpring.JsonObjects.NutrientREST.NutrientNorms;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,7 +15,7 @@ public class NutrientRestController {
     Calculations calculations;
 
     @PostMapping
-    public CalculationResponse getCombinations(@RequestBody DietInfo dietInfo){
+    public CalculationResponse postCombinations(@RequestBody DietInfo dietInfo){
         CalculationResponse r = new CalculationResponse();
         r.setCombinations(calculations.getEfficientCombinations(
                 dietInfo.getGender(),
@@ -24,10 +24,12 @@ public class NutrientRestController {
                 dietInfo.getMass(),
                 dietInfo.getHeight(),
                 dietInfo.getDiet_type(),
-                dietInfo.getDietRestrictions()
+                dietInfo.getDietRestrictions(),
+                dietInfo.isPregnancy()
                 ).getCombinationList());
         r.setNorms(new NutrientNorms(calculations.getPfcNorms(),
                 calculations.getVitaminNorms(), calculations.getAcidNorms(), calculations.getMineralNorms()));
         return r;
     }
+
 }
