@@ -3,6 +3,7 @@ package com.nutrient.nutrientSpring.Services;
 import com.nutrient.nutrientSpring.Model.FoodModel.Category;
 import com.nutrient.nutrientSpring.Model.FoodModel.Food;
 import com.nutrient.nutrientSpring.Repos.FoodRepository.*;
+import com.nutrient.nutrientSpring.Utils.Ingredient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -292,7 +293,7 @@ public class FoodService {
         return categoryRepo.findByNameNotIn(notNeededCategories);
     }
 
-    /*public List<Ingredient> getListOfIngredients(List<Food> foodList){
+    public List<Ingredient> getListOfIngredients(List<Food> foodList){
         List<Ingredient> ingredients = new ArrayList<>();
 
         for(Food food : foodList){
@@ -319,7 +320,7 @@ public class FoodService {
             ingredients.add(ingredient);
         }
         return ingredients;
-    }*/
+    }
 
     //Возвращаем список еды, с прикреплёнными значениями кислоты, минералов, витаминов и БЖУ
     public HashMap<Long, HashMap<String, Object>> getListOfFoodsNutrients(List<Food> foodList){

@@ -142,4 +142,28 @@ public class Acid {
         this.id = -1L;
         this.food = null;
     }
+    
+    public Acid(Acid a, Acid aNorm){
+        this.tryptophan= a.getTryptophan()/aNorm.getTryptophan();
+        this.threonine= a.getThreonine()/aNorm.getThreonine();
+        this.isoleucine= a.getIsoleucine()/aNorm.getIsoleucine();
+        this.leucine= a.getLeucine()/aNorm.getLeucine();
+        this.lysine= a.getLysine()/aNorm.getLysine();
+        this.methionine= a.getMethionine()/aNorm.getMethionine();
+        this.cystine= a.getCystine()/aNorm.getCystine();
+        this.phenylalanine= a.getPhenylalanine()/aNorm.getPhenylalanine();
+        this.tyrosine= a.getTyrosine()/aNorm.getTyrosine();
+        this.valine= a.getValine()/aNorm.getValine();
+        this.arginine= a.getArginine()/aNorm.getArginine();
+        this.histidine= a.getHistidine()/aNorm.getHistidine();
+        this.alanine= a.getAlanine()/aNorm.getAlanine();
+        this.aspartic_acid= a.getAspartic_acid()/aNorm.getAspartic_acid();
+        this.glutamic_acid= a.getGlutamic_acid()/aNorm.getGlutamic_acid();
+        this.glycine= a.getGlycine()/aNorm.getGlycine();
+        this.proline= a.getProline()/aNorm.getProline();
+        this.serine= a.getSerine()/aNorm.getSerine();
+
+        this.id = -1L;
+        this.food = null;
+    }
 }

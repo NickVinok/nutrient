@@ -1,5 +1,8 @@
 package com.nutrient.nutrientSpring.Services;
 
+import com.nutrient.nutrientSpring.Model.FoodModel.Acid;
+import com.nutrient.nutrientSpring.Model.FoodModel.Mineral;
+import com.nutrient.nutrientSpring.Model.FoodModel.Vitamin;
 import com.nutrient.nutrientSpring.Model.NutrientModel.Nutrient;
 import com.nutrient.nutrientSpring.Model.NutrientModel.NutrientHasGender;
 import com.nutrient.nutrientSpring.Model.NutrientModel.NutritionCompositeKey;
@@ -24,9 +27,9 @@ public class NutrientService {
     @Autowired
     private NutrientHasGenderRepo nutrientHasGenderRepo;
 
-    private List<NutrientHasGender> vitaminNorms;
-    private List<NutrientHasGender> mineralNorms;
-    private List<NutrientHasGender> acidNorms;
+    private Vitamin vitaminNorms;
+    private Mineral mineralNorms;
+    private Acid acidNorms;
 
     public void getNutrientsValueForGender(String gender) {
         Long id = genderRepo.findByName(gender).get().getId();
@@ -53,9 +56,18 @@ public class NutrientService {
                 .map(Nutrient::getId)
                 .collect(Collectors.toList());
 
-        vitaminNorms = nutrientHasGenderRepo.findByNutritionCompositeKey_GenderAndNutritionCompositeKey_NutrientIn(id,vitaminIds);
-        mineralNorms = nutrientHasGenderRepo.findByNutritionCompositeKey_GenderAndNutritionCompositeKey_NutrientIn(id,mineralIds);
-        acidNorms = nutrientHasGenderRepo.findByNutritionCompositeKey_GenderAndNutritionCompositeKey_NutrientIn(id,acidIds);
+        acidNorms = new Acid(nutrientHasGenderRepo.findByNutritionCompositeKey_GenderAndNutritionCompositeKey_NutrientIn(id,acidIds)
+                .stream()
+                .map(NutrientHasGender::getValue)
+                .collect(Collectors.toList()));
+        vitaminNorms = new Vitamin(nutrientHasGenderRepo.findByNutritionCompositeKey_GenderAndNutritionCompositeKey_NutrientIn(id,vitaminIds)
+                .stream()
+                .map(NutrientHasGender::getValue)
+                .collect(Collectors.toList()));
+        mineralNorms = new Mineral(nutrientHasGenderRepo.findByNutritionCompositeKey_GenderAndNutritionCompositeKey_NutrientIn(id,mineralIds)
+                .stream()
+                .map(NutrientHasGender::getValue)
+                .collect(Collectors.toList()));
     }
 
     public Float getValueOfCertainNutrient(String nutrientName, String gender) {
@@ -74,15 +86,13 @@ public class NutrientService {
         return sum;
     }
 
-    public List<NutrientHasGender> getVitaminNorms() {
-        return vitaminNorms;
-    }
+    public Vitamin getVitaminNorms() { return vitaminNorms; }
 
-    public List<NutrientHasGender> getMineralNorms() {
+    public Mineral getMineralNorms() {
         return mineralNorms;
     }
 
-    public List<NutrientHasGender> getAcidNorms() {
+    public Acid getAcidNorms() {
         return acidNorms;
     }
 }

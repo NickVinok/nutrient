@@ -14,4 +14,5 @@ public class PfcNorms {
     public float transfats;
     public float cholesterol;
     public float starch;
+    public float fiber;
 }

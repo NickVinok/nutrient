@@ -70,6 +70,7 @@ public class PfcNormsCalculation extends PfcNorms {
         this.transfats = calories/100;
         this.cholesterol = 300;
         this.starch = carbohydrates-this.sugar;
+        this.fiber = 38;
     }
 
     public PfcNorms getNorms(){
@@ -88,7 +89,7 @@ public class PfcNormsCalculation extends PfcNorms {
     }
 
     public List<Float> getPfc(){
-        return Stream.of(calories, proteins, fats, carbohydrates, water, ash, sugar, starch, transfats, cholesterol)
+        return Stream.of(calories, proteins, fats, carbohydrates, water, ash, sugar, starch, transfats, cholesterol, fiber)
                 .collect(Collectors.toList());
     }
 }

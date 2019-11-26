@@ -136,4 +136,28 @@ public class Vitamin {
         this.id = -1L;
         this.food = null;
     }
+
+    public Vitamin(Vitamin v, Vitamin vNorm){
+        this.vitamin_a=v.getVitamin_a()/vNorm.getVitamin_a();
+        this.beta_carotene=v.getBeta_carotene()/vNorm.getBeta_carotene();
+        this.alpha_carotene=v.getAlpha_carotene()/vNorm.getAlpha_carotene();
+        this.vitamin_d=v.getVitamin_d()/vNorm.getVitamin_d();
+        //Так как их норм для них пока что нет
+        //this.vitamin_d2=norms.get(4);
+        //this.vitamin_d3=norms.get(5);
+        this.vitamin_e=v.getVitamin_e()/vNorm.getVitamin_e();
+        this.vitamin_k=v.getVitamin_k()/vNorm.getVitamin_k();
+        this.vitamin_c=v.getVitamin_c()/vNorm.getVitamin_c();
+        this.vitamin_b1=v.getVitamin_b1()/vNorm.getVitamin_b1();
+        this.vitamin_b2=v.getVitamin_b2()/vNorm.getVitamin_b2();
+        this.vitamin_b3=v.getVitamin_b3()/vNorm.getVitamin_b3();
+        this.vitamin_b4=v.getVitamin_b4()/vNorm.getVitamin_b4();
+        this.vitamin_b5=v.getVitamin_b5()/vNorm.getVitamin_b5();
+        this.vitamin_b6=v.getVitamin_b6()/vNorm.getVitamin_b6();
+        this.vitamin_b9=v.getVitamin_b9()/vNorm.getVitamin_b9();
+        this.vitamin_b12=v.getVitamin_b12()/vNorm.getVitamin_b12();
+
+        this.id = -1L;
+        this.food = null;
+    }
 }

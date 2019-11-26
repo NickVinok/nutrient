@@ -104,4 +104,22 @@ public class Mineral {
         this.id = -1L;
         this.food = null;
     }
+
+    public Mineral(Mineral m, Mineral mNorm){
+        this.calcium = m.getCalcium()/mNorm.getCalcium();
+        this.iron = m.getIron()/mNorm.getIron();
+        this.magnesium= m.getMagnesium()/mNorm.getMagnesium();
+        this.phosphorus = m.getPhosphorus()/mNorm.getPhosphorus();
+        this.potassium = m.getPotassium()/mNorm.getPotassium();
+        this.sodium = m.getSodium()/mNorm.getSodium();
+        this.zinc = m.getZinc()/mNorm.getZinc();
+        this.copper = m.getCopper()/mNorm.getCopper();
+        this.manganese= m.getManganese()/mNorm.getManganese();
+        this.selenium = m.getSelenium()/mNorm.getSelenium();
+        this.fluoride =m.getFluoride()/mNorm.getFluoride();
+
+        this.id = -1L;
+        this.food = null;
+    }
+
 }

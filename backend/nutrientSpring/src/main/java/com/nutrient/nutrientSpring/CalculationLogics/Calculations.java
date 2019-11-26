@@ -11,6 +11,7 @@ import com.nutrient.nutrientSpring.JsonObjects.NutrientREST.Combinations;
 import com.nutrient.nutrientSpring.Model.NutrientModel.NutrientHasGender;
 import com.nutrient.nutrientSpring.Services.FoodService;
 import com.nutrient.nutrientSpring.Services.NutrientService;
+import com.nutrient.nutrientSpring.Utils.Ingredient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,23 +37,13 @@ public class Calculations {
             String gender, int workingGroup, float age, float weight, float height, String dietType, int dietRestrictions, boolean pregnancy){
         Combinations combinations = new Combinations();
         //Получаем список словарей, где ключом выступает id еды, а значениями являются объекты еды, витаминов, минералов, кислот)
-        //List<Ingredient> ingredients = foodService.getListOfIngredients(foodService.getFoodWOProhibitedCategories(dietRestrictions));
+        List<Ingredient> ingredients = foodService.getListOfIngredients(foodService.getFoodWOProhibitedCategories(dietRestrictions));
 
-        HashMap<Long, HashMap<String, Object>> foodWithNutrientsUnsortedList = foodService.getListOfFoodsNutrients(
-                foodService.getFoodWOProhibitedCategories(dietRestrictions));
+        //HashMap<Long, HashMap<String, Object>> foodWithNutrientsUnsortedList = foodService.getListOfFoodsNutrients(
+        //       foodService.getFoodWOProhibitedCategories(dietRestrictions));
 
         //Получаем список объектов значений нутриентов для конкретного пола
         nutrientService.getNutrientsValueForGender(gender);
-
-        acidNorms = new Acid(nutrientService.getAcidNorms().stream()
-                .map(NutrientHasGender::getValue)
-                .collect(Collectors.toList()));
-        vitaminNorms = new Vitamin(nutrientService.getVitaminNorms().stream()
-                .map(NutrientHasGender::getValue)
-                .collect(Collectors.toList()));
-        mineralNorms = new Mineral(nutrientService.getMineralNorms().stream()
-                .map(NutrientHasGender::getValue)
-                .collect(Collectors.toList()));
 
         //Рассчитываем Нрмы БЖУ, исходя из роста, веса, пола и т.д.)
         pfcNormsCalculation = new PfcNormsCalculation(gender, age, weight, height, dietType, workingGroup);
@@ -60,12 +51,13 @@ public class Calculations {
         List<Long> mineralIds = mapper.getMineralsId();
         pfcNormsCalculation.setAsh(nutrientService.getMineralsSum(gender, mineralIds));
         //Получаем список норм БЖУ
-        List<Float> pfcNorms = pfcNormsCalculation.getPfc();
+        Food pfcNorms = new Food(pfcNormsCalculation.getPfc());
         pfcNormsToController = pfcNormsCalculation.getNorms();
 
         //Рассчитываем эффективность каждого из продуктов (пока просто по максимуму - дальше - можно поиграться с коэффициентами и
         //записать всё в бд отдельным скриптом
-        productOverallEfficiency(foodWithNutrientsUnsortedList, pfcNorms, nutrientService.getVitaminNorms(), nutrientService.getMineralNorms(), nutrientService.getAcidNorms());
+        List<Ingredient> foodEfficiency = productOverallEfficiency(ingredients, pfcNorms, nutrientService.getVitaminNorms(), nutrientService.getMineralNorms(), nutrientService.getAcidNorms());
+
         //Получаем список категорий, превращаем в словарь, где значение - допустимое количество оставшихся использований
         //Делаем 2 списка: один локальный, другой глобальный для выполнения требований к максимальному количеству продуктов из одной группы внутри комбинации
         //и во всех комбинациях
@@ -94,8 +86,8 @@ public class Calculations {
     }
 
     //Добавляем к оригинальной мапе проценты эффективности по бжу и прочему говну
-    private void productOverallEfficiency(HashMap<Long, HashMap<String, Object>> productsNutrients, List<Float> pfcNorms,
-                                          List<NutrientHasGender> vitaminNorms, List<NutrientHasGender> mineralNorms, List<NutrientHasGender> acidNorms) {
+    private List<Ingredient> productOverallEfficiency(List<Ingredient> ingredients, Food pfcNorms,
+                                          Vitamin vitaminNorms, Mineral mineralNorms, Acid acidNorms) {
         //Еда:объект еды, Минералы: объект минералов, Витамины:объект витаминов, Кислоты: объект кислот
         /*Здесь добавляем к этому следующую конструкцию
         {
@@ -105,7 +97,24 @@ public class Calculations {
             Общая эффективность 100гр. продукта : Значение
         }
         */
-       for(Map.Entry<Long, HashMap<String, Object>> entry : productsNutrients.entrySet()){
+
+        for(Ingredient in: ingredients){
+            Ingredient efficiency;
+
+            Mineral m = in.getMineral();
+            Acid a = in.getAcid();
+            Vitamin v = in.getVitamin();
+            Food f = in.getFood();
+
+            Mineral mEf = new Mineral(m, mineralNorms);
+            Acid aEf = new Acid(a, acidNorms);
+            Vitamin vEf = new Vitamin(v, vitaminNorms);
+            Food fEf = new Food(f, pfcNorms);
+
+            in.setEfficiency(fEf, vEf, mEf, aEf);
+        }
+
+       /*for(Map.Entry<Long, HashMap<String, Object>> entry : productsNutrients.entrySet()){
            HashMap<String, Object> food = entry.getValue();
 
            HashMap<String, Float> pfcEfficiency = new HashMap<>();
@@ -196,7 +205,8 @@ public class Calculations {
            food.put("overallEfficiency", overallEfficiency);
 
            entry.setValue(food);
-       }
+       }*/
+       return ingredients;
     }
 
     //Рассчитываем эфективные комбинации

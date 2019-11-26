@@ -41,11 +41,6 @@ public class Food {
     @JsonIgnore
     private int img;
 
-    @Transient
-    @JsonSerialize
-    @JsonDeserialize
-    private int gram=100;
-
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "category", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -91,7 +86,6 @@ public class Food {
         this.starch*=c;
         this.cholesterol*=c;
         this.fat_trans*=c;
-        this.gram*=c;
     }
 
     @JsonIgnore
@@ -100,4 +94,36 @@ public class Food {
                 .collect(Collectors.toList());
     }
 
+    public Food(List<Float> f){
+        this.id = -1L;
+        this.name = "Норма БЖУ";
+        this.energy=f.get(0);
+        this.fat=f.get(2);
+        this.protein=f.get(1);
+        this.carbohydrate=f.get(3);
+        this.water=f.get(4);
+        this.ash=f.get(5);
+        this.sugares=f.get(6);
+        this.fiber=f.get(10);
+        this.starch=f.get(7);
+        this.cholesterol=f.get(9);
+        this.fat_trans=f.get(8);
+    }
+
+    public Food(Food f, Food foodNorm){
+        this.id = -1L;
+        this.name = "";
+
+        this.energy=f.getEnergy()/foodNorm.getEnergy();
+        this.fat=f.getFat()/foodNorm.getFat();
+        this.protein=f.getProtein()/foodNorm.getProtein();
+        this.carbohydrate=f.getCarbohydrate()/foodNorm.getCarbohydrate();
+        this.water=f.getWater()/foodNorm.getWater();
+        this.ash=f.getAsh()/foodNorm.getAsh();
+        this.sugares=f.getSugares()/foodNorm.getSugares();
+        this.fiber=f.getFiber()/foodNorm.getFiber();
+        this.starch=f.getStarch()/foodNorm.getStarch();
+        this.cholesterol=f.getCholesterol()/foodNorm.getCholesterol();
+        this.fat_trans=f.getFat_trans()/foodNorm.getFat_trans();
+    }
 }
