@@ -17,4 +17,5 @@ public interface FoodRepo extends JpaRepository<Food, Long>{
     List<Food> findByCategory_IdNotIn(Collection<Long> categories);
     List<Food> findByCategory_IdIn(Collection<Long> categories);
     List<Food> findByIdIn(Collection<Long> ids);
+    List<Food> findByIdInAndCategory_IdIn(Collection<Long> ids, Collection<Long> categories);
 }

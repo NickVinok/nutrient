@@ -1,6 +1,8 @@
 package com.nutrient.nutrientSpring.Services;
 
 import com.nutrient.nutrientSpring.Model.FoodModel.Category;
+import com.nutrient.nutrientSpring.Model.FoodModel.EnabledCategories;
+import com.nutrient.nutrientSpring.Model.FoodModel.EnabledProducts;
 import com.nutrient.nutrientSpring.Model.FoodModel.Food;
 import com.nutrient.nutrientSpring.Repos.FoodRepository.*;
 import com.nutrient.nutrientSpring.Utils.Ingredient;
@@ -28,6 +30,12 @@ public class FoodService {
     private MineralRepo mineralRepo;
     @Autowired
     private VitaminRepo vitaminRepo;
+    @Autowired
+    private EnabledCategoriesRepo enabledCategoriesRepo;
+    @Autowired
+    private EnabledProductsRepo enabledProductsRepo;
+    @Autowired
+    private DietTypesRepo dietTypesRepo;
 
     private final List<String> MineralsNames = Stream.of("calcium", "phosphorus", "magnesium", "potassium",
             "sodium", "iron", "zinc", "copper", "manganese", "selenium", "fluoride")
@@ -46,10 +54,24 @@ public class FoodService {
 
     //Возвращаем список еды, которая пододит под требования к категории
     public List<Food> getFoodWOProhibitedCategories(int dietRestrictions){
-        List<String> notNeededCategories = new ArrayList<>();
-        List<Category> notNeededCategoriesIds1 = new ArrayList<>();
-        List<Food> foodLList = new ArrayList<>();
-        switch (dietRestrictions){
+        List<Food> foodList;
+
+        List<EnabledCategories> tmp1 = enabledCategoriesRepo.findByDietAndEnabled(dietTypesRepo.getOne((long)dietRestrictions), true);
+        List<EnabledProducts> tmp2 = enabledProductsRepo.findByDietAndEnabled(dietTypesRepo.getOne((long)dietRestrictions), true);
+        List<Long> enabledC = tmp1
+                .stream()
+                .map(EnabledCategories::getCategory)
+                .map(Category::getId)
+                .collect(Collectors.toList());
+        List<Long> enabledF = tmp2
+                .stream()
+                .map(EnabledProducts::getFood)
+                .map(Food::getId)
+                .collect(Collectors.toList());
+
+        foodList = foodRepo.findByIdInAndCategory_IdIn(enabledF, enabledC);
+        
+       /* switch (dietRestrictions){
             case 1: {
                 notNeededCategories = Stream.of(
                         "Крупы и злаки (рис)",
@@ -94,7 +116,7 @@ public class FoodService {
                 for(Category category : notNeededCategoriesIds1) {
                     notNeededCategoriesIds.add(category.getId());
                 }
-                foodLList = foodRepo.findByCategory_IdNotIn(notNeededCategoriesIds);
+                foodList = foodRepo.findByCategory_IdNotIn(notNeededCategoriesIds);
                 break;
             }
             case 2: {
@@ -141,7 +163,7 @@ public class FoodService {
                 for(Category category : notNeededCategoriesIds1) {
                     categorieIds.add(category.getId());
                 }
-                foodLList = foodRepo.findByCategory_IdIn(categorieIds);
+                foodList = foodRepo.findByCategory_IdIn(categorieIds);
                 break;
             }
             case 3: {
@@ -185,7 +207,7 @@ public class FoodService {
                 for(Category category : notNeededCategoriesIds1) {
                     categorieIds.add(category.getId());
                 }
-                foodLList = foodRepo.findByCategory_IdIn(categorieIds);
+                foodList = foodRepo.findByCategory_IdIn(categorieIds);
                 break;
             }
             case 4: {
@@ -224,7 +246,7 @@ public class FoodService {
                 for(Category category : notNeededCategoriesIds1) {
                     categorieIds.add(category.getId());
                 }
-                foodLList = foodRepo.findByCategory_IdIn(categorieIds);
+                foodList = foodRepo.findByCategory_IdIn(categorieIds);
                 break;
             }
             case 5: {
@@ -243,11 +265,11 @@ public class FoodService {
                 for(Category category : notNeededCategoriesIds1) {
                     categorieIds.add(category.getId());
                 }
-                foodLList = foodRepo.findByCategory_IdIn(categorieIds);
+                foodList = foodRepo.findByCategory_IdIn(categorieIds);
                 break;
             }
-        }
-        return foodLList;
+        }*/
+        return foodList;
     }
 
     public List<Category> getCategories(){
@@ -435,13 +457,14 @@ public class FoodService {
         return foodRepo.findAll();
     }
 
+
+    //переделать
     public HashMap<Long, HashMap<String, Object>> getFoodNutrientsForCustomCombination(List<Long> ids){
         List<Food> foods = foodRepo.findByIdIn(ids);
         HashMap<Long, HashMap<String, Object>> foodNutrientsList = new HashMap<>();
         for(Food f: foods){
             Long id = f.getId();
             HashMap<String, Object> tmp = new HashMap<String, Object>();
-            f.setGram(100);
 
             Category cat = f.getCategory();
             Pattern p = Pattern.compile("\\((.*)\\)");
