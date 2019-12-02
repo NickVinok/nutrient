@@ -53,7 +53,7 @@ public class Mineral {
         this.fluoride +=m1.getFluoride();
     }
 
-    public void substract(Mineral m1){
+    public void subtract(Mineral m1){
         this.calcium -= m1.getCalcium();
         this.iron -= m1.getIron();
         this.magnesium-= m1.getMagnesium();
@@ -79,6 +79,26 @@ public class Mineral {
         this.manganese*= c;
         this.selenium *= c;
         this.fluoride *=c;
+    }
+    
+    public boolean compare(Float numb){
+        int overflowingNutrientsValue = 3;
+        for(Float nutrient: getValues()){
+            if(nutrient<numb) overflowingNutrientsValue--;
+            if(overflowingNutrientsValue == 0) return false;
+        }
+        return true;
+        /*return this.calcium <=numb &&
+        this.iron <=numb &&
+        this.magnesium<=numb &&
+        this.phosphorus <=numb &&
+        this.potassium <=numb &&
+        this.sodium <=numb &&
+        this.zinc <=numb &&
+        this.copper <=numb &&
+        this.manganese<=numb &&
+        this.selenium <=numb &&
+        this.fluoride <=numb;*/
     }
     
     @JsonIgnore

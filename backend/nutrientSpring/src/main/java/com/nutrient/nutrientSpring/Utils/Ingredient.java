@@ -88,4 +88,56 @@ public class Ingredient {
         return (calculateOverallFoodEfficiency()+calculateOverallAcidEfficiency()+calculateOverallMineralEfficiency()
                 +calculateOverallVitaminEfficiency())/4;
     }
+
+    public void sum(Ingredient i1){
+        this.gram+= i1.gram;
+        
+        this.food.sum(i1.food);
+        this.foodEfficiency.sum(i1.foodEfficiency);
+        
+        this.acid.sum(i1.acid);
+        this.acidEfficiency.sum(i1.acidEfficiency);
+        
+        this.mineral.sum(i1.mineral);
+        this.mineralEfficiency.sum(i1.mineralEfficiency);
+        
+        this.vitamin.sum(i1.vitamin);
+        this.vitaminEfficiency.sum(i1.vitaminEfficiency);
+    }
+    
+    public void subtract(Ingredient i1){
+        this.gram-= i1.gram;
+
+        this.food.subtract(i1.food);
+        this.foodEfficiency.subtract(i1.foodEfficiency);
+
+        this.acid.subtract(i1.acid);
+        this.acidEfficiency.subtract(i1.acidEfficiency);
+
+        this.mineral.subtract(i1.mineral);
+        this.mineralEfficiency.subtract(i1.mineralEfficiency);
+
+        this.vitamin.subtract(i1.vitamin);
+        this.vitaminEfficiency.subtract(i1.vitaminEfficiency);
+    }
+    
+    public void multiply(Float coef){
+        this.gram*=coef;
+
+        this.food.modify(coef);
+        this.foodEfficiency.modify(coef);
+
+        this.acid.modify(coef);
+        this.acidEfficiency.modify(coef);
+
+        this.mineral.modify(coef);
+        this.mineralEfficiency.modify(coef);
+
+        this.vitamin.modify(coef);
+        this.vitaminEfficiency.modify(coef);
+    }
+
+    public boolean compare(Float numb){
+        return food.compare(numb) && acid.compare(numb) && mineral.compare(numb) && vitamin.compare(numb);
+    }
 }

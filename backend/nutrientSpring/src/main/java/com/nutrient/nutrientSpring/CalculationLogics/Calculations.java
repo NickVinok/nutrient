@@ -11,6 +11,7 @@ import com.nutrient.nutrientSpring.JsonObjects.NutrientREST.Combinations;
 import com.nutrient.nutrientSpring.Model.NutrientModel.NutrientHasGender;
 import com.nutrient.nutrientSpring.Services.FoodService;
 import com.nutrient.nutrientSpring.Services.NutrientService;
+import com.nutrient.nutrientSpring.Utils.FoodAndCategoriesLimitationTable;
 import com.nutrient.nutrientSpring.Utils.Ingredient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -60,7 +61,7 @@ public class Calculations {
         //Получаем список категорий, превращаем в словарь, где значение - допустимое количество оставшихся использований
         //Делаем 2 списка: один локальный, другой глобальный для выполнения требований к максимальному количеству продуктов из одной группы внутри комбинации
         //и во всех комбинациях
-        HashMap<Long, Long> categoryCounter = foodService.getCategoriesCounter();
+        FoodAndCategoriesLimitationTable limitationTable = foodService.getLimitations();
 
         foodWithEfficiency = foodWithEfficiency
                 .stream()
@@ -68,13 +69,14 @@ public class Calculations {
                 .collect(Collectors.toList());
 
         //Непосредственный расчёт: передаём список допустимой еды, нормы БЖУ, нормы нутриентов
-        combinations = calculateEfficientCombinations(categoryCounter, foodWithEfficiency);
+        combinations = calculateEfficientCombinations(limitationTable, foodWithEfficiency);
 
 
         for (int i = 0; i < 100; i++) {
-            combinations = optimizeCombinations(foodWithNutrientsList, combinations);
+            combinations = optimizeCombinations(limitationTable, combinations);
             combinations = addFoodToOptimizedCombination(combinations, foodWithNutrientsList);
         }
+
         combinations.setCombinationList(
                 combinations.getCombinationList().stream()
                         .sorted((x, y) -> Float.compare((float) y.getCombinationEfficiency(), (float) x.getCombinationEfficiency()))
@@ -207,14 +209,10 @@ public class Calculations {
 
     //Рассчитываем эфективные комбинации
     private Combinations calculateEfficientCombinations(
-            HashMap<Long, Long> categoryCounter, List<Ingredient> sortedFood) {
+            FoodAndCategoriesLimitationTable limits, List<Ingredient> sortedFood) {
         Combinations finalCombinations = new Combinations();
 
         HashMap<Long, Long> overallCounter = new HashMap<>();
-        //Делаем общий счётчик категорий
-        for (Map.Entry<Long, Long> oc : categoryCounter.entrySet()) {
-            overallCounter.put(oc.getKey(), 3L);
-        }
         //Чтобы не было повторений
         //Т.е. в течение скольких циклов составления комбинаций данный ингридиент будет игнорироваться
         HashMap<Long, Long> usedIds2 = new HashMap<>();
@@ -222,13 +220,8 @@ public class Calculations {
         for (int i = 0; i < 12; i++) {
             Combination combinationToAdd = new Combination();
 
-            //Локальный счётчик категорий
-            HashMap<Long, Long> localCounter = new HashMap<>();
-            for (Map.Entry<Long, Long> old : categoryCounter.entrySet()) {
-                localCounter.put(old.getKey(), old.getValue());
-            }
-
             for (Ingredient ingredient : sortedFood) {
+                int productId = ingredient.getId().intValue();
                 //Если данный ингридиент долго не использовался в комбинациях
                 //(т.е. счётчик игнорирования == 0)
                 //то мы возвращаем ингридиент в пулл
@@ -240,17 +233,20 @@ public class Calculations {
                     }
                 }
 
-                Long categoryId = ingredient.getFood().getCategory().getId();
-                if (localCounter.containsKey(categoryId) && overallCounter.containsKey(categoryId)) {
-                    if (localCounter.get(categoryId) > 0 && overallCounter.get(categoryId) > 0) {
-                        if (!usedIds2.containsKey(ingredient.getId())) {
-                            if (combinationToAdd.addIngredientToCombination(ingredient, localCounter)) {
+                int categoryId = ingredient.getFood().getCategory().getId().intValue();
+
+                if (limits.getCategoryLimitInAllCombs(categoryId)>0 && limits.getCategoryLimitInComb(categoryId)>0) {
+                    if (!usedIds2.containsKey(ingredient.getId())) {
+                        if (limits.getFoodLimit(productId)>0) {
+
+                            if (combinationToAdd.addProductToCombination(ingredient, limits)) {
                                 if (Math.random() > 0.5) {
                                     usedIds2.put(ingredient.getId(), (long) (1 + Math.random() * 3));
                                 }
-                                localCounter.put(categoryId, (Long) localCounter.get(categoryId) - 1);
-                                overallCounter.put(categoryId, (Long) overallCounter.get(categoryId) - 1);
+                                limits.updateCategoryLimit(categoryId, -1);
+                                limits.updateFoodLimit(productId, -1);
                             }
+
                         } else {
                             continue;
                         }
@@ -367,13 +363,15 @@ public class Calculations {
         return pfcNormsToController;
     }
 
-    public Combinations optimizeCombinations(HashMap<Long, HashMap<String, Object>> foodWithNutrientsList, Combinations unOptimizedCombinations) {
+    public Combinations optimizeCombinations(List<Ingredient> products, Combinations unOptimizedCombinations) {
         for (Combination comb : unOptimizedCombinations.getCombinationList()) {
             int counter = 5;
             List<List<Integer>> listOfOverflowingNutrients = comb.doesCombinationHasOverflowingNutrients();
-            List<Long> foodIds = comb.getFoods().stream()
+            List<Long> foodIds = comb.getProducts().stream()
+                    .map((Ingredient::getFood))
                     .map(Food::getId)
-                    .collect(Collectors.toList());
+                    .collect(Collectors.toList())
+                    ;
 
             //Получаем айди тех нутриентов, которые в избытке
             List<Integer> pfcOverflow, vitaminOverflow, mineralOverflow, acidOverflow;

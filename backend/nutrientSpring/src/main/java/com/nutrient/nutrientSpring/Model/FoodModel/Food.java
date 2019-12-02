@@ -60,7 +60,7 @@ public class Food {
         this.fat_trans+=f1.getFat_trans();
     }
 
-    public void substract(Food f1){
+    public void subtract(Food f1){
         this.energy-=f1.getEnergy();
         this.fat-=f1.getFat();
         this.protein-=f1.getProtein();
@@ -86,6 +86,26 @@ public class Food {
         this.starch*=c;
         this.cholesterol*=c;
         this.fat_trans*=c;
+    }
+    
+    public boolean compare(Float numb){
+        int overflowingNutrientsValue = 1;
+        for(Float nutrient: getValues()){
+            if(nutrient<numb) overflowingNutrientsValue--;
+            if(overflowingNutrientsValue == 0) return false;
+        }
+        return true;
+        /*return this.energy<=numb &&
+        this.fat <= numb &&
+        this.protein<=numb &&
+        this.carbohydrate<=numb &&
+        this.water<=numb &&
+        this.ash<=numb &&
+        this.sugares<=numb &&
+        this.fiber<=numb &&
+        this.starch<=numb &&
+        this.cholesterol<=numb &&
+        this.fat_trans<=numb;*/
     }
 
     @JsonIgnore

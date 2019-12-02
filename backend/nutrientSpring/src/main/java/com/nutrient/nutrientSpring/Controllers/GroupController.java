@@ -19,7 +19,7 @@ public class GroupController {
 
     @GetMapping
     public List<Category> getCategories(){
-        List<Category> tmp = foodService.getCategories();
+        List<Category> tmp = foodService.getLimits();
         return tmp;
     }
 }

@@ -1,10 +1,8 @@
 package com.nutrient.nutrientSpring.Services;
 
-import com.nutrient.nutrientSpring.Model.FoodModel.Category;
-import com.nutrient.nutrientSpring.Model.FoodModel.EnabledCategories;
-import com.nutrient.nutrientSpring.Model.FoodModel.EnabledProducts;
-import com.nutrient.nutrientSpring.Model.FoodModel.Food;
+import com.nutrient.nutrientSpring.Model.FoodModel.*;
 import com.nutrient.nutrientSpring.Repos.FoodRepository.*;
+import com.nutrient.nutrientSpring.Utils.FoodAndCategoriesLimitationTable;
 import com.nutrient.nutrientSpring.Utils.Ingredient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,6 +34,12 @@ public class FoodService {
     private EnabledProductsRepo enabledProductsRepo;
     @Autowired
     private DietTypesRepo dietTypesRepo;
+    @Autowired
+    private CategoryLimitRepo categoryLimitRepo;
+    @Autowired
+    private FoodLimitRepo foodLimitRepo;
+
+    private FoodAndCategoriesLimitationTable limitationTable;
 
     private final List<String> MineralsNames = Stream.of("calcium", "phosphorus", "magnesium", "potassium",
             "sodium", "iron", "zinc", "copper", "manganese", "selenium", "fluoride")
@@ -70,7 +74,11 @@ public class FoodService {
                 .collect(Collectors.toList());
 
         foodList = foodRepo.findByIdInAndCategory_IdIn(enabledF, enabledC);
-        
+
+        List<CategoryLimit> categoryLimits = categoryLimitRepo.findByCategory_idIn(enabledC);
+        List<FoodLimit> foodLimits = foodLimitRepo.findByFood_idIn(enabledF);
+        limitationTable = new FoodAndCategoriesLimitationTable(foodLimits, categoryLimits);
+
        /* switch (dietRestrictions){
             case 1: {
                 notNeededCategories = Stream.of(
@@ -272,49 +280,6 @@ public class FoodService {
         return foodList;
     }
 
-    public List<Category> getCategories(){
-        List<String> notNeededCategories = Stream.of(
-                "Рис в сухом виде",
-                "Лапша в сухом виде",
-                "Яйца в сыром и сухом виде",
-                "Протеин порошок",
-                "Рыба сырая",
-                "Свинина сырая",
-                "Свиные субпродукты сырые",
-                "Говядина сырая",
-                "Говяжьи субпродукты сырые",
-                "Курица сырая",
-                "Куриные субпродукты сырые",
-                "Индейка сырая",
-                "Мясо другое сырое ",
-                "Приправы",
-                "Соки, нектары, морсы",
-                "Животные жиры",
-                "Алкогольные напитки",
-                "Безалкогольные напитки",
-                "Уксус",
-                "Фастфуд",
-                "Моллюски сырые",
-                "Майонез",
-                "Раки, крабы, креветки сырые",
-                "Свинина (приготовленная)",
-                "Свиные субпродукты приготовленные",
-                "Говядина приготовленная",
-                "Говяжьи субпродукты (приготовленные)",
-                "Курица (приготовленная)",
-                "Куриные субпродукты (приготовленные)",
-                "Индейка (приготовленная)",
-                "Мясо другое (приготовленное)",
-                "Мясные продукты",
-                "Кондитерские изделия, печенье, сладости",
-                "Сахар и заменители",
-                "Шоколад"
-        )
-                .collect(Collectors.toList());
-
-        return categoryRepo.findByNameNotIn(notNeededCategories);
-    }
-
     public List<Ingredient> getListOfIngredients(List<Food> foodList){
         List<Ingredient> ingredients = new ArrayList<>();
 
@@ -457,6 +422,9 @@ public class FoodService {
         return foodRepo.findAll();
     }
 
+    public FoodAndCategoriesLimitationTable getLimitations(){
+        return this.limitationTable;
+    }
 
     //переделать
     public HashMap<Long, HashMap<String, Object>> getFoodNutrientsForCustomCombination(List<Long> ids){

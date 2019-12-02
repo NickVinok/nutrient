@@ -110,6 +110,33 @@ public class Acid {
         this.serine*=c;
     }
     
+    public boolean compare(Float numb){
+        int overflowingNutrientsValue = 3;
+        for(Float nutrient: getValues()){
+            if(nutrient<numb) overflowingNutrientsValue--;
+            if(overflowingNutrientsValue == 0) return false;
+        }
+        return true;
+       /* return this.tryptophan<=numb &&
+        this.threonine<=numb &&
+        this.isoleucine<=numb &&
+        this.leucine<=numb &&
+        this.lysine<=numb &&
+        this.methionine<=numb &&
+        this.cystine<=numb &&
+        this.phenylalanine<=numb &&
+        this.tyrosine<=numb &&
+        this.valine<=numb &&
+        this.arginine<=numb &&
+        this.histidine<=numb &&
+        this.alanine<=numb &&
+        this.aspartic_acid<=numb &&
+        this.glutamic_acid<=numb &&
+        this.glycine<=numb &&
+        this.proline<=numb &&
+        this.serine<=numb;*/
+    }
+    
     @JsonIgnore
     public List<Float> getValues(){
         return Stream.of(this.tryptophan, this.threonine, this.isoleucine, this.leucine,

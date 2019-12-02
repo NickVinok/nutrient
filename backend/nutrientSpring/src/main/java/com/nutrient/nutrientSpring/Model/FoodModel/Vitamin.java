@@ -65,7 +65,7 @@ public class Vitamin {
         this.vitamin_b12+=v1.getVitamin_b12();
     }
 
-    public void substract(Vitamin v1){
+    public void subtract(Vitamin v1){
         this.vitamin_a-=v1.getVitamin_a();
         this.beta_carotene-=v1.getBeta_carotene();
         this.alpha_carotene-=v1.getAlpha_carotene();
@@ -104,7 +104,33 @@ public class Vitamin {
         this.vitamin_b9*=c;
         this.vitamin_b12*=c;
     }
-    
+
+    public boolean compare(Float numb){
+        int overflowingNutrientsValue = 3;
+        for(Float nutrient: getValues()){
+            if(nutrient<numb) overflowingNutrientsValue--;
+            if(overflowingNutrientsValue == 0) return false;
+        }
+        return true;
+        /*return this.vitamin_a<=numb &&
+        this.beta_carotene<=numb &&
+        this.alpha_carotene<=numb &&
+        this.vitamin_d<=numb &&
+        this.vitamin_d2<=numb &&
+        this.vitamin_d3<=numb &&
+        this.vitamin_e<=numb &&
+        this.vitamin_k<=numb &&
+        this.vitamin_c<=numb &&
+        this.vitamin_b1<=numb &&
+        this.vitamin_b2<=numb &&
+        this.vitamin_b3<=numb &&
+        this.vitamin_b4<=numb &&
+        this.vitamin_b5<=numb &&
+        this.vitamin_b6<=numb &&
+        this.vitamin_b9<=numb &&
+        this.vitamin_b12<=numb;*/
+    }
+
     @JsonIgnore
     public List<Float> getValues(){
         return Stream.of(vitamin_c, vitamin_b1, vitamin_b2, vitamin_b6, vitamin_b3,
