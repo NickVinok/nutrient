@@ -8,7 +8,6 @@ import com.nutrient.nutrientSpring.Model.FoodModel.Food;
 import com.nutrient.nutrientSpring.Model.FoodModel.Mineral;
 import com.nutrient.nutrientSpring.Model.FoodModel.Vitamin;
 import com.nutrient.nutrientSpring.JsonObjects.NutrientREST.Combinations;
-import com.nutrient.nutrientSpring.Model.NutrientModel.NutrientHasGender;
 import com.nutrient.nutrientSpring.Services.FoodService;
 import com.nutrient.nutrientSpring.Services.NutrientService;
 import com.nutrient.nutrientSpring.Utils.FoodAndCategoriesLimitationTable;
@@ -73,8 +72,8 @@ public class Calculations {
 
 
         for (int i = 0; i < 100; i++) {
-            combinations = optimizeCombinations(limitationTable, combinations);
-            combinations = addFoodToOptimizedCombination(combinations, foodWithNutrientsList);
+            combinations = optimizeCombinations(ingredients, combinations);
+            combinations = addFoodToOptimizedCombination(combinations, ingredients);
         }
 
         combinations.setCombinationList(
@@ -112,98 +111,6 @@ public class Calculations {
             in.setEfficiency(fEf, vEf, mEf, aEf);
         }
 
-       /*for(Map.Entry<Long, HashMap<String, Object>> entry : productsNutrients.entrySet()){
-           HashMap<String, Object> food = entry.getValue();
-
-           HashMap<String, Float> pfcEfficiency = new HashMap<>();
-           HashMap<String, Float> mineralEfficiency = new HashMap<>();
-           HashMap<String, Float> vitaminEfficiency = new HashMap<>();
-           HashMap<String, Float> acidEfficiency = new HashMap<>();
-
-           Float overallEfficiency;
-           Float avgMineralEfficiency = 0f;
-           Float avgVitaminEfficiency = 0f;
-           Float avgAcidEfficiency = 0f;
-           Float avgPcfEfficiency = 0f;
-
-           for(Object foodNutrient : food.values()){
-               if(foodNutrient instanceof Food){
-                   Food tmpFood = (Food)foodNutrient;
-                   pfcEfficiency.put("calorieEfficiency", tmpFood.getEnergy()/ pfcNorms.get(0));
-                   pfcEfficiency.put("fatEfficiency", tmpFood.getFat()/ pfcNorms.get(2));
-                   pfcEfficiency.put("proteinEfficiency", tmpFood.getProtein()/ pfcNorms.get(1));
-                   pfcEfficiency.put("carbohydrateEfficiency", tmpFood.getCarbohydrate()/ pfcNorms.get(3));
-                   pfcEfficiency.put("waterEfficiency", tmpFood.getWater()/ pfcNorms.get(4));
-                   pfcEfficiency.put("ashEfficiency", 0f);
-                   pfcEfficiency.put("sugarEfficiency", tmpFood.getSugares()/ pfcNorms.get(6));
-                   pfcEfficiency.put("starchEfficiency", tmpFood.getStarch()/ pfcNorms.get(7));
-                   pfcEfficiency.put("cholesterolEfficiency", tmpFood.getFat_trans()/ pfcNorms.get(9));
-                   pfcEfficiency.put("fatransEfficiency", tmpFood.getFat_trans()/ pfcNorms.get(8));
-               }
-               else if(foodNutrient instanceof Mineral){
-                   Mineral tmpMineral = (Mineral)foodNutrient;
-                   List<Float> mineralValues = tmpMineral.getValues();
-                   for(int i = 0; i<mineralValues.size(); i++){
-                       mineralEfficiency.put(foodService.getMineralsNames().get(i), mineralValues.get(i)/mineralNorms.get(i).getValue());
-                   }
-
-                   for(Float mineralVal : mineralEfficiency.values()){
-                       avgMineralEfficiency+=mineralVal;
-                   }
-                   avgMineralEfficiency=avgMineralEfficiency/mineralEfficiency.size();
-
-                   Float ash = ((tmpMineral.getCalcium() + tmpMineral.getIron() + tmpMineral.getMagnesium() +
-                           tmpMineral.getPhosphorus() + tmpMineral.getPotassium() + tmpMineral.getSodium() +
-                           tmpMineral.getZinc() + tmpMineral.getCopper() + tmpMineral.getManganese() +
-                           tmpMineral.getSelenium() + tmpMineral.getFluoride())/11)/pfcNorms.get(5);
-                   pfcEfficiency.put("ashEfficiency", ash);
-               }
-               else if(foodNutrient instanceof Vitamin){
-                   Vitamin tmpVitamin = (Vitamin)foodNutrient;
-                   List<Float> vitaminValues = tmpVitamin.getValues();
-                   for(int i = 0; i<vitaminValues.size(); i++){
-                       vitaminEfficiency.put(foodService.getVitaminNames().get(i), vitaminValues.get(i)/vitaminNorms.get(i).getValue());
-                   }
-
-                   for(Float vitaminVal : vitaminEfficiency.values()){
-                       avgVitaminEfficiency+=vitaminVal;
-                   }
-                   avgVitaminEfficiency=avgVitaminEfficiency/vitaminEfficiency.size();
-
-               } else if(foodNutrient instanceof Acid){
-                   Acid tmpAcid = (Acid)foodNutrient;
-                   List<Float> acidValues = tmpAcid.getValues();
-                   for(int i = 0; i<acidValues.size(); i++){
-                       acidEfficiency.put(foodService.getAcidNames().get(i), acidValues.get(i)/acidNorms.get(i).getValue());
-                   }
-
-                   for(Float acidVal : acidEfficiency.values()){
-                       avgAcidEfficiency+=acidVal;
-                   }
-                   avgAcidEfficiency=avgAcidEfficiency/acidEfficiency.size();
-               }
-           }
-
-           avgPcfEfficiency = 0f;
-           for(Float pfcVal : pfcEfficiency.values()){
-               avgPcfEfficiency+=pfcVal;
-           }
-           avgPcfEfficiency=avgPcfEfficiency/pfcEfficiency.size();
-
-           pfcEfficiency.put("overallPfcEfficiency", avgPcfEfficiency);
-           mineralEfficiency.put("overallMineralEfficiency", avgMineralEfficiency);
-           vitaminEfficiency.put("overallVitaminEfficiency", avgVitaminEfficiency);
-           acidEfficiency.put("overallAcidEfficiency", avgAcidEfficiency);
-           overallEfficiency = (avgMineralEfficiency+avgPcfEfficiency+avgVitaminEfficiency+avgAcidEfficiency)/4;
-
-           food.put("pfcEfficiency", pfcEfficiency);
-           food.put("mineralEfficiency", mineralEfficiency);
-           food.put("vitaminEfficiency", vitaminEfficiency);
-           food.put("acidEfficiency", acidEfficiency);
-           food.put("overallEfficiency", overallEfficiency);
-
-           entry.setValue(food);
-       }*/
         return ingredients;
     }
 
@@ -259,101 +166,35 @@ public class Calculations {
         return finalCombinations;
     }
 
-/*        for(
-    int i = 0;
-    i< 12;i++)
-
-    {
-        Combination combinationToAdd = new Combination();
-
-        //Должно копировать
-        HashMap<Long, Long> localCounter = new HashMap<>();
-        for (Map.Entry<Long, Long> old : categoryCounter.entrySet()) {
-            localCounter.put(old.getKey(), old.getValue());
-        }
-        //Составляем комбинацию из продуктов, смотря на категории
-        for (Map.Entry<Long, HashMap<String, Object>> foodList : foodWithNutrientsList.entrySet()) {
-            Food tmpFood = ((Food) foodList.getValue().get("food"));
-
-            //Если данный ингридиент долго не использовался в комбинациях
-            //(т.е. счётчик игнорирования == 0)
-            //то мы возвращаем ингридиент в пулл
-            if (usedIds2.containsValue(0)) {
-                for (Map.Entry<Long, Long> keyVal : usedIds2.entrySet()) {
-                    if (keyVal.getValue() == 0) {
-                        usedIds2.remove(keyVal.getKey());
-                    }
-                }
-            }
-
-            Long categoryId = tmpFood.getCategory().getId();
-            if (newCounter.containsKey(categoryId) && overallCounter.containsKey(categoryId)) {
-                if (newCounter.get(categoryId) > 0 && overallCounter.get(categoryId) > 0) {
-                    if (!usedIds2.containsKey(tmpFood.getId())) {
-                        //внезависимости от добавления/недобавления будет обновлён счётчик
-                        if (!combinationToAdd.addFoodToCombination(foodList.getValue(), newCounter)) {
-                            break;
-                        } else {
-                            if (Math.random() > 0.5) {
-                                usedIds2.put(tmpFood.getId(), (long) (1 + Math.random() * 3));
-                            }
-                            newCounter.put(categoryId, (Long) newCounter.get(categoryId) - 1);
-                            overallCounter.put(categoryId, (Long) overallCounter.get(categoryId) - 1);
-                        }
-                    }
-                }
-            }
-        }
-
-        finalCombinations.addCombination(combinationToAdd);
-    }
-        finalCombinations.setOverallCategoryCounter(overallCounter);
-        return finalCombinations;
-}*/
-
     private Combinations addFoodToOptimizedCombination(
-            Combinations combs, HashMap<Long, HashMap<String, Object>> foodWithNutrientsList) {
-        HashMap<Long, Long> overallCounter = combs.getOverallCategoryCounter();
-        //в течение скольких циклов составления комбинаций данный ингридиент будет игнорироваться
+            Combinations combs, List<Ingredient> products) {
+
         HashMap<Long, Long> usedIds2 = new HashMap<>();
         for (Combination comb : combs.getCombinationList()) {
-            HashMap<Long, Long> localCounter = comb.getCategoryCounter();
-            for (Map.Entry<Long, HashMap<String, Object>> foodList : foodWithNutrientsList.entrySet()) {
-                Food tmpFood = ((Food) foodList.getValue().get("food"));
+            FoodAndCategoriesLimitationTable limits = comb.getLimitationTable();
+            for (Ingredient ingredient: products) {
+                Food tmpFood = ingredient.getFood();
 
                 if (comb.isInCombination(tmpFood)) {
                     continue;
                 }
 
-                //Если данный ингридиент долго не использовался в комбинациях
-                //(т.е. счётчик игнорирования == 0)
-                //то мы возвращаем ингридиент в пулл
-                /*if(usedIds2.containsValue(0)){
-                    for(Map.Entry <Long, Long> keyVal: usedIds2.entrySet()){
-                        if(keyVal.getValue() == 0){
-                            usedIds2.remove(keyVal.getKey());
-                        }
-                    }
-                }*/
-
-                Long categoryId = tmpFood.getCategory().getId();
-                if (localCounter.containsKey(categoryId) && overallCounter.containsKey(categoryId)) {
-                    if (localCounter.get(categoryId) > 0 && overallCounter.get(categoryId) > 0) {
-                        //if(!usedIds2.containsKey(tmpFood.getId())) {
-                        if (!comb.addFoodToCombination(foodList.getValue(), localCounter)) {
-                            break;
-                        }
-                            /*else {
+                int categoryId = ingredient.getFood().getCategory().getId().intValue();
+                if (limits.getCategoryLimitInAllCombs(categoryId)>0 && limits.getCategoryLimitInComb(categoryId)>0) {
+                    if (!usedIds2.containsKey(ingredient.getId())) {
+                        if (limits.getFoodLimit(ingredient.getId().intValue())>0) {
+                            if (comb.addProductToCombination(ingredient, limits)) {
                                 if (Math.random() > 0.5) {
-                                    usedIds2.put(tmpFood.getId(), (long)(1+Math.random()*3));
+                                    usedIds2.put(ingredient.getId(), (long) (1 + Math.random() * 3));
                                 }
-                                localCounter.put(categoryId, (Long) localCounter.get(categoryId) - 1);
-                                overallCounter.put(categoryId, (Long) overallCounter.get(categoryId) - 1);
-                            }*/
-                        //}
+                                limits.updateCategoryLimit(categoryId, -1);
+                                limits.updateFoodLimit(ingredient.getId().intValue(), -1);
+                            }
+                        } else {
+                            continue;
+                        }
                     }
                 }
-
             }
         }
         return combs;
@@ -385,27 +226,53 @@ public class Calculations {
                     (mineralOverflow.size() != 0) || (acidOverflow.size() != 0)) {
                 List<List<Integer>> tmp = new ArrayList<>(listOfOverflowingNutrients);
 
+                //какой нутриент в каком из продуктов больше всего
                 HashMap<Long, HashMap<Integer, Float>> mostOverFlowingNutrient = new HashMap<>();
-                Float valueOfMostOverflowingNutrientInComb = 1f;
+                //Значение эффективности(сколько процентов суточной нормы удоволетворяет ДАННЫЙ продукт)
+                //по самому удоволетворяемому нутриенту
+                Float percentOfMostOverflowingNutrientInComb = 1f;
+                Ingredient nutrientsAndEfficiency = comb.getOverallNutrientsAndEfficiency();
 
+                //Находим самый избыточный компонент и его значение
                 if (pfcOverflow.size() > 0) {
-                    mostOverFlowingNutrient = getMostOverflowingNutrient(foodWithNutrientsList, foodIds, pfcOverflow, "pfcEfficiency");
-                    valueOfMostOverflowingNutrientInComb = new ArrayList<Float>(comb.getPfcEfficiency().values()).get(pfcOverflow.get(0));
+                    mostOverFlowingNutrient = getMostOverflowingNutrient(products, foodIds,
+                            pfcOverflow, "food");
+                    percentOfMostOverflowingNutrientInComb = nutrientsAndEfficiency.getFoodEfficiency()
+                            .getValues().get(pfcOverflow.get(0));
                 } else if (vitaminOverflow.size() > 0) {
-                    mostOverFlowingNutrient = getMostOverflowingNutrient(foodWithNutrientsList, foodIds, vitaminOverflow, "vitaminEfficiency");
-                    valueOfMostOverflowingNutrientInComb = new ArrayList<Float>(comb.getVitaminEfficiency().values()).get(vitaminOverflow.get(0));
+                    mostOverFlowingNutrient = getMostOverflowingNutrient(products, foodIds,
+                            vitaminOverflow, "vitamin");
+                    percentOfMostOverflowingNutrientInComb = nutrientsAndEfficiency.getVitaminEfficiency()
+                            .getValues().get(pfcOverflow.get(0));
                 } else if (mineralOverflow.size() > 0) {
-                    mostOverFlowingNutrient = getMostOverflowingNutrient(foodWithNutrientsList, foodIds, mineralOverflow, "mineralEfficiency");
-                    valueOfMostOverflowingNutrientInComb = new ArrayList<Float>(comb.getMineralEfficiency().values()).get(mineralOverflow.get(0));
+                    mostOverFlowingNutrient = getMostOverflowingNutrient(products, foodIds,
+                            mineralOverflow, "mineral");
+                    percentOfMostOverflowingNutrientInComb = nutrientsAndEfficiency.getMineralEfficiency()
+                            .getValues().get(pfcOverflow.get(0));
                 } else if (acidOverflow.size() > 0) {
-                    mostOverFlowingNutrient = getMostOverflowingNutrient(foodWithNutrientsList, foodIds, acidOverflow, "acidEfficiency");
-                    valueOfMostOverflowingNutrientInComb = new ArrayList<Float>(comb.getAcidEfficiency().values()).get(acidOverflow.get(0));
+                    mostOverFlowingNutrient = getMostOverflowingNutrient(products, foodIds,
+                            acidOverflow, "acid");
+                    percentOfMostOverflowingNutrientInComb =  nutrientsAndEfficiency.getAcidEfficiency()
+                            .getValues().get(pfcOverflow.get(0));
                 }
 
-                Long idOfFoodToBeModified = mostOverFlowingNutrient.entrySet().stream().findFirst().get().getKey();
-                comb.deleteFoodFromCombination(idOfFoodToBeModified, foodWithNutrientsList.get(idOfFoodToBeModified));
-                Float gramFixCoef = getNutrientFixCoefficient(mostOverFlowingNutrient, valueOfMostOverflowingNutrientInComb);
-                comb.addFoodToCustomCombination(modifyFoodGrams(foodWithNutrientsList.get(idOfFoodToBeModified), gramFixCoef));
+                Long idOfFoodToBeModified = mostOverFlowingNutrient.entrySet()
+                        .stream()
+                        .findFirst()
+                        .get()
+                        .getKey()
+                        ;
+
+                Ingredient productTobeModified = products.stream()
+                        .filter(ingredient -> ingredient.getId().equals(idOfFoodToBeModified))
+                        .findFirst()
+                        .get()
+                        ;
+
+                comb.deleteFoodFromCombination(productTobeModified);
+                Float gramFixCoef = getNutrientFixCoefficient(mostOverFlowingNutrient, percentOfMostOverflowingNutrientInComb);
+                productTobeModified.multiply(gramFixCoef);
+                comb.addFoodToCustomCombination(productTobeModified);
 
                 listOfOverflowingNutrients = comb.doesCombinationHasOverflowingNutrients();
                 pfcOverflow = listOfOverflowingNutrients.get(0);
@@ -429,66 +296,76 @@ public class Calculations {
 
     public Combination calculateCustomCombination(String gender, int workingGroup, float age, float weight, float height, String dietType,
                                                   int dietRestrictions, boolean pregnancy, List<HashMap<String, Long>> idsWithGrams) {
+
         List<Long> ids = new ArrayList<>();
         HashMap<Long, Integer> actualIdsGrams = new HashMap<>();
         for (HashMap<String, Long> hs : idsWithGrams) {
             ids.add(hs.get("id"));
             actualIdsGrams.put(hs.get("id"), hs.get("gram").intValue());
         }
-        HashMap<Long, HashMap<String, Object>> foodWithNutrientsUnsortedList = foodService.getFoodNutrientsForCustomCombination(ids);
+        List<Ingredient> products = foodService.getProductsForCustomCombination(ids);
         //Получаем список объектов значений нутриентов для конкретного пола
         nutrientService.getNutrientsValueForGender(gender);
 
-        acidNorms = new Acid(nutrientService.getAcidNorms().stream()
-                .map(NutrientHasGender::getValue)
-                .collect(Collectors.toList()));
-        vitaminNorms = new Vitamin(nutrientService.getVitaminNorms().stream()
-                .map(NutrientHasGender::getValue)
-                .collect(Collectors.toList()));
-        mineralNorms = new Mineral(nutrientService.getMineralNorms().stream()
-                .map(NutrientHasGender::getValue)
-                .collect(Collectors.toList()));
+        acidNorms = nutrientService.getAcidNorms();
+        vitaminNorms = nutrientService.getVitaminNorms();
+        mineralNorms = nutrientService.getMineralNorms();
         //Рассчитываем Нрмы БЖУ, исходя из роста, веса, пола и т.д.)
         pfcNormsCalculation = new PfcNormsCalculation(gender, age, weight, height, dietType, workingGroup);
         //Рассчитываем норму золы
         List<Long> mineralIds = mapper.getMineralsId();
         pfcNormsCalculation.setAsh(nutrientService.getMineralsSum(gender, mineralIds));
         //Получаем список норм БЖУ
-        List<Float> pfcNorms = pfcNormsCalculation.getPfc();
+        Food pfcNorms = new Food(pfcNormsCalculation.getPfc());
         pfcNormsToController = pfcNormsCalculation.getNorms();
         //Рассчитываем эффективность каждого из продуктов
-        productOverallEfficiency(foodWithNutrientsUnsortedList, pfcNorms,
+        productOverallEfficiency(products, pfcNorms,
                 nutrientService.getVitaminNorms(), nutrientService.getMineralNorms(), nutrientService.getAcidNorms());
 
         Combination result = new Combination();
-        for (Map.Entry<Long, HashMap<String, Object>> food : foodWithNutrientsUnsortedList.entrySet()) {
-            Long id = ((Food) food.getValue().get("food")).getId();
+        for (Ingredient product: products) {
+            Long id = product.getId();
             int numberOfGrams = actualIdsGrams.get(id);
-            food.setValue(modifyFoodGrams(food.getValue(), (float) numberOfGrams / 100));
-            result.addFoodToCustomCombination(food.getValue());
+            product.multiply(numberOfGrams/100f);
+            result.addFoodToCustomCombination(product);
         }
 
         return result;
     }
 
-    private HashMap<Long, HashMap<Integer, Float>> getMostOverflowingNutrient(HashMap<Long, HashMap<String, Object>> foodWithNutrientsList, List<Long> foodIds,
-                                                                              List<Integer> overflowingIndexes, String nutrientGroup) {
+    private HashMap<Long, HashMap<Integer, Float>> getMostOverflowingNutrient(List<Ingredient> products, List<Long> foodIds,
+                                                                              List<Integer> overflowingIndexes,
+                                                                              String nutrient) {
+
         HashMap<Long, HashMap<Integer, Float>> efficiencyOnSingleNutrient = new HashMap<>();
         Integer index = overflowingIndexes.get(0);
 
-        for (Long id : foodIds) {
+        for (Ingredient ingredient: products) {
             HashMap<Integer, Float> nutrientEffectPair = new HashMap<>();
-            nutrientEffectPair.put(index,
-                    new ArrayList<>(((HashMap<String, Float>) foodWithNutrientsList.get(id).get(nutrientGroup)).values())
-                            .get(index));
+            Float effect = 0f;
 
-            efficiencyOnSingleNutrient.put(id, nutrientEffectPair);
+            if(nutrient.equals("food")){
+                effect = ingredient.getFoodEfficiency().getValues().get(index);
+            } else if(nutrient.equals("mineral")){
+                effect = ingredient.getMineralEfficiency().getValues().get(index);
+            } else if(nutrient.equals("vitamin")){
+                effect = ingredient.getVitaminEfficiency().getValues().get(index);
+            } else {
+                effect = ingredient.getAcidEfficiency().getValues().get(index);
+            }
+            nutrientEffectPair.put(index, effect);
+
+            efficiencyOnSingleNutrient.put(ingredient.getId(), nutrientEffectPair);
         }
 
         Long idOfMaxOverflow = efficiencyOnSingleNutrient.entrySet().stream()
                 .max((f1, f2) -> Float.compare(f1.getValue().get(index), f2.getValue().get(index))).get().getKey();
-        HashMap<Integer, Float> efficiencyOfMaxOverflow = efficiencyOnSingleNutrient.entrySet().stream()
-                .max((f1, f2) -> Float.compare(f1.getValue().get(index), f2.getValue().get(index))).get().getValue();
+        HashMap<Integer, Float> efficiencyOfMaxOverflow = efficiencyOnSingleNutrient.entrySet()
+                .stream()
+                .max((f1, f2) -> Float.compare(f1.getValue().get(index), f2.getValue().get(index)))
+                .get()
+                .getValue()
+                ;
 
         HashMap<Long, HashMap<Integer, Float>> result = new HashMap<>();
         result.put(idOfMaxOverflow, efficiencyOfMaxOverflow);
@@ -501,8 +378,15 @@ public class Calculations {
 
         Float gramFixCoefficient;
         Float nutrientPercentOfOverflow = mostOverFlowingNutrient.entrySet().stream()
-                .findFirst().get().getValue().entrySet().stream()
-                .findFirst().get().getValue();
+                .findFirst()
+                .get()
+                .getValue()
+                .entrySet()
+                .stream()
+                .findFirst()
+                .get()
+                .getValue()
+                ;
 
         Float tmp = nutrientPercentOfOverflow / valueOfOverflowingNutrientInComb;
 
@@ -521,7 +405,7 @@ public class Calculations {
         return gramFixCoefficient;
     }
 
-    public HashMap<String, Object> modifyFoodGrams(HashMap<String, Object> foodNutrients, Float gramFixCoef) {
+  /*  public HashMap<String, Object> modifyFoodGrams(HashMap<String, Object> foodNutrients, Float gramFixCoef) {
 
         Food f = (Food) foodNutrients.get("food");
         Mineral m = (Mineral) foodNutrients.get("mineral");
@@ -563,13 +447,13 @@ public class Calculations {
             valueMap4.put(foodEfficiency.getKey(), gramFixCoef * foodEfficiency.getValue());
         }
         foodNutrients.put("acidEfficiency", valueMap4);
-        /*for(Map.Entry<String, Float> foodEfficiency : ((HashMap<String, Float>)foodNutrients.get("overallEfficiency")).entrySet()){
+        *//*for(Map.Entry<String, Float> foodEfficiency : ((HashMap<String, Float>)foodNutrients.get("overallEfficiency")).entrySet()){
             foodEfficiency.setValue(foodEfficiency.getValue()*gramFixCoef);
-        }*/
+        }*//*
         foodNutrients.put("overallEfficiency", (Float) foodNutrients.get("overallEfficiency") * gramFixCoef);
 
         return foodNutrients;
-    }
+    }*/
 
     public Acid getAcidNorms() {
         return acidNorms;

@@ -3,6 +3,7 @@ package com.nutrient.nutrientSpring.Model.FoodModel;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.nutrient.nutrientSpring.Utils.NutrientGroup;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import javax.persistence.*;
@@ -23,7 +24,7 @@ import java.util.stream.Stream;
 @Table(name = "food")
 @AllArgsConstructor
 @NoArgsConstructor
-public class Food {
+public class Food implements NutrientGroup {
     @Id
     private Long id;
     private String name;

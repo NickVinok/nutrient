@@ -1,6 +1,7 @@
 package com.nutrient.nutrientSpring.Model.FoodModel;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.nutrient.nutrientSpring.Utils.NutrientGroup;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,7 +19,7 @@ import java.util.stream.Stream;
 @NoArgsConstructor
 @Entity
 @Table(name = "vitamins")
-public class Vitamin {
+public class Vitamin implements NutrientGroup {
     @Id
     private Long id;
 

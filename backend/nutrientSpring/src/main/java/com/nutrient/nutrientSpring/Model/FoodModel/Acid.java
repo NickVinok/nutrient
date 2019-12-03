@@ -1,6 +1,7 @@
 package com.nutrient.nutrientSpring.Model.FoodModel;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.nutrient.nutrientSpring.Utils.NutrientGroup;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import javax.persistence.*;
@@ -19,7 +20,7 @@ import java.util.stream.Stream;
 @Table(name = "acids")
 @AllArgsConstructor
 @NoArgsConstructor
-public class Acid {
+public class Acid implements NutrientGroup {
     @Id
     private Long id;
 

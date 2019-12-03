@@ -427,12 +427,10 @@ public class FoodService {
     }
 
     //переделать
-    public HashMap<Long, HashMap<String, Object>> getFoodNutrientsForCustomCombination(List<Long> ids){
+    public List<Ingredient> getProductsForCustomCombination(List<Long> ids){
         List<Food> foods = foodRepo.findByIdIn(ids);
-        HashMap<Long, HashMap<String, Object>> foodNutrientsList = new HashMap<>();
+        List<Ingredient> products = new ArrayList<>();
         for(Food f: foods){
-            Long id = f.getId();
-            HashMap<String, Object> tmp = new HashMap<String, Object>();
 
             Category cat = f.getCategory();
             Pattern p = Pattern.compile("\\((.*)\\)");
@@ -447,13 +445,13 @@ public class FoodService {
             }
             f.setCategory(cat);
 
-            tmp.put("food", f);
-            tmp.put("mineral", mineralRepo.findByFood_id(id).get());
-            tmp.put("vitamin", vitaminRepo.findByFood_id(id).get());
-            tmp.put("acid", acidsRepo.findByFood_id(id).get());
-            foodNutrientsList.put(id, tmp);
+            Ingredient ingredient = new Ingredient(f,
+                    vitaminRepo.findByFood_id(f.getId()).get(),
+                    mineralRepo.findByFood_id(f.getId()).get(),
+                    acidsRepo.findByFood_id(f.getId()).get());
+            products.add(ingredient);
         }
-        return  foodNutrientsList;
+        return  products;
     }
 
     public List<String> getMineralsNames() {
