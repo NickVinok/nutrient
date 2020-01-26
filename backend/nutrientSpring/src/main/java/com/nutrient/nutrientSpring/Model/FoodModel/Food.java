@@ -51,7 +51,7 @@ public class Food implements NutrientGroup {
     private Float organicAcid;
     @Nullable
     private Float sfa;
-
+    @Column(name="category_id")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "category_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
