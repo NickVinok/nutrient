@@ -43,8 +43,7 @@ public class Food implements NutrientGroup {
     private float fiber;
     private float starch;
     private float cholesterol;
-    @JsonIgnore
-    @Column(name = "img")
+    @Column(name = "img_id")
     private String img;
     //TODO ДОБАВИТЬ НОРМЫ  И В РАСЧЁТЫ
     @Column(name = "organic_acid")
