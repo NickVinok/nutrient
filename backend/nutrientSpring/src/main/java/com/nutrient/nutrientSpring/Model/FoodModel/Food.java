@@ -51,11 +51,10 @@ public class Food implements NutrientGroup {
     private Float organicAcid;
     @Nullable
     private Float sfa;
-    @Column(name="category_id")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "category_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private Category category;
+    private Category category_id;
 
     public void sum(Food f1){
         this.energy+=f1.getEnergy();

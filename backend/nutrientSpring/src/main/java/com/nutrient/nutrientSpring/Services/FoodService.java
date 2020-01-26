@@ -91,7 +91,7 @@ public class FoodService {
 
             //вот здесь пытаемся вытащить категорию еды, но её назуй
             //потом норм сделаю
-            Category cat = food.getCategory();
+            Category cat = food.getCategory_id();
             Pattern p = Pattern.compile("\\((.*)\\)");
             Matcher match = p.matcher(cat.getName());
             String status = "-";
@@ -101,7 +101,7 @@ public class FoodService {
             } else{
                 cat.setStatus(status);
             }
-            food.setCategory(cat);
+            food.setCategory_id(cat);
 
             Ingredient ingredient = new Ingredient(food,
                     vitaminRepo.findByFood_id(id).get(),
@@ -120,7 +120,7 @@ public class FoodService {
             Long id = food.getId();
             HashMap<String, Object> tmp = new HashMap<String, Object>();
 
-            Category cat = food.getCategory();
+            Category cat = food.getCategory_id();
             Pattern p = Pattern.compile("\\((.*)\\)");
             Matcher match = p.matcher(cat.getName());
             String status = "-";
@@ -130,7 +130,7 @@ public class FoodService {
             } else{
                 cat.setStatus(status);
             }
-            food.setCategory(cat);
+            food.setCategory_id(cat);
 
             tmp.put("food", food);
             tmp.put("mineral", mineralRepo.findByFood_id(id).get());
@@ -235,7 +235,7 @@ public class FoodService {
         List<Ingredient> products = new ArrayList<>();
         for(Food f: foods){
 
-            Category cat = f.getCategory();
+            Category cat = f.getCategory_id();
             Pattern p = Pattern.compile("\\((.*)\\)");
             Matcher match = p.matcher(cat.getName());
             String status = "-";
@@ -246,7 +246,7 @@ public class FoodService {
             } else{
                 cat.setStatus(status);
             }
-            f.setCategory(cat);
+            f.setCategory_id(cat);
 
             Ingredient ingredient = new Ingredient(f,
                     vitaminRepo.findByFood_id(f.getId()).get(),

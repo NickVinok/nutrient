@@ -159,7 +159,7 @@ public class Calculations {
                     }
                 }
                 //System.out.println(limits.getSingleTable());
-                Long categoryId = ingredient.getFood().getCategory().getId();
+                Long categoryId = ingredient.getFood().getCategory_id().getId();
 
 
                     if (limits.isCategoryAllowed(categoryId)) {
@@ -202,7 +202,7 @@ public class Calculations {
                 }
 
                 Long productId = ingredient.getId();
-                Long categoryId = ingredient.getFood().getCategory().getId();
+                Long categoryId = ingredient.getFood().getCategory_id().getId();
 
                     if (limits.isCategoryAllowed(categoryId)) {
                         if (limits.getCategoryLimitInAllCombs(categoryId) > 0 && limits.getCategoryLimitInComb(categoryId) > 0) {
