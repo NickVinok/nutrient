@@ -64,7 +64,7 @@ public class PackedFoodService {
             packedFood.addRelationship("acid", relationshipValues);
 
             packedFood.addRelationship("category",
-                    f.getCategory_id());
+                    f.getCategory());
 
             listOfFood.add(packedFood);
         }

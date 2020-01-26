@@ -54,7 +54,7 @@ public class Food implements NutrientGroup {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "category_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private Category category_id;
+    private Category category;
 
     public void sum(Food f1){
         this.energy+=f1.getEnergy();

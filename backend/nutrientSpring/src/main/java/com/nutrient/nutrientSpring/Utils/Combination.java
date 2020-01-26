@@ -78,7 +78,7 @@ public class Combination{
         this.combinationEfficiency = (pfcOverallEfficiency+acidOverallEfficiency+
                 mineralOverallEfficiency+vitaminOverallEfficiency)/4;
 
-        this.limitationTable.updateCategoryLimit(product.getFood().getCategory_id().getId(), -1);
+        this.limitationTable.updateCategoryLimit(product.getFood().getCategory().getId(), -1);
         this.limitationTable.updateFoodLimit(product.getId(), -1);
     }
 
@@ -93,7 +93,7 @@ public class Combination{
         this.combinationEfficiency = (pfcOverallEfficiency+acidOverallEfficiency+
                 mineralOverallEfficiency+vitaminOverallEfficiency)/4;
 
-        this.limitationTable.updateCategoryLimit(product.getFood().getCategory_id().getId(), 1);
+        this.limitationTable.updateCategoryLimit(product.getFood().getCategory().getId(), 1);
         this.limitationTable.updateFoodLimit(product.getId(), 1);
     }
 
