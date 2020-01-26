@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="0fa6d8d1-3b4d-48cd-a6aa-ff0ae0386506" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/backend/nutrientSpring/src/main/java/com/nutrient/nutrientSpring/CalculationLogics/Calculations.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/nutrientSpring/src/main/java/com/nutrient/nutrientSpring/CalculationLogics/Calculations.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/nutrientSpring/src/main/java/com/nutrient/nutrientSpring/CalculationLogics/Pfc/PfcNorms.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/nutrientSpring/src/main/java/com/nutrient/nutrientSpring/CalculationLogics/Pfc/PfcNorms.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/nutrientSpring/src/main/java/com/nutrient/nutrientSpring/CalculationLogics/Pfc/PfcNormsCalculation.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/nutrientSpring/src/main/java/com/nutrient/nutrientSpring/CalculationLogics/Pfc/PfcNormsCalculation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/nutrientSpring/src/main/java/com/nutrient/nutrientSpring/Controllers/GroupController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/nutrientSpring/src/main/java/com/nutrient/nutrientSpring/Model/FoodModel/Acid.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/nutrientSpring/src/main/java/com/nutrient/nutrientSpring/Model/FoodModel/Acid.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/nutrientSpring/src/main/java/com/nutrient/nutrientSpring/Model/FoodModel/CategoryLimit.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/nutrientSpring/src/main/java/com/nutrient/nutrientSpring/Model/FoodModel/CategoryLimit.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/nutrientSpring/src/main/java/com/nutrient/nutrientSpring/Model/FoodModel/EnabledCategories.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/nutrientSpring/src/main/java/com/nutrient/nutrientSpring/Model/FoodModel/EnabledCategories.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/nutrientSpring/src/main/java/com/nutrient/nutrientSpring/Model/FoodModel/EnabledProducts.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/nutrientSpring/src/main/java/com/nutrient/nutrientSpring/Model/FoodModel/EnabledProducts.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/nutrientSpring/src/main/java/com/nutrient/nutrientSpring/Model/FoodModel/Food.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/nutrientSpring/src/main/java/com/nutrient/nutrientSpring/Model/FoodModel/Food.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/nutrientSpring/src/main/java/com/nutrient/nutrientSpring/Model/FoodModel/Mineral.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/nutrientSpring/src/main/java/com/nutrient/nutrientSpring/Model/FoodModel/Mineral.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/nutrientSpring/src/main/java/com/nutrient/nutrientSpring/Model/FoodModel/Vitamin.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/nutrientSpring/src/main/java/com/nutrient/nutrientSpring/Model/FoodModel/Vitamin.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/nutrientSpring/src/main/java/com/nutrient/nutrientSpring/Repos/FoodRepository/CategoryLimitRepo.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/nutrientSpring/src/main/java/com/nutrient/nutrientSpring/Repos/FoodRepository/CategoryLimitRepo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/nutrientSpring/src/main/java/com/nutrient/nutrientSpring/Repos/FoodRepository/EnabledCategoriesRepo.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/nutrientSpring/src/main/java/com/nutrient/nutrientSpring/Repos/FoodRepository/EnabledCategoriesRepo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/nutrientSpring/src/main/java/com/nutrient/nutrientSpring/Repos/FoodRepository/EnabledProductsRepo.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/nutrientSpring/src/main/java/com/nutrient/nutrientSpring/Repos/FoodRepository/EnabledProductsRepo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/nutrientSpring/src/main/java/com/nutrient/nutrientSpring/Repos/FoodRepository/FoodLimitRepo.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/nutrientSpring/src/main/java/com/nutrient/nutrientSpring/Repos/FoodRepository/FoodLimitRepo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/nutrientSpring/src/main/java/com/nutrient/nutrientSpring/Services/FoodService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/nutrientSpring/src/main/java/com/nutrient/nutrientSpring/Services/FoodService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/nutrientSpring/src/main/java/com/nutrient/nutrientSpring/Services/NutrientService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/nutrientSpring/src/main/java/com/nutrient/nutrientSpring/Services/NutrientService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/nutrientSpring/src/main/java/com/nutrient/nutrientSpring/Utils/Combination.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/nutrientSpring/src/main/java/com/nutrient/nutrientSpring/Utils/Combination.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/nutrientSpring/src/main/java/com/nutrient/nutrientSpring/Utils/FoodAndCategoriesLimitationTable.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/nutrientSpring/src/main/java/com/nutrient/nutrientSpring/Utils/FoodAndCategoriesLimitationTable.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/nutrientSpring/src/main/java/com/nutrient/nutrientSpring/Utils/Ingredient.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/nutrientSpring/src/main/java/com/nutrient/nutrientSpring/Utils/Ingredient.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1VOmk1G0VkJfN1vKtcMy4qO6oOc" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/backend" />
+  </component>
+  <component name="ServiceViewManager">
+    <option name="viewStates">
+      <list>
+        <serviceView>
+          <treeState>
+            <expand />
+            <select />
+          </treeState>
+        </serviceView>
+      </list>
+    </option>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="0fa6d8d1-3b4d-48cd-a6aa-ff0ae0386506" name="Default Changelist" comment="" />
+      <created>1577132654521</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1577132654521</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="584" y="191" key="FileChooserDialogImpl" timestamp="1577132665964">
+      <screen x="0" y="0" width="1600" height="870" />
+    </state>
+    <state x="584" y="191" key="FileChooserDialogImpl/0.0.1600.870@0.0.1600.870" timestamp="1577132665964" />
+  </component>
+</project>

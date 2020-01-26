@@ -11,8 +11,10 @@ public class PfcNorms {
     public float water;
     public float ash;
     public float sugar;
-    public float transfats;
     public float cholesterol;
     public float starch;
     public float fiber;
+    public float omega3;
+    public float omega6;
+    public float omega9;
 }

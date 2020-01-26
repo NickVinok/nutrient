@@ -67,10 +67,12 @@ public class PfcNormsCalculation extends PfcNorms {
         }
 
         this.sugar = 50;
-        this.transfats = calories/100;
         this.cholesterol = 300;
         this.starch = carbohydrates-this.sugar;
         this.fiber = 38;
+        this.omega3 = calories/1000;
+        this.omega6 = calories/1000*4;
+        this.omega9 = calories/10;
     }
 
     public PfcNorms getNorms(){
@@ -82,14 +84,16 @@ public class PfcNormsCalculation extends PfcNorms {
         norms.setWater(water);
         norms.setAsh(ash);
         norms.setSugar(sugar);
-        norms.setTransfats(transfats);
         norms.setCholesterol(cholesterol);
         norms.setStarch (starch);
+        norms.setOmega3(omega3);
+        norms.setOmega6(omega6);
+        norms.setOmega9(omega9);
         return norms;
     }
 
     public List<Float> getPfc(){
-        return Stream.of(calories, proteins, fats, carbohydrates, water, ash, sugar, starch, transfats, cholesterol, fiber)
+        return Stream.of(calories, proteins, fats, carbohydrates, water, ash, sugar, starch, cholesterol, fiber)
                 .collect(Collectors.toList());
     }
 }

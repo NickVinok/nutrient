@@ -11,7 +11,7 @@ import java.util.Date;
 
 @Data
 @Entity
-@Table(name = "combinations_limit")
+@Table(name = "categories_limit")
 public class CategoryLimit {
     @Id
     private Long id;

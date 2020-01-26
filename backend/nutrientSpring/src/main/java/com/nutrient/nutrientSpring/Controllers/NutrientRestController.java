@@ -4,6 +4,7 @@ import com.nutrient.nutrientSpring.CalculationLogics.Calculations;
 import com.nutrient.nutrientSpring.JsonObjects.NutrientREST.DietInfo;
 import com.nutrient.nutrientSpring.JsonObjects.NutrientREST.CalculationResponse;
 import com.nutrient.nutrientSpring.JsonObjects.NutrientREST.NutrientNorms;
+import com.nutrient.nutrientSpring.Utils.Combination;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +28,9 @@ public class NutrientRestController {
                 dietInfo.getDietRestrictions(),
                 dietInfo.isPregnancy()
                 ).getCombinationList());
+        /*for (Combination c : r.getCombinations()){
+            System.out.println(c.getProducts().size());
+        }*/
         r.setNorms(new NutrientNorms(calculations.getPfcNorms(),
                 calculations.getVitaminNorms(), calculations.getAcidNorms(), calculations.getMineralNorms()));
         return r;

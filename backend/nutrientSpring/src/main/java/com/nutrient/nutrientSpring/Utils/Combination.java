@@ -26,6 +26,10 @@ public class Combination{
     @JsonIgnore
     private FoodAndCategoriesLimitationTable limitationTable;
 
+    public List<Ingredient> getProducts(){
+        return products;
+    }
+
     public boolean isInCombination(Food food){
         if(products.stream()
                 .map(Ingredient::getFood)
@@ -36,10 +40,16 @@ public class Combination{
     }
 
     private boolean isPossibleToAddProduct(Ingredient product){
+        if(products.size()>18){
+            return false;
+        }
+
         overallNutrientsAndEfficiency.sum(product);
+
         if(overallNutrientsAndEfficiency.compare(1f)){
             return true;
         }
+
         overallNutrientsAndEfficiency.subtract(product);
         return false;
     }
@@ -63,6 +73,7 @@ public class Combination{
     public void addFoodToCustomCombination(Ingredient product){
         overallNutrientsAndEfficiency.sum(product);
         products.add(product);
+
         this.pfcOverallEfficiency += product.calculateOverallFoodEfficiency();
         this.acidOverallEfficiency += product.calculateOverallAcidEfficiency();
         this.mineralOverallEfficiency+=product.calculateOverallMineralEfficiency();
@@ -70,27 +81,29 @@ public class Combination{
         this.combinationEfficiency = (pfcOverallEfficiency+acidOverallEfficiency+
                 mineralOverallEfficiency+vitaminOverallEfficiency)/4;
 
-        this.limitationTable.updateCategoryLimit(product.getFood().getCategory().getId().intValue(), -1);
-        this.limitationTable.updateFoodLimit(product.getId().intValue(), -1);
+        this.limitationTable.updateCategoryLimit(product.getFood().getCategory().getId(), -1);
+        this.limitationTable.updateFoodLimit(product.getId(), -1);
     }
 
     public void deleteFoodFromCombination(Ingredient product){
         products.remove(product);
         overallNutrientsAndEfficiency.subtract(product);
+
         this.pfcOverallEfficiency -= product.calculateOverallFoodEfficiency();
         this.acidOverallEfficiency -= product.calculateOverallAcidEfficiency();
-        this.mineralOverallEfficiency-=product.calculateOverallMineralEfficiency();
-        this.vitaminOverallEfficiency-=product.calculateOverallVitaminEfficiency();
+        this.mineralOverallEfficiency -=product.calculateOverallMineralEfficiency();
+        this.vitaminOverallEfficiency -=product.calculateOverallVitaminEfficiency();
         this.combinationEfficiency = (pfcOverallEfficiency+acidOverallEfficiency+
                 mineralOverallEfficiency+vitaminOverallEfficiency)/4;
 
-        this.limitationTable.updateCategoryLimit(product.getFood().getCategory().getId().intValue(), 1);
-        this.limitationTable.updateFoodLimit(product.getId().intValue(), 1);
+        this.limitationTable.updateCategoryLimit(product.getFood().getCategory().getId(), 1);
+        this.limitationTable.updateFoodLimit(product.getId(), 1);
     }
 
     public List<List<Integer>> doesCombinationHasOverflowingNutrients(){
         List<List<Integer>> tmp = Stream.of(doesPFCOverflow(), doesVitaminsOverflow(), doesMineralsOverflow(), doesAcidsOverflow())
                 .collect(Collectors.toList());
+        //System.out.println(tmp);
         return tmp;
     }
 
@@ -136,5 +149,14 @@ public class Combination{
             }
         }
         return tmp;
+    }
+    public Combination(){
+        this.limitationTable = new FoodAndCategoriesLimitationTable();
+        this.overallNutrientsAndEfficiency = new Ingredient();
+    }
+
+    @JsonIgnore
+    public FoodAndCategoriesLimitationTable getLimitationTable(){
+        return this.limitationTable;
     }
 }

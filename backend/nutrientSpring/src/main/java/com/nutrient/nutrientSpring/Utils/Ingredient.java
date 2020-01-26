@@ -36,6 +36,19 @@ public class Ingredient {
         this(f,v,m,a,100);
     }
 
+    public Ingredient(){
+        this.food = new Food(null, "overall",-1L, 0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,"id",-1f,-1f,null);
+        this.vitamin = new Vitamin(null, 0f, 0f, 0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,null);
+        this.mineral = new Mineral(null, 0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,-1f,-1f,-1f,-1f,-1f,-1f,-1f,-1f,-1f,-1f,-1f,-1f,-1f,-1f,-1f,-1f,-1f,null);
+        this.acid = new Acid(null, 0f,0f,0f,0f,0f,0f, 0f,0f,0f, 0f, 0f,0f,0f, 0f,0f,0f,0f,0f,0f,0f,0f, -1f, -1f, -1f,null);
+        this.id = -1L;
+        this.gram = 0;
+        this.foodEfficiency = new Food(null, "overallEfficiency",-1L, 0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,"id",-1f, -1f,null);
+        this.mineralEfficiency = new Mineral(null, 0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,1f,-1f,-1f,-1f,-1f,-1f,-1f,-1f,-1f,-1f,-1f,-1f,-1f,-1f,-1f,-1f,-1f,null);
+        this.vitaminEfficiency = new Vitamin(null, 0f, 0f, 0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,null);;
+        this.acidEfficiency = new Acid(null, 0f,0f,0f,0f,0f,0f, 0f,0f,0f, 0f, 0f,0f,0f, 0f,0f,0f,0f,0f,0f,0f,0f,-1f,-1f,-1f, null);
+    }
+
     @JsonIgnore
     public void setEfficiency(Food fE, Vitamin vE, Mineral mE, Acid aE){
         this.foodEfficiency = fE;
@@ -138,6 +151,8 @@ public class Ingredient {
     }
 
     public boolean compare(Float numb){
-        return food.compare(numb) && acid.compare(numb) && mineral.compare(numb) && vitamin.compare(numb);
+
+        return foodEfficiency.compare(numb) && acidEfficiency.compare(numb) &&
+                mineralEfficiency.compare(numb) && vitaminEfficiency.compare(numb);
     }
 }

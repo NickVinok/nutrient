@@ -67,6 +67,14 @@ public class Vitamin implements NutrientGroup {
     }
 
     public void subtract(Vitamin v1){
+        /*for (Float val : this.getValues()){
+            if(val < 0){
+                System.out.print("Из чего вычитаем: ");
+                System.out.println(this);
+                System.out.print("Что вычитаем: ");
+                System.out.println(v1);
+            }
+        }*/
         this.vitamin_a-=v1.getVitamin_a();
         this.beta_carotene-=v1.getBeta_carotene();
         this.alpha_carotene-=v1.getAlpha_carotene();
@@ -109,27 +117,12 @@ public class Vitamin implements NutrientGroup {
     public boolean compare(Float numb){
         int overflowingNutrientsValue = 3;
         for(Float nutrient: getValues()){
-            if(nutrient<numb) overflowingNutrientsValue--;
+            if((nutrient/numb)>4) overflowingNutrientsValue=0;
+            else if(nutrient>numb) overflowingNutrientsValue--;
+
             if(overflowingNutrientsValue == 0) return false;
         }
         return true;
-        /*return this.vitamin_a<=numb &&
-        this.beta_carotene<=numb &&
-        this.alpha_carotene<=numb &&
-        this.vitamin_d<=numb &&
-        this.vitamin_d2<=numb &&
-        this.vitamin_d3<=numb &&
-        this.vitamin_e<=numb &&
-        this.vitamin_k<=numb &&
-        this.vitamin_c<=numb &&
-        this.vitamin_b1<=numb &&
-        this.vitamin_b2<=numb &&
-        this.vitamin_b3<=numb &&
-        this.vitamin_b4<=numb &&
-        this.vitamin_b5<=numb &&
-        this.vitamin_b6<=numb &&
-        this.vitamin_b9<=numb &&
-        this.vitamin_b12<=numb;*/
     }
 
     @JsonIgnore
@@ -141,24 +134,24 @@ public class Vitamin implements NutrientGroup {
     }
     
     public Vitamin(List<Float> norms){
-        this.vitamin_a=norms.get(0);
-        this.beta_carotene=norms.get(1);
-        this.alpha_carotene=norms.get(2);
-        this.vitamin_d=norms.get(3);
         //Так как их норм для них пока что нет
         //this.vitamin_d2=norms.get(4);
         //this.vitamin_d3=norms.get(5);
-        this.vitamin_e=norms.get(4);
-        this.vitamin_k=norms.get(5);
-        this.vitamin_c=norms.get(6);
-        this.vitamin_b1=norms.get(7);
-        this.vitamin_b2=norms.get(8);
-        this.vitamin_b3=norms.get(9);
-        this.vitamin_b4=norms.get(10);
-        this.vitamin_b5=norms.get(11);
-        this.vitamin_b6=norms.get(12);
-        this.vitamin_b9=norms.get(13);
-        this.vitamin_b12=norms.get(14);
+        this.vitamin_c=norms.get(0);
+        this.vitamin_b1=norms.get(1);
+        this.vitamin_b2=norms.get(2);
+        this.vitamin_b6=norms.get(3);
+        this.vitamin_b3=norms.get(4);
+        this.vitamin_b12=norms.get(5);
+        this.vitamin_b9=norms.get(6);
+        this.vitamin_b5=norms.get(7);
+        this.alpha_carotene=norms.get(8);
+        this.vitamin_a=norms.get(9);
+        this.beta_carotene=norms.get(10);
+        this.vitamin_e=norms.get(11);
+        this.vitamin_d=norms.get(12);
+        this.vitamin_k=norms.get(13);
+        this.vitamin_b4=norms.get(14);
 
         this.id = -1L;
         this.food = null;

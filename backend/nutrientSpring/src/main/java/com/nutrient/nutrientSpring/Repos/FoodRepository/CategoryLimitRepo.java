@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface CategoryLimitRepo extends JpaRepository<CategoryLimit, Long> {
-    List<CategoryLimit> findByCategory_idIn(Collection<Long> ids);
+    List<CategoryLimit> findByCategory_IdIn(Collection<Long> ids);
 }

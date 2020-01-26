@@ -48,15 +48,24 @@ public class Calculations {
         //Рассчитываем Нрмы БЖУ, исходя из роста, веса, пола и т.д.)
         pfcNormsCalculation = new PfcNormsCalculation(gender, age, weight, height, dietType, workingGroup);
         //Рассчитываем норму золы
+        acidNorms = nutrientService.getAcidNorms();
+        vitaminNorms = nutrientService.getVitaminNorms();
+        mineralNorms = nutrientService.getMineralNorms();
         List<Long> mineralIds = mapper.getMineralsId();
         pfcNormsCalculation.setAsh(nutrientService.getMineralsSum(gender, mineralIds));
         //Получаем список норм БЖУ
         Food pfcNorms = new Food(pfcNormsCalculation.getPfc());
         pfcNormsToController = pfcNormsCalculation.getNorms();
+        //Из-за того, что норма для кислот рассчитывается в разделе БЖУ
+        //А сами кислоты в кислотах)
+        acidNorms.setOmega3(pfcNormsCalculation.getOmega3());
+        acidNorms.setOmega6(pfcNormsCalculation.getOmega6());
+        acidNorms.setOmega9(pfcNormsCalculation.getOmega9());
 
         //Рассчитываем эффективность каждого из продуктов (пока просто по максимуму - дальше - можно поиграться с коэффициентами и
         //записать всё в бд отдельным скриптом
-        List<Ingredient> foodWithEfficiency = productOverallEfficiency(ingredients, pfcNorms, nutrientService.getVitaminNorms(), nutrientService.getMineralNorms(), nutrientService.getAcidNorms());
+        List<Ingredient> foodWithEfficiency = productOverallEfficiency(ingredients, pfcNorms, vitaminNorms,
+               mineralNorms, acidNorms);
         //Получаем список категорий, превращаем в словарь, где значение - допустимое количество оставшихся использований
         //Делаем 2 списка: один локальный, другой глобальный для выполнения требований к максимальному количеству продуктов из одной группы внутри комбинации
         //и во всех комбинациях
@@ -70,15 +79,20 @@ public class Calculations {
         //Непосредственный расчёт: передаём список допустимой еды, нормы БЖУ, нормы нутриентов
         combinations = calculateEfficientCombinations(limitationTable, foodWithEfficiency);
 
-
-        for (int i = 0; i < 100; i++) {
+        combinations.setCombinationList(
+                combinations.getCombinationList().stream()
+                        .filter(x->x.getProducts().size() != 0)
+                        .collect(Collectors.toList())
+        );
+        System.out.println(combinations.getCombinationList().get(0).getProducts().stream().map(Ingredient::getId).collect(Collectors.toList()));
+        for (int i = 0; i < 10; i++) {
             combinations = optimizeCombinations(ingredients, combinations);
             combinations = addFoodToOptimizedCombination(combinations, ingredients);
         }
 
         combinations.setCombinationList(
                 combinations.getCombinationList().stream()
-                        .sorted((x, y) -> Float.compare((float) y.getCombinationEfficiency(), (float) x.getCombinationEfficiency()))
+                        .sorted((x, y) -> Float.compare(y.getCombinationEfficiency(), x.getCombinationEfficiency()))
                         .collect(Collectors.toList())
         );
         return combinations;
@@ -96,7 +110,7 @@ public class Calculations {
             Общая эффективность 100гр. продукта : Значение
         }
         */
-
+        List<Ingredient> tmp = new ArrayList<>();
         for (Ingredient in : ingredients) {
             Mineral m = in.getMineral();
             Acid a = in.getAcid();
@@ -109,9 +123,15 @@ public class Calculations {
             Food fEf = new Food(f, pfcNorms);
 
             in.setEfficiency(fEf, vEf, mEf, aEf);
+            if(in.calculateOverallMineralEfficiency()<2 && in.calculateOverallVitaminEfficiency()<2 &&
+                    in.calculateOverallAcidEfficiency()<2 && in.calculateOverallFoodEfficiency()<2&&in.compare(1f)){
+                tmp.add(in);
+            } else {
+                continue;
+            }
         }
 
-        return ingredients;
+        return tmp;
     }
 
     //Рассчитываем эфективные комбинации
@@ -119,7 +139,6 @@ public class Calculations {
             FoodAndCategoriesLimitationTable limits, List<Ingredient> sortedFood) {
         Combinations finalCombinations = new Combinations();
 
-        HashMap<Long, Long> overallCounter = new HashMap<>();
         //Чтобы не было повторений
         //Т.е. в течение скольких циклов составления комбинаций данный ингридиент будет игнорироваться
         HashMap<Long, Long> usedIds2 = new HashMap<>();
@@ -128,7 +147,7 @@ public class Calculations {
             Combination combinationToAdd = new Combination();
 
             for (Ingredient ingredient : sortedFood) {
-                int productId = ingredient.getId().intValue();
+                Long productId = ingredient.getId();
                 //Если данный ингридиент долго не использовался в комбинациях
                 //(т.е. счётчик игнорирования == 0)
                 //то мы возвращаем ингридиент в пулл
@@ -139,30 +158,32 @@ public class Calculations {
                         }
                     }
                 }
+                //System.out.println(limits.getSingleTable());
+                Long categoryId = ingredient.getFood().getCategory().getId();
 
-                int categoryId = ingredient.getFood().getCategory().getId().intValue();
 
-                if (limits.getCategoryLimitInAllCombs(categoryId)>0 && limits.getCategoryLimitInComb(categoryId)>0) {
-                    if (!usedIds2.containsKey(ingredient.getId())) {
-                        if (limits.getFoodLimit(productId)>0) {
+                    if (limits.isCategoryAllowed(categoryId)) {
+                        if (limits.getCategoryLimitInAllCombs(categoryId) > 0 && limits.getCategoryLimitInComb(categoryId) > 0) {
+                            if (!usedIds2.containsKey(ingredient.getId())) {
+                                if (limits.getFoodLimit(productId) > 0) {
+                                    if (combinationToAdd.addProductToCombination(ingredient, limits)) {
+                                        if (Math.random() > 0.5) {
+                                            usedIds2.put(ingredient.getId(), (long) (1 + Math.random() * 3));
+                                        }
+                                        limits.updateCategoryLimit(categoryId, -1);
+                                        limits.updateFoodLimit(productId, -1);
+                                    }
 
-                            if (combinationToAdd.addProductToCombination(ingredient, limits)) {
-                                if (Math.random() > 0.5) {
-                                    usedIds2.put(ingredient.getId(), (long) (1 + Math.random() * 3));
+                                } else {
+                                    continue;
                                 }
-                                limits.updateCategoryLimit(categoryId, -1);
-                                limits.updateFoodLimit(productId, -1);
                             }
 
-                        } else {
-                            continue;
-                        }
                     }
                 }
             }
             finalCombinations.addCombination(combinationToAdd);
         }
-        finalCombinations.setOverallCategoryCounter(overallCounter);
         return finalCombinations;
     }
 
@@ -172,27 +193,33 @@ public class Calculations {
         HashMap<Long, Long> usedIds2 = new HashMap<>();
         for (Combination comb : combs.getCombinationList()) {
             FoodAndCategoriesLimitationTable limits = comb.getLimitationTable();
-            for (Ingredient ingredient: products) {
+
+            for (Ingredient ingredient : products) {
                 Food tmpFood = ingredient.getFood();
 
                 if (comb.isInCombination(tmpFood)) {
                     continue;
                 }
 
-                int categoryId = ingredient.getFood().getCategory().getId().intValue();
-                if (limits.getCategoryLimitInAllCombs(categoryId)>0 && limits.getCategoryLimitInComb(categoryId)>0) {
-                    if (!usedIds2.containsKey(ingredient.getId())) {
-                        if (limits.getFoodLimit(ingredient.getId().intValue())>0) {
-                            if (comb.addProductToCombination(ingredient, limits)) {
-                                if (Math.random() > 0.5) {
-                                    usedIds2.put(ingredient.getId(), (long) (1 + Math.random() * 3));
+                Long productId = ingredient.getId();
+                Long categoryId = ingredient.getFood().getCategory().getId();
+
+                    if (limits.isCategoryAllowed(categoryId)) {
+                        if (limits.getCategoryLimitInAllCombs(categoryId) > 0 && limits.getCategoryLimitInComb(categoryId) > 0) {
+                            if (!usedIds2.containsKey(productId)) {
+                                if (limits.getFoodLimit(productId) > 0) {
+                                    if (comb.addProductToCombination(ingredient, limits)) {
+                                        if (Math.random() > 0.5) {
+                                            usedIds2.put(ingredient.getId(), (long) (1 + Math.random() * 3));
+                                        }
+                                        limits.updateCategoryLimit(categoryId, -1);
+                                        limits.updateFoodLimit(productId, -1);
+                                    }
+                                } else {
+                                    continue;
                                 }
-                                limits.updateCategoryLimit(categoryId, -1);
-                                limits.updateFoodLimit(ingredient.getId().intValue(), -1);
                             }
-                        } else {
-                            continue;
-                        }
+
                     }
                 }
             }
@@ -211,8 +238,9 @@ public class Calculations {
             List<Long> foodIds = comb.getProducts().stream()
                     .map((Ingredient::getFood))
                     .map(Food::getId)
-                    .collect(Collectors.toList())
-                    ;
+                    .collect(Collectors.toList());
+            /*System.out.print("То что в списке системном");
+            System.out.println(foodIds);*/
 
             //Получаем айди тех нутриентов, которые в избытке
             List<Integer> pfcOverflow, vitaminOverflow, mineralOverflow, acidOverflow;
@@ -235,26 +263,40 @@ public class Calculations {
 
                 //Находим самый избыточный компонент и его значение
                 if (pfcOverflow.size() > 0) {
-                    mostOverFlowingNutrient = getMostOverflowingNutrient(products, foodIds,
+                    mostOverFlowingNutrient = getMostOverflowingNutrient(comb.getProducts(), foodIds,
                             pfcOverflow, "food");
                     percentOfMostOverflowingNutrientInComb = nutrientsAndEfficiency.getFoodEfficiency()
                             .getValues().get(pfcOverflow.get(0));
                 } else if (vitaminOverflow.size() > 0) {
-                    mostOverFlowingNutrient = getMostOverflowingNutrient(products, foodIds,
+                    mostOverFlowingNutrient = getMostOverflowingNutrient(comb.getProducts(), foodIds,
                             vitaminOverflow, "vitamin");
+
                     percentOfMostOverflowingNutrientInComb = nutrientsAndEfficiency.getVitaminEfficiency()
-                            .getValues().get(pfcOverflow.get(0));
+                            .getValues().get(vitaminOverflow.get(0));
                 } else if (mineralOverflow.size() > 0) {
-                    mostOverFlowingNutrient = getMostOverflowingNutrient(products, foodIds,
+                    mostOverFlowingNutrient = getMostOverflowingNutrient(comb.getProducts(), foodIds,
                             mineralOverflow, "mineral");
                     percentOfMostOverflowingNutrientInComb = nutrientsAndEfficiency.getMineralEfficiency()
-                            .getValues().get(pfcOverflow.get(0));
+                            .getValues().get(mineralOverflow.get(0));
                 } else if (acidOverflow.size() > 0) {
-                    mostOverFlowingNutrient = getMostOverflowingNutrient(products, foodIds,
+                    mostOverFlowingNutrient = getMostOverflowingNutrient(comb.getProducts(), foodIds,
                             acidOverflow, "acid");
-                    percentOfMostOverflowingNutrientInComb =  nutrientsAndEfficiency.getAcidEfficiency()
-                            .getValues().get(pfcOverflow.get(0));
+                    percentOfMostOverflowingNutrientInComb = nutrientsAndEfficiency.getAcidEfficiency()
+                            .getValues().get(acidOverflow.get(0));
                 }
+
+                /*System.out.println(pfcOverflow);
+                System.out.println(acidOverflow);
+                System.out.println(mineralOverflow);
+                System.out.println(vitaminOverflow);
+                System.out.println(mostOverFlowingNutrient);
+                System.out.println(comb.getOverallNutrientsAndEfficiency());
+                System.out.println(comb.getProducts().stream().map(Ingredient::getId).collect(Collectors.toList()));
+                try{
+                    Thread.sleep(10000);
+                } catch (Exception e){
+                    
+                }*/
 
                 Long idOfFoodToBeModified = mostOverFlowingNutrient.entrySet()
                         .stream()
@@ -262,13 +304,31 @@ public class Calculations {
                         .get()
                         .getKey()
                         ;
-
                 Ingredient productTobeModified = products.stream()
                         .filter(ingredient -> ingredient.getId().equals(idOfFoodToBeModified))
                         .findFirst()
                         .get()
                         ;
 
+                /*System.out.print("В списке еды до вычитания");
+                System.out.print(comb.getProducts()
+                        .stream()
+                        .map(Ingredient::getFood)
+                        .map(Food::getId)
+                        .collect(Collectors.toList())
+                );
+                System.out.print("До вычитания: ");
+                System.out.println(comb.getOverallNutrientsAndEfficiency().getVitamin());
+
+                System.out.print("Что вычли");
+                System.out.println(productTobeModified.getVitamin());
+                System.out.print("После вычитания: ");
+                System.out.println(comb.getOverallNutrientsAndEfficiency().getVitamin());
+                try{
+                    Thread.sleep(10000);
+                } catch (Exception e){
+
+                }*/
                 comb.deleteFoodFromCombination(productTobeModified);
                 Float gramFixCoef = getNutrientFixCoefficient(mostOverFlowingNutrient, percentOfMostOverflowingNutrientInComb);
                 productTobeModified.multiply(gramFixCoef);
@@ -318,15 +378,19 @@ public class Calculations {
         //Получаем список норм БЖУ
         Food pfcNorms = new Food(pfcNormsCalculation.getPfc());
         pfcNormsToController = pfcNormsCalculation.getNorms();
+        acidNorms.setOmega3(pfcNormsCalculation.getOmega3());
+        acidNorms.setOmega6(pfcNormsCalculation.getOmega6());
+        acidNorms.setOmega9(pfcNormsCalculation.getOmega9());
+
         //Рассчитываем эффективность каждого из продуктов
         productOverallEfficiency(products, pfcNorms,
-                nutrientService.getVitaminNorms(), nutrientService.getMineralNorms(), nutrientService.getAcidNorms());
+                vitaminNorms, mineralNorms, acidNorms);
 
         Combination result = new Combination();
-        for (Ingredient product: products) {
+        for (Ingredient product : products) {
             Long id = product.getId();
             int numberOfGrams = actualIdsGrams.get(id);
-            product.multiply(numberOfGrams/100f);
+            product.multiply(numberOfGrams / 100f);
             result.addFoodToCustomCombination(product);
         }
 
@@ -340,15 +404,16 @@ public class Calculations {
         HashMap<Long, HashMap<Integer, Float>> efficiencyOnSingleNutrient = new HashMap<>();
         Integer index = overflowingIndexes.get(0);
 
-        for (Ingredient ingredient: products) {
+        for (Ingredient ingredient : products) {
+
             HashMap<Integer, Float> nutrientEffectPair = new HashMap<>();
             Float effect = 0f;
 
-            if(nutrient.equals("food")){
+            if (nutrient.equals("food")) {
                 effect = ingredient.getFoodEfficiency().getValues().get(index);
-            } else if(nutrient.equals("mineral")){
+            } else if (nutrient.equals("mineral")) {
                 effect = ingredient.getMineralEfficiency().getValues().get(index);
-            } else if(nutrient.equals("vitamin")){
+            } else if (nutrient.equals("vitamin")) {
                 effect = ingredient.getVitaminEfficiency().getValues().get(index);
             } else {
                 effect = ingredient.getAcidEfficiency().getValues().get(index);
@@ -358,14 +423,14 @@ public class Calculations {
             efficiencyOnSingleNutrient.put(ingredient.getId(), nutrientEffectPair);
         }
 
+
         Long idOfMaxOverflow = efficiencyOnSingleNutrient.entrySet().stream()
                 .max((f1, f2) -> Float.compare(f1.getValue().get(index), f2.getValue().get(index))).get().getKey();
         HashMap<Integer, Float> efficiencyOfMaxOverflow = efficiencyOnSingleNutrient.entrySet()
                 .stream()
                 .max((f1, f2) -> Float.compare(f1.getValue().get(index), f2.getValue().get(index)))
                 .get()
-                .getValue()
-                ;
+                .getValue();
 
         HashMap<Long, HashMap<Integer, Float>> result = new HashMap<>();
         result.put(idOfMaxOverflow, efficiencyOfMaxOverflow);

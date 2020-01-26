@@ -42,8 +42,8 @@ public class NutrientFoodMapper {
         mapper.put(Mineral.class.getDeclaredField("zinc"), 21L);
         mapper.put(Mineral.class.getDeclaredField("copper"), 23L);
         mapper.put(Mineral.class.getDeclaredField("manganese"), 24L);
-        mapper.put(Mineral.class.getDeclaredField("selenium"), 25L);
-        mapper.put(Mineral.class.getDeclaredField("fluoride"), 28L);
+        mapper.put(Mineral.class.getDeclaredField("selen"), 25L);
+        mapper.put(Mineral.class.getDeclaredField("fluorine"), 28L);
         mapper.put(Vitamin.class.getDeclaredField("vitamin_b4"), 29L);
     }
 

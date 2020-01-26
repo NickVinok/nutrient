@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface FoodLimitRepo extends JpaRepository<FoodLimit, Long> {
-    List<FoodLimit> findByFood_idIn(Collection<Long> ids);
+    List<FoodLimit> findByFood_IdIn(Collection<Long> ids);
 }

@@ -10,8 +10,8 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class NutrientNorms {
-    PfcNorms pfcNorms;
-    Vitamin vitaminNorms;
-    Acid acidNorms;
-    Mineral mineralNorms;
+    private PfcNorms pfcNorms;
+    private Vitamin vitaminNorms;
+    private Acid acidNorms;
+    private Mineral mineralNorms;
 }

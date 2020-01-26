@@ -43,7 +43,7 @@ public class NutrientService {
                 .collect(Collectors.toList());
         List<String> tmpAcidNames = Stream.of("tryptophan","threonine","isoleucine","leucine","lysine",
                 "methionine", "cystine", "phenylalanine","tyrosine","valine","arginine","histidine",
-                "alanine","aspartic_acid","glutamic_acid","glycine","proline","serine")
+                "alanine","aspartic_acid","glutamic_acid","glycine","proline","serine","omega_3", "omega_6", "omega_9")
                 .collect(Collectors.toList());
 
         List<Long> vitaminIds = nutrientRepo.findByNameIn(tmpVitaminNames).get().stream()

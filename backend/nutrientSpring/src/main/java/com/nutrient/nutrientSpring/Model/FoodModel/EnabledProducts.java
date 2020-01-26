@@ -1,12 +1,11 @@
 package com.nutrient.nutrientSpring.Model.FoodModel;
 
 import lombok.Data;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.*;
 
 import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.util.Date;
 
 @Data
@@ -16,7 +15,8 @@ public class EnabledProducts {
     @Id
     private Long id;
 
-    private boolean enabled;
+    //@Column(columnDefinition = "TINYINT(1)")
+    private boolean enable;
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)

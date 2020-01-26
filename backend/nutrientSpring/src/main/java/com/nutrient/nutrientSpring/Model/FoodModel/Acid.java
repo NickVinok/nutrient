@@ -9,6 +9,7 @@ import javax.persistence.*;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.springframework.lang.Nullable;
 
 import java.util.HashMap;
 import java.util.List;
@@ -43,6 +44,21 @@ public class Acid implements NutrientGroup {
     private float proline;
     private float serine;
 
+    @Column(name = "omega_3")
+    private float omega3;
+    @Column(name = "omega_6")
+    private float omega6;
+    @Column(name = "omega_9")
+    private float omega9;
+    @Nullable
+    private Float hydroxyproline;
+    @Column(name = "methionine_cystine")
+    @Nullable
+    private Float methionineCystine;
+    @Column(name = "phenylalanine_tyrosine")
+    @Nullable
+    private Float phenylalanineTyrosine;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "food_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -67,6 +83,9 @@ public class Acid implements NutrientGroup {
         this.glycine+=a1.getGlycine();
         this.proline+=a1.getProline();
         this.serine+=a1.getSerine();
+        this.omega3+=a1.getOmega3();
+        this.omega6+=a1.getOmega6();
+        this.omega9+=a1.getOmega9();
     }
 
     public void subtract(Acid a1){
@@ -88,6 +107,9 @@ public class Acid implements NutrientGroup {
         this.glycine-=a1.getGlycine();
         this.proline-=a1.getProline();
         this.serine-=a1.getSerine();
+        this.omega3-=a1.getOmega3();
+        this.omega6-=a1.getOmega6();
+        this.omega9-=a1.getOmega9();
     }
 
     public void modify(Float c){
@@ -109,33 +131,20 @@ public class Acid implements NutrientGroup {
         this.glycine*=c;
         this.proline*=c;
         this.serine*=c;
+        this.omega3*=c;
+        this.omega6*=c;
+        this.omega9*=c;
     }
     
     public boolean compare(Float numb){
         int overflowingNutrientsValue = 3;
         for(Float nutrient: getValues()){
-            if(nutrient<numb) overflowingNutrientsValue--;
+            if(nutrient/numb>4) overflowingNutrientsValue=0;
+            else if(nutrient>numb) overflowingNutrientsValue--;
+            
             if(overflowingNutrientsValue == 0) return false;
         }
         return true;
-       /* return this.tryptophan<=numb &&
-        this.threonine<=numb &&
-        this.isoleucine<=numb &&
-        this.leucine<=numb &&
-        this.lysine<=numb &&
-        this.methionine<=numb &&
-        this.cystine<=numb &&
-        this.phenylalanine<=numb &&
-        this.tyrosine<=numb &&
-        this.valine<=numb &&
-        this.arginine<=numb &&
-        this.histidine<=numb &&
-        this.alanine<=numb &&
-        this.aspartic_acid<=numb &&
-        this.glutamic_acid<=numb &&
-        this.glycine<=numb &&
-        this.proline<=numb &&
-        this.serine<=numb;*/
     }
     
     @JsonIgnore
@@ -143,7 +152,7 @@ public class Acid implements NutrientGroup {
         return Stream.of(this.tryptophan, this.threonine, this.isoleucine, this.leucine,
                 this.lysine, this.methionine, this.cystine, this.phenylalanine, this.tyrosine,
                 this.valine, this.arginine, this.histidine, this.alanine, this.aspartic_acid,
-                this.glutamic_acid, this.glycine, this.proline, this.serine)
+                this.glutamic_acid, this.glycine, this.proline, this.serine, omega3, omega6, omega9)
                 .collect(Collectors.toList());
     }
 
@@ -190,6 +199,9 @@ public class Acid implements NutrientGroup {
         this.glycine= a.getGlycine()/aNorm.getGlycine();
         this.proline= a.getProline()/aNorm.getProline();
         this.serine= a.getSerine()/aNorm.getSerine();
+        this.omega3=a.getOmega3()/aNorm.getOmega3();
+        this.omega6=a.getOmega6()/aNorm.getOmega6();
+        this.omega9=a.getOmega9()/aNorm.getOmega9();
 
         this.id = -1L;
         this.food = null;

@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface EnabledProductsRepo extends JpaRepository<EnabledProducts, Long> {
-    List<EnabledProducts> findByDietAndEnabled(DietTypes diet, boolean enabled);
+    List<EnabledProducts> findByDietAndEnable(DietTypes diet, boolean enabled);
 }
