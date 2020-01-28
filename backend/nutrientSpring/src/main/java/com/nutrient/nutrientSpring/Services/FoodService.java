@@ -232,6 +232,13 @@ public class FoodService {
     //переделать
     public List<Ingredient> getProductsForCustomCombination(List<Long> ids){
         List<Food> foods = foodRepo.findByIdIn(ids);
+        List<FoodLimit> foodLimits = foodLimitRepo.findByFood_IdIn(ids);
+        List<CategoryLimit> categoryLimits = categoryLimitRepo.findByCategory_IdIn(
+                foods.stream()
+                        .map(Food::getCategory)
+                        .map(Category::getId)
+                        .collect(Collectors.toList()));
+
         List<Ingredient> products = new ArrayList<>();
         for(Food f: foods){
 
@@ -254,6 +261,7 @@ public class FoodService {
                     acidsRepo.findByFood_id(f.getId()).get());
             products.add(ingredient);
         }
+        limitationTable = new FoodAndCategoriesLimitationTable(foodLimits, categoryLimits);
         return  products;
     }
 

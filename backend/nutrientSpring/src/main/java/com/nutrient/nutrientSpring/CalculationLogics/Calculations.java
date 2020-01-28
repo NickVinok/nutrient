@@ -285,19 +285,6 @@ public class Calculations {
                             .getValues().get(acidOverflow.get(0));
                 }
 
-                /*System.out.println(pfcOverflow);
-                System.out.println(acidOverflow);
-                System.out.println(mineralOverflow);
-                System.out.println(vitaminOverflow);
-                System.out.println(mostOverFlowingNutrient);
-                System.out.println(comb.getOverallNutrientsAndEfficiency());
-                System.out.println(comb.getProducts().stream().map(Ingredient::getId).collect(Collectors.toList()));
-                try{
-                    Thread.sleep(10000);
-                } catch (Exception e){
-                    
-                }*/
-
                 Long idOfFoodToBeModified = mostOverFlowingNutrient.entrySet()
                         .stream()
                         .findFirst()
@@ -310,25 +297,6 @@ public class Calculations {
                         .get()
                         ;
 
-                /*System.out.print("В списке еды до вычитания");
-                System.out.print(comb.getProducts()
-                        .stream()
-                        .map(Ingredient::getFood)
-                        .map(Food::getId)
-                        .collect(Collectors.toList())
-                );
-                System.out.print("До вычитания: ");
-                System.out.println(comb.getOverallNutrientsAndEfficiency().getVitamin());
-
-                System.out.print("Что вычли");
-                System.out.println(productTobeModified.getVitamin());
-                System.out.print("После вычитания: ");
-                System.out.println(comb.getOverallNutrientsAndEfficiency().getVitamin());
-                try{
-                    Thread.sleep(10000);
-                } catch (Exception e){
-
-                }*/
                 comb.deleteFoodFromCombination(productTobeModified);
                 Float gramFixCoef = getNutrientFixCoefficient(mostOverFlowingNutrient, percentOfMostOverflowingNutrientInComb);
                 productTobeModified.multiply(gramFixCoef);
@@ -382,11 +350,14 @@ public class Calculations {
         acidNorms.setOmega6(pfcNormsCalculation.getOmega6());
         acidNorms.setOmega9(pfcNormsCalculation.getOmega9());
 
+        FoodAndCategoriesLimitationTable limits = foodService.getLimitations();
+
         //Рассчитываем эффективность каждого из продуктов
         productOverallEfficiency(products, pfcNorms,
                 vitaminNorms, mineralNorms, acidNorms);
 
         Combination result = new Combination();
+        result.setLimitationTable(limits);
         for (Ingredient product : products) {
             Long id = product.getId();
             int numberOfGrams = actualIdsGrams.get(id);
@@ -469,56 +440,6 @@ public class Calculations {
 
         return gramFixCoefficient;
     }
-
-  /*  public HashMap<String, Object> modifyFoodGrams(HashMap<String, Object> foodNutrients, Float gramFixCoef) {
-
-        Food f = (Food) foodNutrients.get("food");
-        Mineral m = (Mineral) foodNutrients.get("mineral");
-        Acid a = (Acid) foodNutrients.get("acid");
-        Vitamin v = (Vitamin) foodNutrients.get("vitamin");
-
-
-        f.modify(gramFixCoef);
-        m.modify(gramFixCoef);
-        a.modify(gramFixCoef);
-        v.modify(gramFixCoef);
-
-        foodNutrients.put("food", f);
-        foodNutrients.put("mineral", m);
-        foodNutrients.put("acid", a);
-        foodNutrients.put("vitamin", v);
-
-
-        HashMap<String, Float> valueMap1 = new HashMap<>();
-        for (Map.Entry<String, Float> foodEfficiency : ((HashMap<String, Float>) foodNutrients.get("pfcEfficiency")).entrySet()) {
-            valueMap1.put(foodEfficiency.getKey(), gramFixCoef * foodEfficiency.getValue());
-        }
-        foodNutrients.put("pfcEfficiency", valueMap1);
-
-        HashMap<String, Float> valueMap2 = new HashMap<>();
-        for (Map.Entry<String, Float> foodEfficiency : ((HashMap<String, Float>) foodNutrients.get("mineralEfficiency")).entrySet()) {
-            valueMap2.put(foodEfficiency.getKey(), gramFixCoef * foodEfficiency.getValue());
-        }
-        foodNutrients.put("mineralEfficiency", valueMap2);
-
-        HashMap<String, Float> valueMap3 = new HashMap<>();
-        for (Map.Entry<String, Float> foodEfficiency : ((HashMap<String, Float>) foodNutrients.get("vitaminEfficiency")).entrySet()) {
-            valueMap3.put(foodEfficiency.getKey(), gramFixCoef * foodEfficiency.getValue());
-        }
-        foodNutrients.put("vitaminEfficiency", valueMap3);
-
-        HashMap<String, Float> valueMap4 = new HashMap<>();
-        for (Map.Entry<String, Float> foodEfficiency : ((HashMap<String, Float>) foodNutrients.get("acidEfficiency")).entrySet()) {
-            valueMap4.put(foodEfficiency.getKey(), gramFixCoef * foodEfficiency.getValue());
-        }
-        foodNutrients.put("acidEfficiency", valueMap4);
-        *//*for(Map.Entry<String, Float> foodEfficiency : ((HashMap<String, Float>)foodNutrients.get("overallEfficiency")).entrySet()){
-            foodEfficiency.setValue(foodEfficiency.getValue()*gramFixCoef);
-        }*//*
-        foodNutrients.put("overallEfficiency", (Float) foodNutrients.get("overallEfficiency") * gramFixCoef);
-
-        return foodNutrients;
-    }*/
 
     public Acid getAcidNorms() {
         return acidNorms;

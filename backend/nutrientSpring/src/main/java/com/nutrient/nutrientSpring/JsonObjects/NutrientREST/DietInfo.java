@@ -9,7 +9,6 @@ public class DietInfo {
     private String gender;
     private float age;
     private String diet_type;
-    private String group;
     private int workingGroup;
     private int dietRestrictions;
     private boolean pregnancy;

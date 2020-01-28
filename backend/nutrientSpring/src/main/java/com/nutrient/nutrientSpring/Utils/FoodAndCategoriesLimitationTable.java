@@ -62,4 +62,5 @@ public class FoodAndCategoriesLimitationTable {
     public FoodAndCategoriesLimitationTable(){
 
     }
+
 }
