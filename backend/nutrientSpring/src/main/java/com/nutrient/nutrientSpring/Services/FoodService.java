@@ -88,7 +88,7 @@ public class FoodService {
 
         for(Food food : foodList){
             Long id = food.getId();
-            if(food.getGeneral().equals(null) || food.getGeneral()==0){
+            if(food.getGeneral()==null || food.getGeneral()==0){
                 continue;
             }
             //вот здесь пытаемся вытащить категорию еды, но её назуй
@@ -243,9 +243,9 @@ public class FoodService {
 
         List<Ingredient> products = new ArrayList<>();
         for(Food f: foods){
-            if(f.getGeneral().equals(null) || f.getGeneral()==0){
+            /*if(f.getGeneral()==null || f.getGeneral()==0){
                 continue;
-            }
+            }*/
             Category cat = f.getCategory();
             Pattern p = Pattern.compile("\\((.*)\\)");
             Matcher match = p.matcher(cat.getName());

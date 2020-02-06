@@ -84,7 +84,7 @@ public class Calculations {
                         .filter(x->x.getProducts().size() != 0)
                         .collect(Collectors.toList())
         );
-        System.out.println(combinations.getCombinationList().get(0).getProducts().stream().map(Ingredient::getId).collect(Collectors.toList()));
+
         for (int i = 0; i < 10; i++) {
             combinations = optimizeCombinations(ingredients, combinations);
             combinations = addFoodToOptimizedCombination(combinations, ingredients);
