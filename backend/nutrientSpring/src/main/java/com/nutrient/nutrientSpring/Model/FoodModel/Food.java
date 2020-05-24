@@ -49,8 +49,8 @@ public class Food implements NutrientGroup {
     @Column(name = "organic_acid")
     @Nullable
     private Float organicAcid;
-    @Nullable
     private Float sfa;
+    private boolean isNorm;
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "category_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -67,6 +67,7 @@ public class Food implements NutrientGroup {
         this.fiber+=f1.getFiber();
         this.starch+=f1.getStarch();
         this.cholesterol+=f1.getCholesterol();
+        this.sfa +=  f1.getSfa();
     }
 
     public void subtract(Food f1){
@@ -80,6 +81,7 @@ public class Food implements NutrientGroup {
         this.fiber-=f1.getFiber();
         this.starch-=f1.getStarch();
         this.cholesterol-=f1.getCholesterol();
+        this.sfa -= f1.getSfa();
     }
 
     public void modify(Float c){
@@ -93,6 +95,7 @@ public class Food implements NutrientGroup {
         this.fiber*=c;
         this.starch*=c;
         this.cholesterol*=c;
+        this.sfa*=c;
     }
     
     public boolean compare(Float numb){
@@ -108,7 +111,7 @@ public class Food implements NutrientGroup {
 
     @JsonIgnore
     public List<Float> getValues(){
-        return Stream.of(energy, fat, protein, carbohydrate, water, ash, sugares, starch, cholesterol)
+        return Stream.of(energy, fat, protein, carbohydrate, water, ash, sugares, starch, cholesterol, sfa)
                 .collect(Collectors.toList());
     }
 
@@ -125,6 +128,7 @@ public class Food implements NutrientGroup {
         this.fiber=f.get(9);
         this.starch=f.get(7);
         this.cholesterol=f.get(8);
+        this.sfa = f.get(10);
     }
 
     public Food(Food f, Food foodNorm){
@@ -141,5 +145,6 @@ public class Food implements NutrientGroup {
         this.fiber=f.getFiber()/foodNorm.getFiber();
         this.starch=f.getStarch()/foodNorm.getStarch();
         this.cholesterol=f.getCholesterol()/foodNorm.getCholesterol();
+        this.sfa = f.getSfa()/foodNorm.getSfa();
     }
 }

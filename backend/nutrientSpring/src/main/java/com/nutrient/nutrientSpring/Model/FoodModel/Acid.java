@@ -43,6 +43,7 @@ public class Acid implements NutrientGroup {
     private float glycine;
     private float proline;
     private float serine;
+    private boolean isNorm;
 
     @Column(name = "omega_3")
     private float omega3;
@@ -50,8 +51,6 @@ public class Acid implements NutrientGroup {
     private float omega6;
     @Column(name = "omega_9")
     private float omega9;
-    @Nullable
-    private Float hydroxyproline;
     @Column(name = "methionine_cystine")
     @Nullable
     private Float methionineCystine;
@@ -86,6 +85,8 @@ public class Acid implements NutrientGroup {
         this.omega3+=a1.getOmega3();
         this.omega6+=a1.getOmega6();
         this.omega9+=a1.getOmega9();
+      //  this.methionineCystine+=a1.getMethionineCystine();
+      //  this.phenylalanineTyrosine+=a1.getPhenylalanineTyrosine();
     }
 
     public void subtract(Acid a1){
@@ -110,6 +111,8 @@ public class Acid implements NutrientGroup {
         this.omega3-=a1.getOmega3();
         this.omega6-=a1.getOmega6();
         this.omega9-=a1.getOmega9();
+     //   this.methionineCystine-=a1.getMethionineCystine();
+     //   this.phenylalanineTyrosine-=a1.getPhenylalanineTyrosine();
     }
 
     public void modify(Float c){
@@ -134,6 +137,8 @@ public class Acid implements NutrientGroup {
         this.omega3*=c;
         this.omega6*=c;
         this.omega9*=c;
+ //       this.phenylalanineTyrosine*=c;
+     //   this.methionineCystine*=c;
     }
     
     public boolean compare(Float numb){
@@ -152,7 +157,8 @@ public class Acid implements NutrientGroup {
         return Stream.of(this.tryptophan, this.threonine, this.isoleucine, this.leucine,
                 this.lysine, this.methionine, this.cystine, this.phenylalanine, this.tyrosine,
                 this.valine, this.arginine, this.histidine, this.alanine, this.aspartic_acid,
-                this.glutamic_acid, this.glycine, this.proline, this.serine, omega3, omega6, omega9)
+                this.glutamic_acid, this.glycine, this.proline, this.serine, omega3, omega6, omega9,
+                methionineCystine, phenylalanineTyrosine)
                 .collect(Collectors.toList());
     }
 
@@ -202,6 +208,8 @@ public class Acid implements NutrientGroup {
         this.omega3=a.getOmega3()/aNorm.getOmega3();
         this.omega6=a.getOmega6()/aNorm.getOmega6();
         this.omega9=a.getOmega9()/aNorm.getOmega9();
+        this.methionineCystine= a.getMethionineCystine()/aNorm.getMethionineCystine();
+        this.phenylalanineTyrosine= a.getPhenylalanineTyrosine()/aNorm.getPhenylalanineTyrosine();
 
         this.id = -1L;
         this.food = null;

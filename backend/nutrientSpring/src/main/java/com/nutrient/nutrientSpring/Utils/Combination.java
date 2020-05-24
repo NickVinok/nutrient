@@ -40,7 +40,6 @@ public class Combination{
         if(products.size()>18){
             return false;
         }
-
         overallNutrientsAndEfficiency.sum(product);
 
         if(overallNutrientsAndEfficiency.compare(1f)){

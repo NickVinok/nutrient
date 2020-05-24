@@ -73,7 +73,7 @@ public class FoodService {
                 .map(Food::getId)
                 .collect(Collectors.toList());
 
-        foodList = foodRepo.findByIdInAndCategory_IdIn(enabledF, enabledC);
+        foodList = foodRepo.findByIsNormAndIdInAndCategory_IdIn(false, enabledF, enabledC);
 
 
         List<CategoryLimit> categoryLimits = categoryLimitRepo.findByCategory_IdIn(enabledC);
@@ -233,7 +233,7 @@ public class FoodService {
 
     //переделать
     public List<Ingredient> getProductsForCustomCombination(List<Long> ids){
-        List<Food> foods = foodRepo.findByIdIn(ids);
+        List<Food> foods = foodRepo.findByIsNormAndIdIn(false, ids);
         List<FoodLimit> foodLimits = foodLimitRepo.findByFood_IdIn(ids);
         List<CategoryLimit> categoryLimits = categoryLimitRepo.findByCategory_IdIn(
                 foods.stream()
@@ -243,9 +243,7 @@ public class FoodService {
 
         List<Ingredient> products = new ArrayList<>();
         for(Food f: foods){
-            /*if(f.getGeneral()==null || f.getGeneral()==0){
-                continue;
-            }*/
+
             Category cat = f.getCategory();
             Pattern p = Pattern.compile("\\((.*)\\)");
             Matcher match = p.matcher(cat.getName());

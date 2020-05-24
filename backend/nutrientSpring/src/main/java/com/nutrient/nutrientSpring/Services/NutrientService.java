@@ -3,9 +3,9 @@ package com.nutrient.nutrientSpring.Services;
 import com.nutrient.nutrientSpring.Model.FoodModel.Acid;
 import com.nutrient.nutrientSpring.Model.FoodModel.Mineral;
 import com.nutrient.nutrientSpring.Model.FoodModel.Vitamin;
-import com.nutrient.nutrientSpring.Model.NutrientModel.Nutrient;
 import com.nutrient.nutrientSpring.Model.NutrientModel.NutrientHasGender;
 import com.nutrient.nutrientSpring.Model.NutrientModel.NutritionCompositeKey;
+import com.nutrient.nutrientSpring.Repos.FoodRepository.*;
 import com.nutrient.nutrientSpring.Repos.NutrientRepository.GenderRepo;
 import com.nutrient.nutrientSpring.Repos.NutrientRepository.NutrientHasGenderRepo;
 import com.nutrient.nutrientSpring.Repos.NutrientRepository.NutrientRepo;
@@ -13,26 +13,32 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class NutrientService {
     @Autowired
     private GenderRepo genderRepo;
-
     @Autowired
     private NutrientRepo nutrientRepo;
-
     @Autowired
     private NutrientHasGenderRepo nutrientHasGenderRepo;
+    @Autowired
+    private FoodRepo foodRepo;
+    @Autowired
+    private AcidsRepo acidsRepo;
+    @Autowired
+    private MineralRepo mineralRepo;
+    @Autowired
+    private VitaminRepo vitaminRepo;
+    @Autowired
+    private NormGroupRepo normGroupRepo;
 
     private Vitamin vitaminNorms;
     private Mineral mineralNorms;
     private Acid acidNorms;
 
-    public void getNutrientsValueForGender(String gender) {
-        Long id = genderRepo.findByName(gender).get().getId();
+    public void getNutrientsValueForGender(String gender, double age, boolean isPregnant, boolean isFeeding) {
+        /*Long id = genderRepo.findByName(gender).get().getId();
         List<NutrientHasGender> tmp = nutrientHasGenderRepo.findByNutritionCompositeKey_Gender(id);
 
         List<String> tmpMineralsNames = Stream.of("calcium ", "phosphorus", "magnesum ", "kalium ",
@@ -67,7 +73,18 @@ public class NutrientService {
         mineralNorms = new Mineral(nutrientHasGenderRepo.findByNutritionCompositeKey_GenderAndNutritionCompositeKey_NutrientIn(id,mineralIds)
                 .stream()
                 .map(NutrientHasGender::getValue)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList()));*/
+        if(gender=="Male"){
+            gender="М";
+        } else{
+            gender="Ж";
+        }
+
+        long normId = normGroupRepo.findByGenderAndMinAgeLessThanEqualAndMaxAgeGreaterThanEqualAndIsPregnantAndIsFeeding(
+                gender, age, age, isPregnant, isFeeding).getFood().getId();
+        vitaminNorms = vitaminRepo.findByFood_id(normId).get();
+        mineralNorms = mineralRepo.findByFood_id(normId).get();
+        acidNorms = acidsRepo.findByFood_id(normId).get();
     }
 
     public Float getValueOfCertainNutrient(String nutrientName, String gender) {

@@ -41,6 +41,8 @@ public class Vitamin implements NutrientGroup {
     private float vitamin_b9;
     private float vitamin_b12;
 
+    private boolean isNorm;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "food_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)

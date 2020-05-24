@@ -17,4 +17,5 @@ public class PfcNorms {
     public float omega3;
     public float omega6;
     public float omega9;
+    public float sfa;
 }
