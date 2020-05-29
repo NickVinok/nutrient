@@ -50,14 +50,14 @@ public class Acid implements NutrientGroup {
     private float omega6;
     @Column(name = "omega_9")
     private float omega9;
-    @Nullable
+/*    @Nullable
     private Float hydroxyproline;
     @Column(name = "methionine_cystine")
     @Nullable
     private Float methionineCystine;
     @Column(name = "phenylalanine_tyrosine")
     @Nullable
-    private Float phenylalanineTyrosine;
+    private Float phenylalanineTyrosine;*/
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "food_id", nullable = false)

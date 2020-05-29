@@ -39,14 +39,14 @@ public class Ingredient {
     public Ingredient(){
         this.food = new Food(null, "overall",-1L, 0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,"id",-1f,-1f,null);
         this.vitamin = new Vitamin(null, 0f, 0f, 0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,null);
-        this.mineral = new Mineral(null, 0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,-1f,-1f,-1f,-1f,-1f,-1f,-1f,-1f,-1f,-1f,-1f,-1f,-1f,-1f,-1f,-1f,-1f,null);
-        this.acid = new Acid(null, 0f,0f,0f,0f,0f,0f, 0f,0f,0f, 0f, 0f,0f,0f, 0f,0f,0f,0f,0f,0f,0f,0f, -1f, -1f, -1f,null);
+        this.mineral = new Mineral(null, 0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,null);
+        this.acid = new Acid(null, 0f,0f,0f,0f,0f,0f, 0f,0f,0f, 0f, 0f,0f,0f, 0f,0f,0f,0f,0f,0f,0f,0f,null);
         this.id = -1L;
         this.gram = 0;
-        this.foodEfficiency = new Food(null, "overallEfficiency",-1L, 0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,"id",-1f, -1f,null);
-        this.mineralEfficiency = new Mineral(null, 0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,1f,-1f,-1f,-1f,-1f,-1f,-1f,-1f,-1f,-1f,-1f,-1f,-1f,-1f,-1f,-1f,-1f,null);
+        this.foodEfficiency = new Food(null, "overallEfficiency",-1L, 0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,"id",0f, 0f,null);
+        this.mineralEfficiency = new Mineral(null, 0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,1f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,null);
         this.vitaminEfficiency = new Vitamin(null, 0f, 0f, 0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,null);;
-        this.acidEfficiency = new Acid(null, 0f,0f,0f,0f,0f,0f, 0f,0f,0f, 0f, 0f,0f,0f, 0f,0f,0f,0f,0f,0f,0f,0f,-1f,-1f,-1f, null);
+        this.acidEfficiency = new Acid(null, 0f,0f,0f,0f,0f,0f, 0f,0f,0f, 0f, 0f,0f,0f, 0f,0f,0f,0f,0f,0f,0f,0f, null);
     }
 
     @JsonIgnore

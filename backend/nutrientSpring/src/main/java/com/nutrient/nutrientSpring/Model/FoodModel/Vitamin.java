@@ -27,8 +27,6 @@ public class Vitamin implements NutrientGroup {
     private float beta_carotene;
     private float alpha_carotene;
     private float vitamin_d;
-    private float vitamin_d2;
-    private float vitamin_d3;
     private float vitamin_e;
     private float vitamin_k;
     private float vitamin_c;
@@ -40,6 +38,8 @@ public class Vitamin implements NutrientGroup {
     private float vitamin_b6;
     private float vitamin_b9;
     private float vitamin_b12;
+    private float vitamin_h;
+    private float vitamin_pp;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "food_id", nullable = false)
@@ -51,8 +51,6 @@ public class Vitamin implements NutrientGroup {
         this.beta_carotene+=v1.getBeta_carotene();
         this.alpha_carotene+=v1.getAlpha_carotene();
         this.vitamin_d+=v1.getVitamin_d();
-        this.vitamin_d2+=v1.getVitamin_d2();
-        this.vitamin_d3+=v1.getVitamin_d3();
         this.vitamin_e+=v1.getVitamin_e();
         this.vitamin_k+=v1.getVitamin_k();
         this.vitamin_c+=v1.getVitamin_c();
@@ -64,6 +62,8 @@ public class Vitamin implements NutrientGroup {
         this.vitamin_b6+=v1.getVitamin_b6();
         this.vitamin_b9+=v1.getVitamin_b9();
         this.vitamin_b12+=v1.getVitamin_b12();
+        this.vitamin_h+=v1.getVitamin_h();
+        this.vitamin_pp+=v1.getVitamin_pp();
     }
 
     public void subtract(Vitamin v1){
@@ -79,8 +79,6 @@ public class Vitamin implements NutrientGroup {
         this.beta_carotene-=v1.getBeta_carotene();
         this.alpha_carotene-=v1.getAlpha_carotene();
         this.vitamin_d-=v1.getVitamin_d();
-        this.vitamin_d2-=v1.getVitamin_d2();
-        this.vitamin_d3-=v1.getVitamin_d3();
         this.vitamin_e-=v1.getVitamin_e();
         this.vitamin_k-=v1.getVitamin_k();
         this.vitamin_c-=v1.getVitamin_c();
@@ -92,6 +90,8 @@ public class Vitamin implements NutrientGroup {
         this.vitamin_b6-=v1.getVitamin_b6();
         this.vitamin_b9-=v1.getVitamin_b9();
         this.vitamin_b12-=v1.getVitamin_b12();
+        this.vitamin_h-=v1.getVitamin_h();
+        this.vitamin_pp-=v1.getVitamin_pp();
     }
 
     public void modify(Float c){
@@ -99,8 +99,6 @@ public class Vitamin implements NutrientGroup {
         this.beta_carotene*=c;
         this.alpha_carotene*=c;
         this.vitamin_d*=c;
-        this.vitamin_d2*=c;
-        this.vitamin_d3*=c;
         this.vitamin_e*=c;
         this.vitamin_k*=c;
         this.vitamin_c*=c;
@@ -112,6 +110,8 @@ public class Vitamin implements NutrientGroup {
         this.vitamin_b6*=c;
         this.vitamin_b9*=c;
         this.vitamin_b12*=c;
+        this.vitamin_h*=c;
+        this.vitamin_pp*=c;
     }
 
     public boolean compare(Float numb){
@@ -127,9 +127,9 @@ public class Vitamin implements NutrientGroup {
 
     @JsonIgnore
     public List<Float> getValues(){
-        return Stream.of(vitamin_c, vitamin_b1, vitamin_b2, vitamin_b6, vitamin_b3,
-                vitamin_b12, vitamin_b9, vitamin_b5, alpha_carotene, vitamin_a, beta_carotene,
-                vitamin_e, vitamin_d, vitamin_k, vitamin_b4)
+        return Stream.of(vitamin_a,beta_carotene, alpha_carotene, vitamin_d, vitamin_e,vitamin_k,
+                vitamin_c, vitamin_b1, vitamin_b2, vitamin_b3, vitamin_b4,vitamin_b5,
+                vitamin_b6, vitamin_b9, vitamin_b12, vitamin_pp, vitamin_h)
                 .collect(Collectors.toList());
     }
     
@@ -137,21 +137,23 @@ public class Vitamin implements NutrientGroup {
         //Так как их норм для них пока что нет
         //this.vitamin_d2=norms.get(4);
         //this.vitamin_d3=norms.get(5);
-        this.vitamin_c=norms.get(0);
-        this.vitamin_b1=norms.get(1);
-        this.vitamin_b2=norms.get(2);
-        this.vitamin_b6=norms.get(3);
-        this.vitamin_b3=norms.get(4);
-        this.vitamin_b12=norms.get(5);
-        this.vitamin_b9=norms.get(6);
-        this.vitamin_b5=norms.get(7);
-        this.alpha_carotene=norms.get(8);
-        this.vitamin_a=norms.get(9);
-        this.beta_carotene=norms.get(10);
-        this.vitamin_e=norms.get(11);
-        this.vitamin_d=norms.get(12);
-        this.vitamin_k=norms.get(13);
-        this.vitamin_b4=norms.get(14);
+        this.vitamin_c=norms.get(6);
+        this.vitamin_b1=norms.get(7);
+        this.vitamin_b2=norms.get(8);
+        this.vitamin_b6=norms.get(12);
+        this.vitamin_b3=norms.get(9);
+        this.vitamin_b12=norms.get(14);
+        this.vitamin_b9=norms.get(13);
+        this.vitamin_b5=norms.get(11);
+        this.alpha_carotene=norms.get(2);
+        this.vitamin_a=norms.get(0);
+        this.beta_carotene=norms.get(1);
+        this.vitamin_e=norms.get(4);
+        this.vitamin_d=norms.get(3);
+        this.vitamin_k=norms.get(5);
+        this.vitamin_b4=norms.get(10);
+        this.vitamin_pp=norms.get(15);
+        this.vitamin_h=norms.get(16);
 
         this.id = -1L;
         this.food = null;
@@ -176,6 +178,8 @@ public class Vitamin implements NutrientGroup {
         this.vitamin_b6=v.getVitamin_b6()/vNorm.getVitamin_b6();
         this.vitamin_b9=v.getVitamin_b9()/vNorm.getVitamin_b9();
         this.vitamin_b12=v.getVitamin_b12()/vNorm.getVitamin_b12();
+        this.vitamin_h=v.getVitamin_h()/vNorm.getVitamin_h();
+        this.vitamin_pp=v.getVitamin_pp()/vNorm.getVitamin_pp();
 
         this.id = -1L;
         this.food = null;

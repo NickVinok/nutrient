@@ -14,6 +14,7 @@ public class PfcNorms {
     public float cholesterol;
     public float starch;
     public float fiber;
+    public float sfa;
     public float omega3;
     public float omega6;
     public float omega9;

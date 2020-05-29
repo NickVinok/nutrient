@@ -73,6 +73,7 @@ public class PfcNormsCalculation extends PfcNorms {
         this.omega3 = calories/1000;
         this.omega6 = calories/1000*4;
         this.omega9 = calories/10;
+        this.sfa = 18.9f;
     }
 
     public PfcNorms getNorms(){

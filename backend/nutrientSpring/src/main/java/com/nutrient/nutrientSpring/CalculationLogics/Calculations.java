@@ -43,7 +43,7 @@ public class Calculations {
         //       foodService.getFoodWOProhibitedCategories(dietRestrictions));
 
         //Получаем список объектов значений нутриентов для конкретного пола
-        nutrientService.getNutrientsValueForGender(gender);
+        nutrientService.getNutrientsValueForGender(gender, age, pregnancy, false);
 
         //Рассчитываем Нрмы БЖУ, исходя из роста, веса, пола и т.д.)
         pfcNormsCalculation = new PfcNormsCalculation(gender, age, weight, height, dietType, workingGroup);
@@ -52,7 +52,7 @@ public class Calculations {
         vitaminNorms = nutrientService.getVitaminNorms();
         mineralNorms = nutrientService.getMineralNorms();
         List<Long> mineralIds = mapper.getMineralsId();
-        pfcNormsCalculation.setAsh(nutrientService.getMineralsSum(gender, mineralIds));
+        pfcNormsCalculation.setAsh(nutrientService.getAshNorm());
         //Получаем список норм БЖУ
         Food pfcNorms = new Food(pfcNormsCalculation.getPfc());
         pfcNormsToController = pfcNormsCalculation.getNorms();
@@ -333,7 +333,7 @@ public class Calculations {
         }
         List<Ingredient> products = foodService.getProductsForCustomCombination(ids);
         //Получаем список объектов значений нутриентов для конкретного пола
-        nutrientService.getNutrientsValueForGender(gender);
+        nutrientService.getNutrientsValueForGender(gender, age, pregnancy, false);
 
         acidNorms = nutrientService.getAcidNorms();
         vitaminNorms = nutrientService.getVitaminNorms();
@@ -342,7 +342,7 @@ public class Calculations {
         pfcNormsCalculation = new PfcNormsCalculation(gender, age, weight, height, dietType, workingGroup);
         //Рассчитываем норму золы
         List<Long> mineralIds = mapper.getMineralsId();
-        pfcNormsCalculation.setAsh(nutrientService.getMineralsSum(gender, mineralIds));
+        pfcNormsCalculation.setAsh(nutrientService.getAshNorm());
         //Получаем список норм БЖУ
         Food pfcNorms = new Food(pfcNormsCalculation.getPfc());
         pfcNormsToController = pfcNormsCalculation.getNorms();
