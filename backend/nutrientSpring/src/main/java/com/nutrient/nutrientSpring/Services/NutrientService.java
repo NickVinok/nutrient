@@ -31,7 +31,12 @@ public class NutrientService {
     private Float ashNorm;
 
     public void getNutrientsValueForGender(String gender, double age, boolean isPregnant, boolean isFeeding) {
-        long groupId = groupRepo.findByAgeStartGreaterThanEqualAndAgeEndLessThanEqualAndGenderAndIsPregnantAndIsFeeding
+        if(gender.equals("Male")) {
+            gender="М";
+        }else{
+            gender="Ж";
+        }
+        long groupId = groupRepo.findByAgeStartLessThanEqualAndAgeEndGreaterThanEqualAndGenderAndIsPregnantAndIsFeeding
                 (age, age, gender, isPregnant, isFeeding).getId();
 
         /*List<String> tmpMineralsNames = Stream.of("calcium ", "phosphorus", "magnesum ", "kalium ",

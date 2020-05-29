@@ -8,6 +8,6 @@ import java.util.ArrayList;
 
 @Repository
 public interface GroupRepo extends JpaRepository<Group, Long> {
-    Group findByAgeStartGreaterThanEqualAndAgeEndLessThanEqualAndGenderAndIsPregnantAndIsFeeding
+    Group findByAgeStartLessThanEqualAndAgeEndGreaterThanEqualAndGenderAndIsPregnantAndIsFeeding
             (double age1, double age2, String gender, boolean isPregnant, boolean isFeeding);
 }

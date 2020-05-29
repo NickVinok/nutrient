@@ -17,6 +17,7 @@ public class NutrientRestController {
 
     @PostMapping
     public CalculationResponse postCombinations(@RequestBody DietInfo dietInfo){
+        System.out.println(dietInfo);
         CalculationResponse r = new CalculationResponse();
         r.setCombinations(calculations.getEfficientCombinations(
                 dietInfo.getGender(),

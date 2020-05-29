@@ -90,11 +90,12 @@ public class PfcNormsCalculation extends PfcNorms {
         norms.setOmega3(omega3);
         norms.setOmega6(omega6);
         norms.setOmega9(omega9);
+        norms.setSfa(sfa);
         return norms;
     }
 
     public List<Float> getPfc(){
-        return Stream.of(calories, proteins, fats, carbohydrates, water, ash, sugar, starch, cholesterol, fiber)
+        return Stream.of(calories, proteins, fats, carbohydrates, water, ash, sugar, starch, cholesterol, fiber, sfa)
                 .collect(Collectors.toList());
     }
 }

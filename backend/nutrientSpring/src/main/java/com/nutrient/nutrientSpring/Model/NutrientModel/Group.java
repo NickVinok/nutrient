@@ -8,7 +8,7 @@ import javax.persistence.Table;
 
 @Entity
 @Data
-@Table(name = "Group")
+@Table(name = "NormGroups")
 public class Group {
     @Id
     private long id;
