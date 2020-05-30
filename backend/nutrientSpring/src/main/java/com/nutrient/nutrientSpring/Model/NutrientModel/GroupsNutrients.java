@@ -15,7 +15,7 @@ public class GroupsNutrients {
     @ManyToOne(fetch = FetchType.EAGER)
     @MapsId("idGroup")
     @JoinColumn(name = "idGroup", referencedColumnName = "id")
-    private Group group;
+    private NormGroups normGroups;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @MapsId("idNutrient")

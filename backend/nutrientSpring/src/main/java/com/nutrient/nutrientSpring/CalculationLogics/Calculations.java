@@ -452,4 +452,26 @@ public class Calculations {
     public Mineral getMineralNorms() {
         return mineralNorms;
     }
+
+    public void calculateNormsForPerson(
+            String gender, int workingGroup, float age, float weight, float height, String dietType, int dietRestrictions, boolean pregnancy){
+        nutrientService.getNutrientsValueForGender(gender, age, pregnancy, false);
+
+        //Рассчитываем Нрмы БЖУ, исходя из роста, веса, пола и т.д.)
+        pfcNormsCalculation = new PfcNormsCalculation(gender, age, weight, height, dietType, workingGroup);
+        //Рассчитываем норму золы
+        acidNorms = nutrientService.getAcidNorms();
+        vitaminNorms = nutrientService.getVitaminNorms();
+        mineralNorms = nutrientService.getMineralNorms();
+        List<Long> mineralIds = mapper.getMineralsId();
+        pfcNormsCalculation.setAsh(nutrientService.getAshNorm());
+        //Получаем список норм БЖУ
+        Food pfcNorms = new Food(pfcNormsCalculation.getPfc());
+        pfcNormsToController = pfcNormsCalculation.getNorms();
+        //Из-за того, что норма для кислот рассчитывается в разделе БЖУ
+        //А сами кислоты в кислотах)
+        acidNorms.setOmega3(pfcNormsCalculation.getOmega3());
+        acidNorms.setOmega6(pfcNormsCalculation.getOmega6());
+        acidNorms.setOmega9(pfcNormsCalculation.getOmega9());
+    }
 }

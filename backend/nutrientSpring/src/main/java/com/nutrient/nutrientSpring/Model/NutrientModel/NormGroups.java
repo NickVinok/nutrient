@@ -8,8 +8,8 @@ import javax.persistence.Table;
 
 @Entity
 @Data
-@Table(name = "NormGroups")
-public class Group {
+@Table(name = "NormGroup")
+public class NormGroups {
     @Id
     private long id;
     private String name;
