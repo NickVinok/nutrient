@@ -206,4 +206,16 @@ public class Acid implements NutrientGroup {
         this.id = -1L;
         this.food = null;
     }
+    public void calculateAcidNormsForMass(double mass){
+        this.tryptophan*=mass;
+        this.threonine*=mass;
+        this.isoleucine*=mass;
+        this.leucine*=mass;
+        this.lysine*=mass;
+        this.methionine*=mass;
+        this.cystine*=mass;
+        this.phenylalanine*=mass;
+        this.valine*=mass;
+        this.histidine*=mass;
+    }
 }

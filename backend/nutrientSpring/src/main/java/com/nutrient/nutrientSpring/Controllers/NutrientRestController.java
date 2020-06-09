@@ -17,7 +17,6 @@ public class NutrientRestController {
 
     @PostMapping
     public CalculationResponse postCombinations(@RequestBody DietInfo dietInfo){
-        System.out.println(dietInfo);
         CalculationResponse r = new CalculationResponse();
         r.setCombinations(calculations.getEfficientCombinations(
                 dietInfo.getGender(),
@@ -29,9 +28,6 @@ public class NutrientRestController {
                 dietInfo.getDietRestrictions(),
                 dietInfo.isPregnancy()
                 ).getCombinationList());
-        /*for (Combination c : r.getCombinations()){
-            System.out.println(c.getProducts().size());
-        }*/
         r.setNorms(new NutrientNorms(calculations.getPfcNorms(),
                 calculations.getVitaminNorms(), calculations.getAcidNorms(), calculations.getMineralNorms()));
         return r;

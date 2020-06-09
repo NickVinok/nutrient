@@ -30,7 +30,7 @@ public class NutrientService {
     private Acid acidNorms;
     private Float ashNorm;
 
-    public void getNutrientsValueForGender(String gender, double age, boolean isPregnant, boolean isFeeding) {
+    public void getNutrientsValueForGender(double mass, String gender, double age, boolean isPregnant, boolean isFeeding) {
         if(gender.equals("Male")) {
             gender="М";
         }else{
@@ -63,6 +63,7 @@ public class NutrientService {
                         .stream()
                         .map(GroupsNutrients::getValue)
                         .collect(Collectors.toList()));
+        acidNorms.calculateAcidNormsForMass(mass);
         vitaminNorms = new Vitamin(
                 groupsNutrientsRepo.findByGroupsNutrientsCompositeKey_groupIdAndGroupsNutrientsCompositeKey_nutrientIdIn
                         (groupId, vitaminIds)

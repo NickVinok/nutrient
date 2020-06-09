@@ -43,7 +43,7 @@ public class Calculations {
         //       foodService.getFoodWOProhibitedCategories(dietRestrictions));
 
         //Получаем список объектов значений нутриентов для конкретного пола
-        nutrientService.getNutrientsValueForGender(gender, age, pregnancy, false);
+        nutrientService.getNutrientsValueForGender(weight, gender, age, pregnancy, false);
 
         //Рассчитываем Нрмы БЖУ, исходя из роста, веса, пола и т.д.)
         pfcNormsCalculation = new PfcNormsCalculation(gender, age, weight, height, dietType, workingGroup);
@@ -101,15 +101,6 @@ public class Calculations {
     //Добавляем к оригинальной мапе проценты эффективности по бжу и прочему говну
     private List<Ingredient> productOverallEfficiency(List<Ingredient> ingredients, Food pfcNorms,
                                                       Vitamin vitaminNorms, Mineral mineralNorms, Acid acidNorms) {
-        //Еда:объект еды, Минералы: объект минералов, Витамины:объект витаминов, Кислоты: объект кислот
-        /*Здесь добавляем к этому следующую конструкцию
-        {
-            Эффективность БЖУ:{эффективность по калориям, белкам, жирам, углеводам,воде,золе, холестеролу,трансжирам и сахару, Общая эффективность}
-            Эффективность Минералов:{}
-            Эффективность Витаминов:{}
-            Общая эффективность 100гр. продукта : Значение
-        }
-        */
         List<Ingredient> tmp = new ArrayList<>();
         for (Ingredient in : ingredients) {
             Mineral m = in.getMineral();
@@ -123,6 +114,7 @@ public class Calculations {
             Food fEf = new Food(f, pfcNorms);
 
             in.setEfficiency(fEf, vEf, mEf, aEf);
+            //TODO МЕНЯЕМ ЦИФЕРКИ, С КОТОРЫМИ СРАВНИВАЕМ)
             if(in.calculateOverallMineralEfficiency()<2 && in.calculateOverallVitaminEfficiency()<2 &&
                     in.calculateOverallAcidEfficiency()<2 && in.calculateOverallFoodEfficiency()<2&&in.compare(1f)){
                 tmp.add(in);
@@ -130,7 +122,6 @@ public class Calculations {
                 continue;
             }
         }
-
         return tmp;
     }
 
@@ -333,7 +324,7 @@ public class Calculations {
         }
         List<Ingredient> products = foodService.getProductsForCustomCombination(ids);
         //Получаем список объектов значений нутриентов для конкретного пола
-        nutrientService.getNutrientsValueForGender(gender, age, pregnancy, false);
+        nutrientService.getNutrientsValueForGender(weight, gender, age, pregnancy, false);
 
         acidNorms = nutrientService.getAcidNorms();
         vitaminNorms = nutrientService.getVitaminNorms();
@@ -455,7 +446,7 @@ public class Calculations {
 
     public void calculateNormsForPerson(
             String gender, int workingGroup, float age, float weight, float height, String dietType, int dietRestrictions, boolean pregnancy){
-        nutrientService.getNutrientsValueForGender(gender, age, pregnancy, false);
+        nutrientService.getNutrientsValueForGender(weight, gender, age, pregnancy, false);
 
         //Рассчитываем Нрмы БЖУ, исходя из роста, веса, пола и т.д.)
         pfcNormsCalculation = new PfcNormsCalculation(gender, age, weight, height, dietType, workingGroup);
