@@ -9,6 +9,4 @@ public class NutrientSpringApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(NutrientSpringApplication.class, args);
 	}
-
-
 }

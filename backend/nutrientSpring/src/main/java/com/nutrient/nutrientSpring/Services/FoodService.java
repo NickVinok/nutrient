@@ -109,6 +109,15 @@ public class FoodService {
                     vitaminRepo.findByFood_id(id).get(),
                     mineralRepo.findByFood_id(id).get(),
                     acidsRepo.findByFood_id(id).get());
+            double sugarsSum = 0;
+            if(food.getSugars()==0){
+                sugarsSum+=food.getGlucose()+food.getFructose();
+                sugarsSum+=ingredient.getAcid().getGalactose()
+                        +ingredient.getAcid().getLactose()+ingredient.getAcid().getSaccharose();
+            }
+            food.setSugars((float)sugarsSum);
+            ingredient.setFood(food);
+
             ingredients.add(ingredient);
         }
         return ingredients;

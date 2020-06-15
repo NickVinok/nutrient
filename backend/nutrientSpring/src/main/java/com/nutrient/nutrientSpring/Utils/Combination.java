@@ -58,8 +58,7 @@ public class Combination{
             this.acidOverallEfficiency += product.calculateOverallAcidEfficiency();
             this.mineralOverallEfficiency+=product.calculateOverallMineralEfficiency();
             this.vitaminOverallEfficiency+=product.calculateOverallVitaminEfficiency();
-            this.combinationEfficiency = (pfcOverallEfficiency+acidOverallEfficiency+
-                    mineralOverallEfficiency+vitaminOverallEfficiency)/4;
+            this.combinationEfficiency += product.calculateOverallIngredientEfficiency();
             this.limitationTable = limits;
             return true;
         } else {
@@ -75,8 +74,7 @@ public class Combination{
         this.acidOverallEfficiency += product.calculateOverallAcidEfficiency();
         this.mineralOverallEfficiency+=product.calculateOverallMineralEfficiency();
         this.vitaminOverallEfficiency+=product.calculateOverallVitaminEfficiency();
-        this.combinationEfficiency = (pfcOverallEfficiency+acidOverallEfficiency+
-                mineralOverallEfficiency+vitaminOverallEfficiency)/4;
+        this.combinationEfficiency += product.calculateOverallIngredientEfficiency();
 
         this.limitationTable.updateCategoryLimit(product.getFood().getCategory().getId(), -1);
         this.limitationTable.updateFoodLimit(product.getId(), -1);
