@@ -11,6 +11,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.lang.Nullable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -50,6 +51,10 @@ public class Acid implements NutrientGroup {
     private float omega6;
     @Column(name = "omega_9")
     private float omega9;
+
+    private double saccharose;
+    private double lactose;
+    private double galactose;
 /*    @Nullable
     private Float hydroxyproline;
     @Column(name = "methionine_cystine")
@@ -86,6 +91,9 @@ public class Acid implements NutrientGroup {
         this.omega3+=a1.getOmega3();
         this.omega6+=a1.getOmega6();
         this.omega9+=a1.getOmega9();
+        this.galactose+=a1.getGalactose();
+        this.lactose+=a1.getLactose();
+        this.saccharose+=a1.getSaccharose();
     }
 
     public void subtract(Acid a1){
@@ -110,6 +118,9 @@ public class Acid implements NutrientGroup {
         this.omega3-=a1.getOmega3();
         this.omega6-=a1.getOmega6();
         this.omega9-=a1.getOmega9();
+        this.galactose-=a1.getGalactose();
+        this.lactose-=a1.getLactose();
+        this.saccharose-=a1.getSaccharose();
     }
 
     public void modify(Float c){
@@ -134,6 +145,9 @@ public class Acid implements NutrientGroup {
         this.omega3*=c;
         this.omega6*=c;
         this.omega9*=c;
+        this.galactose*=c;
+        this.lactose*=c;
+        this.saccharose*=c;
     }
     
     public boolean compare(Float numb){
@@ -155,6 +169,23 @@ public class Acid implements NutrientGroup {
                 this.glutamic_acid, this.glycine, this.proline, this.serine, omega3, omega6, omega9)
                 .collect(Collectors.toList());
     }
+    @JsonIgnore
+    public List<Float> getPoints(){
+        //Первая группа нутриентов - важные, редко имеется достаток
+        //Вторая группа нутриентов - более менее нормальное количество
+        //ТРетья группа- не должно превышать определённого уровня
+        //Четвёртая группа - не должно превышать
+        //Пятая группа - не должно первышать
+        List<Float> omegaPoints = new ArrayList<>();
+        if((int)(omega6*100)>115){
+            omegaPoints.add(2*115f-((int)(omega6*100)-115)*10f);
+        }else{
+            omegaPoints.add(omega6*200);
+        }
+        omegaPoints.add(omega3*300);
+        omegaPoints.add(omega9*200);
+        return omegaPoints;
+    }
 
     public Acid(List<Float> norms){
         this.tryptophan=norms.get(0);
@@ -175,6 +206,9 @@ public class Acid implements NutrientGroup {
         this.glycine=norms.get(15);
         this.proline=norms.get(16);
         this.serine=norms.get(17);
+        this.saccharose=0;
+        this.galactose=0;
+        this.lactose=0;
 
         this.id = -1L;
         this.food = null;

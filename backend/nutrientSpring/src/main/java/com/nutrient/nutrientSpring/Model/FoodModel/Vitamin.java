@@ -132,6 +132,33 @@ public class Vitamin implements NutrientGroup {
                 vitamin_b6, vitamin_b9, vitamin_b12, vitamin_pp, vitamin_h)
                 .collect(Collectors.toList());
     }
+    @JsonIgnore
+    public List<Float> getPoints(){
+        List<Float> mineralPoints = Stream.of(
+        //Первая группа нутриентов - важные, редко имеется достаток
+        this.vitamin_b1*300,
+        this.vitamin_b2*300,
+        this.vitamin_b12*300,
+        //Вторая группа нутриентов - более менее нормальное количество
+        this.beta_carotene*200,
+        this.vitamin_a*200,
+        this.vitamin_h*200,
+        this.vitamin_b3*200,
+        this.vitamin_b4*200,
+        this.vitamin_b5*200,
+        this.vitamin_b6*200,
+        this.vitamin_b9*200,
+        this.vitamin_c*200,
+        this.vitamin_e*200,
+        this.vitamin_d*200,
+        this.vitamin_k*200,
+        //ТРетья группа- не должно превышать определённого уровня
+        this.alpha_carotene*100
+        //Четвёртая группа - не должно превышать
+        //Пятая группа - не должно первышать
+        ).collect(Collectors.toList());
+        return mineralPoints;
+    }
     
     public Vitamin(List<Float> norms){
         //Так как их норм для них пока что нет
