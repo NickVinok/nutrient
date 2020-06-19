@@ -154,4 +154,17 @@ public class Combination{
     public FoodAndCategoriesLimitationTable getLimitationTable(){
         return this.limitationTable;
     }
+
+    @JsonIgnore
+    public Ingredient getMostOverflowingProduct(){
+        //получаем здесь самые оверфлоувящие нутриенты (точнее их индексы из getValue)
+        int foodIndex = this.overallNutrientsAndEfficiency.getFoodEfficiency().getMostOverflowingIndex(); //foodEfficiency.getMostOverflowing; ВОЗМОЖНО СТОИТ ВОЗВРАЩАТЬ МАССИВ
+        int vitaminIndex = this.overallNutrientsAndEfficiency.getVitaminEfficiency().getMostOverflowingIndex();
+        int mineralIndex=this.overallNutrientsAndEfficiency.getMineralEfficiency().getMostOverflowingIndex();
+        int acidIndex=this.overallNutrientsAndEfficiency.getAcidEfficiency().getMostOverflowingIndex();
+
+        return this.products.stream()
+                .max(Comparator.comparingDouble(x -> x.getMostOverFlowingNutrient(foodIndex, mineralIndex, vitaminIndex, acidIndex)))
+                .get();
+    }
 }

@@ -9,6 +9,8 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -180,7 +182,7 @@ public class Mineral implements NutrientGroup {
                 rubidium, lithium, zirconium, bromine)
                 .collect(Collectors.toList());
     }
-
+    @JsonIgnore
     public List<Float> getDangerousNutrients(){
         return Stream.of(this.selen, this.potassium, this.chlorine, this.bor,
                         this.bromine, this.vanadium, this.fluorine, this.chrome)
@@ -244,6 +246,19 @@ public class Mineral implements NutrientGroup {
         return mineralPoints;
     }
 
+    @JsonIgnore
+    public int getMostOverflowingIndex(){
+        List<Float> tmp= this.getValues();
+        int index = 0;
+        double value = 0;
+        for(int i = 0;i<tmp.size();i++){
+            if(tmp.get(i)>value){
+                value = tmp.get(i);
+                index = i;
+            }
+        }
+        return index;
+    }
     public Mineral(List<Float> norms) {
         this.calcium = norms.get(0);
         this.iron = norms.get(1);

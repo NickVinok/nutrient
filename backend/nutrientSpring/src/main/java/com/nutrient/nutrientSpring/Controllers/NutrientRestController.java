@@ -28,6 +28,7 @@ public class NutrientRestController {
                 dietInfo.getDietRestrictions(),
                 dietInfo.isPregnancy()
                 ).getCombinationList());
+
         r.setNorms(new NutrientNorms(calculations.getPfcNorms(),
                 calculations.getVitaminNorms(), calculations.getAcidNorms(), calculations.getMineralNorms()));
         return r;

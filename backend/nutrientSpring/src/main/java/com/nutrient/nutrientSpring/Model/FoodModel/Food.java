@@ -154,6 +154,20 @@ public class Food implements NutrientGroup {
         return foodPoints;
     }
 
+    @JsonIgnore
+    public int getMostOverflowingIndex(){
+        List<Float> tmp= this.getValues();
+        int index = 0;
+        double value = 0;
+        for(int i = 0;i<tmp.size();i++){
+            if(tmp.get(i)>value){
+                value = tmp.get(i);
+                index = i;
+            }
+        }
+        return index;
+    }
+
     public Food(List<Float> f){
         this.id = -1L;
         this.name = "Норма БЖУ";

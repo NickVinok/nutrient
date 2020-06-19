@@ -114,7 +114,6 @@ public class Calculations {
             Food fEf = new Food(f, pfcNorms);
 
             in.setEfficiency(fEf, vEf, mEf, aEf);
-            //TODO МЕНЯЕМ ЦИФЕРКИ, С КОТОРЫМИ СРАВНИВАЕМ)
             if(in.calculateOverallMineralEfficiency()<2 && in.calculateOverallVitaminEfficiency()<2 &&
                     in.calculateOverallAcidEfficiency()<2 && in.calculateOverallFoodEfficiency()<2&&in.compare(1f)){
                 tmp.add(in);
@@ -225,89 +224,17 @@ public class Calculations {
     public Combinations optimizeCombinations(List<Ingredient> products, Combinations unOptimizedCombinations) {
         for (Combination comb : unOptimizedCombinations.getCombinationList()) {
             int counter = 5;
-            List<List<Integer>> listOfOverflowingNutrients = comb.doesCombinationHasOverflowingNutrients();
-            List<Long> foodIds = comb.getProducts().stream()
-                    .map((Ingredient::getFood))
-                    .map(Food::getId)
-                    .collect(Collectors.toList());
-            /*System.out.print("То что в списке системном");
-            System.out.println(foodIds);*/
-
-            //Получаем айди тех нутриентов, которые в избытке
-            List<Integer> pfcOverflow, vitaminOverflow, mineralOverflow, acidOverflow;
-            pfcOverflow = listOfOverflowingNutrients.get(0);
-            vitaminOverflow = listOfOverflowingNutrients.get(1);
-            mineralOverflow = listOfOverflowingNutrients.get(2);
-            acidOverflow = listOfOverflowingNutrients.get(3);
-
-            //Пока вообще не будет категорий с избыточными нутриентами
-            while ((pfcOverflow.size() != 0) || (vitaminOverflow.size() != 0) ||
-                    (mineralOverflow.size() != 0) || (acidOverflow.size() != 0)) {
-                List<List<Integer>> tmp = new ArrayList<>(listOfOverflowingNutrients);
-
-                //какой нутриент в каком из продуктов больше всего
-                HashMap<Long, HashMap<Integer, Float>> mostOverFlowingNutrient = new HashMap<>();
-                //Значение эффективности(сколько процентов суточной нормы удоволетворяет ДАННЫЙ продукт)
-                //по самому удоволетворяемому нутриенту
-                Float percentOfMostOverflowingNutrientInComb = 1f;
-                Ingredient nutrientsAndEfficiency = comb.getOverallNutrientsAndEfficiency();
-
-                //Находим самый избыточный компонент и его значение
-                if (pfcOverflow.size() > 0) {
-                    mostOverFlowingNutrient = getMostOverflowingNutrient(comb.getProducts(), foodIds,
-                            pfcOverflow, "food");
-                    percentOfMostOverflowingNutrientInComb = nutrientsAndEfficiency.getFoodEfficiency()
-                            .getValues().get(pfcOverflow.get(0));
-                } else if (vitaminOverflow.size() > 0) {
-                    mostOverFlowingNutrient = getMostOverflowingNutrient(comb.getProducts(), foodIds,
-                            vitaminOverflow, "vitamin");
-
-                    percentOfMostOverflowingNutrientInComb = nutrientsAndEfficiency.getVitaminEfficiency()
-                            .getValues().get(vitaminOverflow.get(0));
-                } else if (mineralOverflow.size() > 0) {
-                    mostOverFlowingNutrient = getMostOverflowingNutrient(comb.getProducts(), foodIds,
-                            mineralOverflow, "mineral");
-                    percentOfMostOverflowingNutrientInComb = nutrientsAndEfficiency.getMineralEfficiency()
-                            .getValues().get(mineralOverflow.get(0));
-                } else if (acidOverflow.size() > 0) {
-                    mostOverFlowingNutrient = getMostOverflowingNutrient(comb.getProducts(), foodIds,
-                            acidOverflow, "acid");
-                    percentOfMostOverflowingNutrientInComb = nutrientsAndEfficiency.getAcidEfficiency()
-                            .getValues().get(acidOverflow.get(0));
-                }
-
-                Long idOfFoodToBeModified = mostOverFlowingNutrient.entrySet()
-                        .stream()
-                        .findFirst()
-                        .get()
-                        .getKey()
-                        ;
-                Ingredient productTobeModified = products.stream()
-                        .filter(ingredient -> ingredient.getId().equals(idOfFoodToBeModified))
-                        .findFirst()
-                        .get()
-                        ;
+            for(int i=0;i<counter;i++){
+                Ingredient productTobeModified=comb.getMostOverflowingProduct();
 
                 comb.deleteFoodFromCombination(productTobeModified);
-                Float gramFixCoef = getNutrientFixCoefficient(mostOverFlowingNutrient, percentOfMostOverflowingNutrientInComb);
+                Float gramFixCoef = 0.5f;
                 productTobeModified.multiply(gramFixCoef);
-                comb.addFoodToCustomCombination(productTobeModified);
-
-                listOfOverflowingNutrients = comb.doesCombinationHasOverflowingNutrients();
-                pfcOverflow = listOfOverflowingNutrients.get(0);
-                vitaminOverflow = listOfOverflowingNutrients.get(1);
-                mineralOverflow = listOfOverflowingNutrients.get(2);
-                acidOverflow = listOfOverflowingNutrients.get(3);
-
-                boolean isCycled = true;
-                for (int i = 0; i < listOfOverflowingNutrients.size(); i++) {
-                    if (!tmp.get(i).equals(listOfOverflowingNutrients.get(i))) {
-                        isCycled = false;
-                        break;
-                    }
+                //Если продукта, который мы уменьшали сатло слишком мало - не возвращаем его в комбинацию
+                if(productTobeModified.getGram()<5){
+                    break;
                 }
-                if (isCycled) counter--;
-                if (counter == 0) break;
+                comb.addFoodToCustomCombination(productTobeModified);
             }
         }
         return unOptimizedCombinations;
@@ -357,79 +284,6 @@ public class Calculations {
         }
 
         return result;
-    }
-
-    private HashMap<Long, HashMap<Integer, Float>> getMostOverflowingNutrient(List<Ingredient> products, List<Long> foodIds,
-                                                                              List<Integer> overflowingIndexes,
-                                                                              String nutrient) {
-
-        HashMap<Long, HashMap<Integer, Float>> efficiencyOnSingleNutrient = new HashMap<>();
-        Integer index = overflowingIndexes.get(0);
-
-        for (Ingredient ingredient : products) {
-
-            HashMap<Integer, Float> nutrientEffectPair = new HashMap<>();
-            Float effect = 0f;
-
-            if (nutrient.equals("food")) {
-                effect = ingredient.getFoodEfficiency().getValues().get(index);
-            } else if (nutrient.equals("mineral")) {
-                effect = ingredient.getMineralEfficiency().getValues().get(index);
-            } else if (nutrient.equals("vitamin")) {
-                effect = ingredient.getVitaminEfficiency().getValues().get(index);
-            } else {
-                effect = ingredient.getAcidEfficiency().getValues().get(index);
-            }
-            nutrientEffectPair.put(index, effect);
-
-            efficiencyOnSingleNutrient.put(ingredient.getId(), nutrientEffectPair);
-        }
-
-
-        Long idOfMaxOverflow = efficiencyOnSingleNutrient.entrySet().stream()
-                .max((f1, f2) -> Float.compare(f1.getValue().get(index), f2.getValue().get(index))).get().getKey();
-        HashMap<Integer, Float> efficiencyOfMaxOverflow = efficiencyOnSingleNutrient.entrySet()
-                .stream()
-                .max((f1, f2) -> Float.compare(f1.getValue().get(index), f2.getValue().get(index)))
-                .get()
-                .getValue();
-
-        HashMap<Long, HashMap<Integer, Float>> result = new HashMap<>();
-        result.put(idOfMaxOverflow, efficiencyOfMaxOverflow);
-        return result;
-    }
-
-    public Float getNutrientFixCoefficient(HashMap<Long, HashMap<Integer, Float>> mostOverFlowingNutrient,
-                                           Float valueOfOverflowingNutrientInComb) {
-        if (valueOfOverflowingNutrientInComb == 0f) return 0f;
-
-        Float gramFixCoefficient;
-        Float nutrientPercentOfOverflow = mostOverFlowingNutrient.entrySet().stream()
-                .findFirst()
-                .get()
-                .getValue()
-                .entrySet()
-                .stream()
-                .findFirst()
-                .get()
-                .getValue()
-                ;
-
-        Float tmp = nutrientPercentOfOverflow / valueOfOverflowingNutrientInComb;
-
-        if (tmp >= 0.35 && tmp < 0.4) {
-            gramFixCoefficient = 0.8f;
-        } else if (tmp >= 0.4 && tmp < 0.6) {
-            gramFixCoefficient = 0.65f;
-        } else if (tmp >= 0.6 && tmp < 0.9) {
-            gramFixCoefficient = 0.5f;
-        } else if (tmp >= 0.9 && tmp < 1.15) {
-            gramFixCoefficient = 0.25f;
-        } else {
-            gramFixCoefficient = 0.1f;
-        }
-
-        return gramFixCoefficient;
     }
 
     public Acid getAcidNorms() {

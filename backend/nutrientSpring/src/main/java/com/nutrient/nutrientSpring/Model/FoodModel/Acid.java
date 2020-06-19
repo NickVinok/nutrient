@@ -187,6 +187,20 @@ public class Acid implements NutrientGroup {
         return omegaPoints;
     }
 
+    @JsonIgnore
+    public int getMostOverflowingIndex(){
+        List<Float> tmp= this.getValues();
+        int index = 0;
+        double value = 0;
+        for(int i = 0;i<tmp.size();i++){
+            if(tmp.get(i)>value){
+                value = tmp.get(i);
+                index = i;
+            }
+        }
+        return index;
+    }
+
     public Acid(List<Float> norms){
         this.tryptophan=norms.get(0);
         this.threonine=norms.get(1);
