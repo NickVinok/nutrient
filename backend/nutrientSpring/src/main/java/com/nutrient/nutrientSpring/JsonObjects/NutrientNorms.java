@@ -1,4 +1,4 @@
-package com.nutrient.nutrientSpring.JsonObjects.NutrientREST;
+package com.nutrient.nutrientSpring.JsonObjects;
 
 import com.nutrient.nutrientSpring.CalculationLogics.Pfc.PfcNorms;
 import com.nutrient.nutrientSpring.Model.FoodModel.Acid;

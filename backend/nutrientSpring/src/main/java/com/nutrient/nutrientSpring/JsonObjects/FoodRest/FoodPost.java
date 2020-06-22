@@ -1,6 +1,6 @@
 package com.nutrient.nutrientSpring.JsonObjects.FoodRest;
 
-import com.nutrient.nutrientSpring.JsonObjects.NutrientREST.DietInfo;
+import com.nutrient.nutrientSpring.JsonObjects.DietInfo;
 import lombok.Data;
 
 import java.util.ArrayList;

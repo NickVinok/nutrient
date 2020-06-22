@@ -1,9 +1,8 @@
 package com.nutrient.nutrientSpring.Controllers;
 
 import com.nutrient.nutrientSpring.CalculationLogics.Calculations;
-import com.nutrient.nutrientSpring.JsonObjects.NutrientREST.DietInfo;
-import com.nutrient.nutrientSpring.JsonObjects.NutrientREST.NutrientNorms;
-import com.nutrient.nutrientSpring.Utils.Ingredient;
+import com.nutrient.nutrientSpring.JsonObjects.DietInfo;
+import com.nutrient.nutrientSpring.JsonObjects.NutrientNorms;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

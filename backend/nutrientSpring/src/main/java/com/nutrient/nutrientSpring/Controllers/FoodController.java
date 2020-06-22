@@ -1,8 +1,10 @@
 package com.nutrient.nutrientSpring.Controllers;
 
 import com.nutrient.nutrientSpring.CalculationLogics.Calculations;
+import com.nutrient.nutrientSpring.JsonObjects.DietInfo;
 import com.nutrient.nutrientSpring.JsonObjects.FoodRest.FoodPost;
 import com.nutrient.nutrientSpring.JsonObjects.FoodRest.PackedJsonObject;
+import com.nutrient.nutrientSpring.JsonObjects.NutrientNorms;
 import com.nutrient.nutrientSpring.JsonObjects.NutrientREST.*;
 import com.nutrient.nutrientSpring.Services.PackedFoodService;
 import com.nutrient.nutrientSpring.Utils.Combination;

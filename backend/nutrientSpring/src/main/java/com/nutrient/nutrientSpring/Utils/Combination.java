@@ -118,4 +118,36 @@ public class Combination{
         }
         return tmp;
     }
+
+    //Mutable, удаляет продукты, которые запихнули в приём пищи из себя
+    @JsonIgnore
+    public Combination getCombinationForMeal(double ratio){
+        Combination comb = new Combination();
+        comb.setLimitationTable(this.limitationTable);
+        if(ratio==1){
+            return this;
+        } else if(ratio==-1){
+            comb.addFoodToCustomCombination(this.products.get(0));
+            this.deleteFoodFromCombination(this.products.get(0));
+            return comb;
+        }
+        
+        float energy = this.overallNutrientsAndEfficiency.getFoodEfficiency().getEnergy();
+        while(true) {
+            List<Ingredient> tmp = this.products.stream()
+                    .sorted((x, y) -> Float.compare(
+                            Math.abs(x.getFoodEfficiency().getEnergy() / energy - (float) ratio),
+                            Math.abs(y.getFoodEfficiency().getEnergy() / energy - (float) ratio)
+                    )).collect(Collectors.toList());
+
+            Ingredient inMeal = tmp.get(0);
+            comb.addFoodToCustomCombination(inMeal);
+            this.deleteFoodFromCombination(inMeal);
+
+            if (Math.abs(comb.getOverallNutrientsAndEfficiency().getFoodEfficiency().getEnergy() / energy - ratio)<0.05 || this.products.size()==1) {
+                break;
+            }
+        }
+        return comb;
+    }
 }

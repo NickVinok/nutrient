@@ -1,4 +1,4 @@
-package com.nutrient.nutrientSpring.JsonObjects.NutrientREST;
+package com.nutrient.nutrientSpring.JsonObjects;
 
 import lombok.Data;
 

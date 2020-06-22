@@ -12,6 +12,7 @@ import com.nutrient.nutrientSpring.Services.NutrientService;
 import com.nutrient.nutrientSpring.Utils.Combination;
 import com.nutrient.nutrientSpring.Utils.FoodAndCategoriesLimitationTable;
 import com.nutrient.nutrientSpring.Utils.Ingredient;
+import com.nutrient.nutrientSpring.Utils.Ration.Ration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -340,8 +341,7 @@ public class Calculations {
                 Float gramFixCoef = 0.5f;
                 productTobeModified.multiply(gramFixCoef);
                 //Если продукта, который мы уменьшали сатло слишком мало - не возвращаем его в комбинацию
-                if (productTobeModified.getGram() < 25) {
-                    
+                if (productTobeModified.getGram() <  10f) {
                     break;
                 }
                 comb.addFoodToCustomCombination(productTobeModified);
@@ -428,5 +428,27 @@ public class Calculations {
         acidNorms.setOmega3(pfcNormsCalculation.getOmega3());
         acidNorms.setOmega6(pfcNormsCalculation.getOmega6());
         acidNorms.setOmega9(pfcNormsCalculation.getOmega9());
+    }
+
+    public List<Ration> calculateRationForPerson(String gender, int workingGroup, float age, float weight, float height,
+                                                 String dietType, int dietRestrictions, boolean pregnancy,
+                                                 int days, int meals){
+        Combinations combinations = this.getEfficientCombinations(gender, workingGroup, age, weight, height,
+                dietType, dietRestrictions, pregnancy);
+        List<Ration> results = new ArrayList<>();
+        int j=0; //Счётчик, с помощью которого мы достаём комбинации из списка
+        for(int i = 0; i<days;i++){
+            if(j>combinations.getCombinationList().size()-1){
+                j=0;
+            }
+            Combination combWhichWillBePartitionedIntoMeals = combinations.getCombinationList().get(j);
+
+            Ration newRation=new Ration(i);
+
+            newRation.combinationPartitioning(combWhichWillBePartitionedIntoMeals, meals);
+            results.add(newRation);
+            j++;
+        }
+        return results;
     }
 }
