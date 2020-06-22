@@ -19,7 +19,6 @@ public class Ration {
     }
 
     public void combinationPartitioning(Combination toBePartitioned, int numberOfMilfs){
-        System.out.println(numberOfMilfs);
         if(numberOfMilfs>=toBePartitioned.getProducts().size()){
             for(int i=0; i<toBePartitioned.getProducts().size();i++){
                 Meal meal = new Meal();
