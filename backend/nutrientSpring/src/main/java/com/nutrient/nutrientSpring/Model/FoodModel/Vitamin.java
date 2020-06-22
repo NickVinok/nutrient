@@ -175,6 +175,21 @@ public class Vitamin implements NutrientGroup {
         return index;
     }
 
+    @JsonIgnore
+    public int getLeastOverflowingNutrient(){
+        List<Float> tmp= this.getValues();
+        int index = 0;
+        double value = tmp.get(0);
+        for(int i=0;i<tmp.size();i++){
+            if(tmp.get(i)<value){
+                value = tmp.get(i);
+                index = i;
+            }
+        }
+        return index;
+    }
+
+
     public Vitamin(List<Float> norms){
         //Так как их норм для них пока что нет
         //this.vitamin_d2=norms.get(4);

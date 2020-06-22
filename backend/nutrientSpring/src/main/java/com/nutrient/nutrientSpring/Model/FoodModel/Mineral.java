@@ -259,6 +259,22 @@ public class Mineral implements NutrientGroup {
         }
         return index;
     }
+
+    @JsonIgnore
+    public int getLeastOverflowingNutrient(){
+        List<Float> tmp= this.getValues();
+        int index = 0;
+        double value = tmp.get(0);
+        for(int i=0;i<tmp.size();i++){
+            if(tmp.get(i)<value){
+                value = tmp.get(i);
+                index = i;
+            }
+        }
+        return index;
+    }
+
+
     public Mineral(List<Float> norms) {
         this.calcium = norms.get(0);
         this.iron = norms.get(1);

@@ -106,7 +106,7 @@ public class Ingredient {
         double mineralPoints = this.mineralEfficiency.getPoints(this.mineral.getDangerousNutrients()).stream().reduce(Float::sum).get();
 
         return ((float)(acidPoints+vitaminPoints+foodPoints+mineralPoints)
-                /10300
+                /103 /100
                 +foodEfficiency.getEnergy())/2;
     }
 
@@ -163,11 +163,13 @@ public class Ingredient {
         return foodEfficiency.compare(numb) && acidEfficiency.compare(numb) &&
                 mineralEfficiency.compare(numb) && vitaminEfficiency.compare(numb);
     }
+
     //На вход поступает 4 индекса - по этим индексам функция
     //определяет: какой из 4-х нутриентов в наибольшем избытке
     //возвращает наибольший процент из 4-х индексов
     public double getMostOverFlowingNutrient(int fi, int mi, int vi, int ai){
-        return Stream.of(this.getFoodEfficiency().getValues().get(fi), this.mineralEfficiency.getValues().get(mi),
+
+        return Stream.of(this.foodEfficiency.getValues().get(fi), this.mineralEfficiency.getValues().get(mi),
                 this.vitaminEfficiency.getValues().get(vi), this.acidEfficiency.getValues().get(ai))
                 .max(Float::compare).get();
     }

@@ -11,6 +11,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.lang.Nullable;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -161,6 +162,20 @@ public class Food implements NutrientGroup {
         double value = 0;
         for(int i = 0;i<tmp.size();i++){
             if(tmp.get(i)>value){
+                value = tmp.get(i);
+                index = i;
+            }
+        }
+        return index;
+    }
+
+    @JsonIgnore
+    public int getLeastOverflowingNutrient(){
+        List<Float> tmp= this.getValues();
+        int index = 0;
+        double value = tmp.get(0);
+        for(int i=0;i<tmp.size();i++){
+            if(tmp.get(i)<value){
                 value = tmp.get(i);
                 index = i;
             }

@@ -27,23 +27,21 @@ public class Combination{
         return products;
     }
 
-    public boolean isInCombination(Food food){
-        if(products.stream()
-                .map(Ingredient::getFood)
-                .collect(Collectors.toList()).contains(food)){
+    public boolean isInCombination(Ingredient ingredient){
+        if(products.contains(ingredient)){
             return true;
         }
         return false;
     }
 
     private boolean isPossibleToAddProduct(Ingredient product){
-        if(products.size()>18){
+        if(products.size()>12){
             return false;
         }
 
         overallNutrientsAndEfficiency.sum(product);
 
-        if(overallNutrientsAndEfficiency.compare(1f)){
+        if(overallNutrientsAndEfficiency.compare(1.05f)){
             return true;
         }
 
@@ -95,56 +93,6 @@ public class Combination{
         this.limitationTable.updateFoodLimit(product.getId(), 1);
     }
 
-    public List<List<Integer>> doesCombinationHasOverflowingNutrients(){
-        List<List<Integer>> tmp = Stream.of(doesPFCOverflow(), doesVitaminsOverflow(), doesMineralsOverflow(), doesAcidsOverflow())
-                .collect(Collectors.toList());
-        //System.out.println(tmp);
-        return tmp;
-    }
-
-    private List<Integer> doesPFCOverflow(){
-        List<Integer> tmp = new ArrayList<>();
-        List<Float> nutrientPercentages = overallNutrientsAndEfficiency.getFoodEfficiency().getValues();
-        for(int i =0;i< nutrientPercentages.size();i++) {
-            if(nutrientPercentages.get(i) > 1){
-                tmp.add(i);
-            }
-        }
-        return tmp;
-    }
-
-    private List<Integer> doesVitaminsOverflow(){
-        List<Integer> tmp = new ArrayList<>();
-        List<Float> nutrientPercentages = overallNutrientsAndEfficiency.getVitaminEfficiency().getValues();
-        for(int i =0;i< nutrientPercentages.size();i++) {
-            if(nutrientPercentages.get(i) > 1){
-                tmp.add(i);
-            }
-        }
-        return tmp;
-    }
-
-    private List<Integer> doesMineralsOverflow(){
-        List<Integer> tmp = new ArrayList<>();
-        List<Float> nutrientPercentages = overallNutrientsAndEfficiency.getMineralEfficiency().getValues();
-        for(int i =0;i< nutrientPercentages.size();i++) {
-            if(nutrientPercentages.get(i) > 1){
-                tmp.add(i);
-            }
-        }
-        return tmp;
-    }
-
-    private List<Integer> doesAcidsOverflow(){
-        List<Integer> tmp = new ArrayList<>();
-        List<Float> nutrientPercentages = overallNutrientsAndEfficiency.getAcidEfficiency().getValues();
-        for(int i =0;i< nutrientPercentages.size();i++) {
-            if(nutrientPercentages.get(i) > 1){
-                tmp.add(i);
-            }
-        }
-        return tmp;
-    }
     public Combination(){
         this.limitationTable = new FoodAndCategoriesLimitationTable();
         this.overallNutrientsAndEfficiency = new Ingredient();
@@ -162,9 +110,12 @@ public class Combination{
         int vitaminIndex = this.overallNutrientsAndEfficiency.getVitaminEfficiency().getMostOverflowingIndex();
         int mineralIndex=this.overallNutrientsAndEfficiency.getMineralEfficiency().getMostOverflowingIndex();
         int acidIndex=this.overallNutrientsAndEfficiency.getAcidEfficiency().getMostOverflowingIndex();
-
-        return this.products.stream()
-                .max(Comparator.comparingDouble(x -> x.getMostOverFlowingNutrient(foodIndex, mineralIndex, vitaminIndex, acidIndex)))
-                .get();
+        //Если нет оверфлоувящих продуктов
+        Ingredient tmp = this.products.stream()
+                .max(Comparator.comparingDouble(x -> x.getMostOverFlowingNutrient(foodIndex, mineralIndex, vitaminIndex, acidIndex))).get();
+        if(tmp.getMostOverFlowingNutrient(foodIndex, mineralIndex, vitaminIndex, acidIndex) < 1.05){
+            return null;
+        }
+        return tmp;
     }
 }
