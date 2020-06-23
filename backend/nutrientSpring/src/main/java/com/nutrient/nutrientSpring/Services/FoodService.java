@@ -4,13 +4,14 @@ import com.nutrient.nutrientSpring.Model.FoodModel.*;
 import com.nutrient.nutrientSpring.Repos.FoodRepository.*;
 import com.nutrient.nutrientSpring.Utils.FoodAndCategoriesLimitationTable;
 import com.nutrient.nutrientSpring.Utils.Ingredient;
+import com.nutrient.nutrientSpring.Utils.Recipe;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -38,6 +39,8 @@ public class FoodService {
     private CategoryLimitRepo categoryLimitRepo;
     @Autowired
     private FoodLimitRepo foodLimitRepo;
+    @Autowired
+    private RecipesRepo recipesRepo;
 
     private FoodAndCategoriesLimitationTable limitationTable;
 
@@ -152,85 +155,7 @@ public class FoodService {
         return foodNutrients;
     }
 
-    public HashMap<Long, Long> getCategoriesCounter(){
 
-        HashMap<Long, Long> categoriesCounter = new HashMap<>();
-        List<String> notNeededCategories = Stream.of(
-                "Рис в сухом виде",
-                "Лапша в сухом виде",
-                "Яйца в сыром и сухом виде",
-                "Протеин порошок",
-                "Рыба (сырая)",
-                "Свинина (сырая)",
-                "Свиные субпродукты (сырые)",
-                "Говядина (сырая)",
-                "Говяжьи субпродукты (сырые)",
-                "Курица (сырая)",
-                "Куриные субпродукты (сырые)",
-                "Индейка (сырая)",
-                "Мясо другое (сырое)",
-                "Приправы",
-                "Соки, нектары, морсы",
-                "Животные жиры",
-                "Алкогольные напитки",
-                "Безалкогольные напитки",
-                "Уксус",
-                "Фастфуд",
-                "Моллюски сырые",
-                "Майонез",
-                "Раки, крабы, креветки сырые",
-                "Свинина (приготовленная)",
-                "Свиные субпродукты приготовленные",
-                "Говядина приготовленная",
-                "Говяжьи субпродукты (приготовленные)",
-                "Курица (приготовленная)",
-                "Куриные субпродукты (приготовленные)",
-                "Индейка (приготовленная)",
-                "Мясо другое (приготовленное)",
-                "Мясные продукты",
-                "Кондитерские изделия, печенье, сладости",
-                "Сахар и заменители",
-                "Шоколад"
-        )
-                .collect(Collectors.toList());
-        List<Long> neededCategories = categoryRepo.findByNameNotIn(notNeededCategories).stream()
-                .map(Category::getId)
-                .collect(Collectors.toList());
-
-        for(Long id : neededCategories){
-            categoriesCounter.put(id, 10L);
-        }
-
-        List<String> namesOfRestrictedCategories = Stream.of(
-                "Кокос и продукты из кокоса",
-                "Ягоды",
-                "Экзотические фрукты, ягоды и плоды",
-                "Сухофрукты",
-                "Соки, нектары, морсы",
-                "Крупы и злаки (приготовленные)",
-                "Крупы и злаки (рис)",
-                "Мука, отруби, крахмал",
-                "Орехи",
-                "Хлеб, лепешки и другое",
-                "Лапша",
-                "Яйца и яичные продукты",
-                "Сыры",
-                "Молоко и молочные продукты (кроме сыров)",
-                "Масла"
-        )
-                .collect(Collectors.toList());
-
-        List<Long> categoriesWithRestrictions = categoryRepo.findByNameIn(namesOfRestrictedCategories).stream()
-                .map(Category::getId)
-                .collect(Collectors.toList());
-        for(Map.Entry<Long, Long> entry: categoriesCounter.entrySet()){
-            if(categoriesWithRestrictions.contains(entry.getKey())){
-                entry.setValue(6L);
-            }
-        }
-
-        return categoriesCounter;
-    }
 
     public List<Food> getAllFood(){
         return foodRepo.findAll();
@@ -277,6 +202,23 @@ public class FoodService {
         limitationTable = new FoodAndCategoriesLimitationTable(foodLimits, categoryLimits);
         return  products;
     }
+    public List<Recipe> getAvailableRecipes(){
+        List<Recipe> recipes = new ArrayList<>();
+        List<Object[]> futureRecipes = this.recipesRepo.extractAvailableRecipes();
+        for(Object[] rm: futureRecipes){
+            List<Long> tmpIngrIds = Stream.of(((String)rm[2]).split(","))
+                    .map(String::strip)
+                    .map(Long::parseLong)
+                    .collect(Collectors.toList());
+            List<Double> tmpIngrWeights = Stream.of(((String)rm[3]).split(","))
+                    .map(String::strip)
+                    .map(Double::parseDouble)
+                    .collect(Collectors.toList());
+            recipes.add(new Recipe(((BigInteger)rm[0]).longValue(), ((String)rm[1]), tmpIngrIds, tmpIngrWeights));
+        }
+        return recipes;
+    }
+
 
     public List<String> getMineralsNames() {
         return MineralsNames;

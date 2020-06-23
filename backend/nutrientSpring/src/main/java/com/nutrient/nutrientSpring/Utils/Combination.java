@@ -10,6 +10,8 @@ import java.util.stream.Stream;
 
 @Data
 public class Combination{
+    private String name="Общая комбинация";
+    private long id=-1L;
     private List<Ingredient> products = new ArrayList<>();
     private Ingredient overallNutrientsAndEfficiency;
     private Float combinationEfficiency = 0f;
