@@ -37,6 +37,10 @@ public class Ingredient {
     public Ingredient(Food f, Vitamin v, Mineral m, Acid a){
         this(f,v,m,a,100);
     }
+    public Ingredient(Food f, Vitamin v, Mineral m, Acid a, long id, int g){
+        this(f,v,m,a,g);
+        this.id=id;
+    }
 
     public Ingredient(){
         this.food = new Food(null, "overall",-1L, 0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,"id",-1f,-1f,0f,0f,null);

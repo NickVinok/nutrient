@@ -2,6 +2,7 @@ package com.nutrient.nutrientSpring.Utils;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.nutrient.nutrientSpring.Model.FoodModel.Food;
+import com.nutrient.nutrientSpring.Model.FoodModel.Recipes;
 import lombok.Data;
 
 import java.util.*;
@@ -10,8 +11,10 @@ import java.util.stream.Stream;
 
 @Data
 public class Combination{
+    private boolean isRecipe=false;
+    private List<Combination> recipes = null;
     private String name="Общая комбинация";
-    private long id=-1L;
+    private Recipes recipe;
     private List<Ingredient> products = new ArrayList<>();
     private Ingredient overallNutrientsAndEfficiency;
     private Float combinationEfficiency = 0f;

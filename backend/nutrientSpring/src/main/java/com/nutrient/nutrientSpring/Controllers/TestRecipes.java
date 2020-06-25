@@ -17,6 +17,6 @@ public class TestRecipes {
 
     @GetMapping
     public List<Recipe> test(){
-        return foodService.getAvailableRecipes();
+        return foodService.getAllRecipes();
     }
 }

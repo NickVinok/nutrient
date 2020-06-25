@@ -35,7 +35,6 @@ public class Mineral implements NutrientGroup {
     private float manganese;
     private float selen;
     private float fluorine;
-    //TODO найти нормы, затем добавить в расчёты
     private float silicon;
     private float sulfur;
     private float chlorine;

@@ -3,10 +3,7 @@ package com.nutrient.nutrientSpring.CalculationLogics;
 import com.nutrient.nutrientSpring.CalculationLogics.Pfc.PfcNorms;
 import com.nutrient.nutrientSpring.CalculationLogics.Pfc.PfcNormsCalculation;
 import com.nutrient.nutrientSpring.JsonObjects.NutrientREST.Combinations;
-import com.nutrient.nutrientSpring.Model.FoodModel.Acid;
-import com.nutrient.nutrientSpring.Model.FoodModel.Food;
-import com.nutrient.nutrientSpring.Model.FoodModel.Mineral;
-import com.nutrient.nutrientSpring.Model.FoodModel.Vitamin;
+import com.nutrient.nutrientSpring.Model.FoodModel.*;
 import com.nutrient.nutrientSpring.Services.FoodService;
 import com.nutrient.nutrientSpring.Services.NutrientService;
 import com.nutrient.nutrientSpring.Utils.Combination;
@@ -33,6 +30,7 @@ public class Calculations {
 
     private PfcNormsCalculation pfcNormsCalculation;
     private PfcNorms pfcNormsToController;
+    private Food foodNorms;
     private Acid acidNorms;
     private Vitamin vitaminNorms;
     private Mineral mineralNorms;
@@ -47,28 +45,11 @@ public class Calculations {
         //       foodService.getFoodWOProhibitedCategories(dietRestrictions));
 
         //Получаем список объектов значений нутриентов для конкретного пола
-        nutrientService.getNutrientsValueForGender(weight, gender, age, pregnancy, false);
-
-        //Рассчитываем Нрмы БЖУ, исходя из роста, веса, пола и т.д.)
-        pfcNormsCalculation = new PfcNormsCalculation(gender, age, weight, height, dietType, workingGroup);
-        //Рассчитываем норму золы
-        acidNorms = nutrientService.getAcidNorms();
-        vitaminNorms = nutrientService.getVitaminNorms();
-        mineralNorms = nutrientService.getMineralNorms();
-        List<Long> mineralIds = mapper.getMineralsId();
-        pfcNormsCalculation.setAsh(nutrientService.getAshNorm());
-        //Получаем список норм БЖУ
-        Food pfcNorms = new Food(pfcNormsCalculation.getPfc());
-        pfcNormsToController = pfcNormsCalculation.getNorms();
-        //Из-за того, что норма для кислот рассчитывается в разделе БЖУ
-        //А сами кислоты в кислотах)
-        acidNorms.setOmega3(pfcNormsCalculation.getOmega3());
-        acidNorms.setOmega6(pfcNormsCalculation.getOmega6());
-        acidNorms.setOmega9(pfcNormsCalculation.getOmega9());
+        this.calculateNormsForPerson(gender, workingGroup, age, weight, height, dietType, dietRestrictions, pregnancy);
 
         //Рассчитываем эффективность каждого из продуктов
-        List<Ingredient> foodWithEfficiency = productOverallEfficiency(ingredients, pfcNorms, vitaminNorms,
-                mineralNorms, acidNorms);
+        List<Ingredient> foodWithEfficiency = productOverallEfficiency(ingredients, foodNorms, vitaminNorms,
+                mineralNorms, acidNorms, false);
         //Получаем список категорий, превращаем в словарь, где значение - допустимое количество оставшихся использований
         //Делаем 2 списка: один локальный, другой глобальный для выполнения требований к максимальному количеству продуктов из одной группы внутри комбинации
         //и во всех комбинациях
@@ -97,8 +78,26 @@ public class Calculations {
     }
 
     private List<Ingredient> productOverallEfficiency(List<Ingredient> ingredients, Food pfcNorms,
-                                                      Vitamin vitaminNorms, Mineral mineralNorms, Acid acidNorms) {
+                                                      Vitamin vitaminNorms, Mineral mineralNorms, Acid acidNorms, boolean isCustom) {
         List<Ingredient> tmp = new ArrayList<>();
+        if(isCustom){
+            for (Ingredient in : ingredients) {
+                Mineral m = in.getMineral();
+                Acid a = in.getAcid();
+                Vitamin v = in.getVitamin();
+                Food f = in.getFood();
+
+                Mineral mEf = new Mineral(m, mineralNorms);
+                Acid aEf = new Acid(a, acidNorms);
+                Vitamin vEf = new Vitamin(v, vitaminNorms);
+                Food fEf = new Food(f, pfcNorms);
+
+                in.setEfficiency(fEf, vEf, mEf, aEf);
+                tmp.add(in);
+            }
+            return tmp;
+        }
+
         List<Ingredient> productsWithNegativePoints = new ArrayList<>();
         for (Ingredient in : ingredients) {
             Mineral m = in.getMineral();
@@ -361,28 +360,13 @@ public class Calculations {
         }
         List<Ingredient> products = foodService.getProductsForCustomCombination(ids);
         //Получаем список объектов значений нутриентов для конкретного пола
-        nutrientService.getNutrientsValueForGender(weight, gender, age, pregnancy, false);
-
-        acidNorms = nutrientService.getAcidNorms();
-        vitaminNorms = nutrientService.getVitaminNorms();
-        mineralNorms = nutrientService.getMineralNorms();
-        //Рассчитываем Нрмы БЖУ, исходя из роста, веса, пола и т.д.)
-        pfcNormsCalculation = new PfcNormsCalculation(gender, age, weight, height, dietType, workingGroup);
-        //Рассчитываем норму золы
-        List<Long> mineralIds = mapper.getMineralsId();
-        pfcNormsCalculation.setAsh(nutrientService.getAshNorm());
-        //Получаем список норм БЖУ
-        Food pfcNorms = new Food(pfcNormsCalculation.getPfc());
-        pfcNormsToController = pfcNormsCalculation.getNorms();
-        acidNorms.setOmega3(pfcNormsCalculation.getOmega3());
-        acidNorms.setOmega6(pfcNormsCalculation.getOmega6());
-        acidNorms.setOmega9(pfcNormsCalculation.getOmega9());
+        this.calculateNormsForPerson(gender, workingGroup, age, weight, height, dietType, dietRestrictions, pregnancy);
 
         FoodAndCategoriesLimitationTable limits = foodService.getLimitations();
 
         //Рассчитываем эффективность каждого из продуктов
-        productOverallEfficiency(products, pfcNorms,
-                vitaminNorms, mineralNorms, acidNorms);
+        productOverallEfficiency(products, foodNorms,
+                vitaminNorms, mineralNorms, acidNorms, true);
 
         Combination result = new Combination();
         result.setLimitationTable(limits);
@@ -411,7 +395,6 @@ public class Calculations {
     public void calculateNormsForPerson(
             String gender, int workingGroup, float age, float weight, float height, String dietType, int dietRestrictions, boolean pregnancy) {
         nutrientService.getNutrientsValueForGender(weight, gender, age, pregnancy, false);
-
         //Рассчитываем Нрмы БЖУ, исходя из роста, веса, пола и т.д.)
         pfcNormsCalculation = new PfcNormsCalculation(gender, age, weight, height, dietType, workingGroup);
         //Рассчитываем норму золы
@@ -421,7 +404,7 @@ public class Calculations {
         List<Long> mineralIds = mapper.getMineralsId();
         pfcNormsCalculation.setAsh(nutrientService.getAshNorm());
         //Получаем список норм БЖУ
-        Food pfcNorms = new Food(pfcNormsCalculation.getPfc());
+        foodNorms = new Food(pfcNormsCalculation.getPfc());
         pfcNormsToController = pfcNormsCalculation.getNorms();
         //Из-за того, что норма для кислот рассчитывается в разделе БЖУ
         //А сами кислоты в кислотах)
@@ -450,5 +433,33 @@ public class Calculations {
             j++;
         }
         return results;
+    }
+
+    public void actionsWithRecipes(String gender, int workingGroup, float age, float weight, float height,
+                                   String dietType, int dietRestrictions, boolean pregnancy){
+        this.calculateNormsForPerson(gender, workingGroup, age, weight, height, dietType, dietRestrictions, pregnancy);
+        int first = 1;
+        int second = 2;
+        int lunch = 3;
+        int salad = 4;
+        List<Ingredient> futureFirstRecipes = this.foodService.getRecipesOfCertainType(first);
+        List<Ingredient> futureSecondRecipes = this.foodService.getRecipesOfCertainType(second);
+        List<Ingredient> futureLunchRecipes = this.foodService.getRecipesOfCertainType(lunch);
+        List<Ingredient> futureSaladRecipes = this.foodService.getRecipesOfCertainType(salad);
+        futureFirstRecipes = productOverallEfficiency(futureFirstRecipes, this.foodNorms, this.vitaminNorms,
+                this.mineralNorms, this.acidNorms, true);
+        futureSecondRecipes = productOverallEfficiency(futureSecondRecipes, this.foodNorms, this.vitaminNorms,
+                this.mineralNorms, this.acidNorms, true);
+        futureLunchRecipes = productOverallEfficiency(futureLunchRecipes, this.foodNorms, this.vitaminNorms,
+                this.mineralNorms, this.acidNorms, true);
+        futureSaladRecipes = productOverallEfficiency(futureSaladRecipes, this.foodNorms, this.vitaminNorms,
+                this.mineralNorms, this.acidNorms, true);
+        List<Recipes> recipesTobIntegrated = foodService.getRecipeObjects(futureFirstRecipes.stream().
+                map(Ingredient::getId).collect(Collectors.toList()));
+        List<Combination> recipeList = new ArrayList<>();
+        for(Ingredient recipeCore: futureFirstRecipes){
+            Combination recipe = new Combination();
+            recipe.set
+        }
     }
 }

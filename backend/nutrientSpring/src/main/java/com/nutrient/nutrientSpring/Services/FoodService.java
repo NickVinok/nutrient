@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -41,6 +42,8 @@ public class FoodService {
     private FoodLimitRepo foodLimitRepo;
     @Autowired
     private RecipesRepo recipesRepo;
+    @Autowired
+    private RecipeCompositionRepo recipeCompositionRepo;
 
     private FoodAndCategoriesLimitationTable limitationTable;
 
@@ -48,23 +51,23 @@ public class FoodService {
             "sodium", "iron", "zinc", "copper", "manganese", "selenium", "fluoride")
             .collect(Collectors.toList());
     private final List<String> VitaminNames = Stream.of("vitamin_c", "vitamin_b1", "vitamin_b2", "vitamin_b6",
-            "vitamin_b3","vitamin_b12", "vitamin_b9", "vitamin_b5", "alpha-carotin",
+            "vitamin_b3", "vitamin_b12", "vitamin_b9", "vitamin_b5", "alpha-carotin",
             "vitamin_a", "beta-carotin", "vitamin_e", "vitamin_d", "vitamin_k", "vitamin_b4")
             .collect(Collectors.toList());
-    private final List<String> AcidNames = Stream.of("tryptophan","threonine","isoleucine","leucine","lysine",
-            "methionine", "cystine", "phenylalanine","tyrosine","valine","arginine","histidine",
-            "alanine","aspartic_acid","glutamic_acid","glycine","proline","serine")
+    private final List<String> AcidNames = Stream.of("tryptophan", "threonine", "isoleucine", "leucine", "lysine",
+            "methionine", "cystine", "phenylalanine", "tyrosine", "valine", "arginine", "histidine",
+            "alanine", "aspartic_acid", "glutamic_acid", "glycine", "proline", "serine")
             .collect(Collectors.toList());
     private final List<String> PFC = Stream.of("energy", "fat", "protein", "carbohydrate",
-            "water","ash", "sugares", "fiber", "starch", "cholesterol", "fat_trans")
+            "water", "ash", "sugares", "fiber", "starch", "cholesterol", "fat_trans")
             .collect(Collectors.toList());
 
     //Возвращаем список еды, которая пододит под требования к категории
-    public List<Food> getFoodWOProhibitedCategories(int dietRestrictions){
+    public List<Food> getFoodWOProhibitedCategories(int dietRestrictions) {
         List<Food> foodList;
 
-        List<EnabledCategories> tmp1 = enabledCategoriesRepo.findByDietAndEnable(dietTypesRepo.getOne((long)dietRestrictions), true);
-        List<EnabledProducts> tmp2 = enabledProductsRepo.findByDietAndEnable(dietTypesRepo.getOne((long)dietRestrictions), true);
+        List<EnabledCategories> tmp1 = enabledCategoriesRepo.findByDietAndEnable(dietTypesRepo.getOne((long) dietRestrictions), true);
+        List<EnabledProducts> tmp2 = enabledProductsRepo.findByDietAndEnable(dietTypesRepo.getOne((long) dietRestrictions), true);
         List<Long> enabledC = tmp1
                 .stream()
                 .map(EnabledCategories::getCategory)
@@ -86,12 +89,12 @@ public class FoodService {
         return foodList;
     }
 
-    public List<Ingredient> getListOfIngredients(List<Food> foodList){
+    public List<Ingredient> getListOfIngredients(List<Food> foodList) {
         List<Ingredient> ingredients = new ArrayList<>();
 
-        for(Food food : foodList){
+        for (Food food : foodList) {
             Long id = food.getId();
-            if(food.getGeneral()==null || food.getGeneral()==0){
+            if (food.getGeneral() == null || food.getGeneral() == 0) {
                 continue;
             }
             //вот здесь пытаемся вытащить категорию еды, но её назуй
@@ -100,10 +103,10 @@ public class FoodService {
             Pattern p = Pattern.compile("\\((.*)\\)");
             Matcher match = p.matcher(cat.getName());
             String status = "-";
-            if(match.find()){
+            if (match.find()) {
                 status = match.group();
                 cat.setStatus(status.split("[\\(||//)]")[1]);
-            } else{
+            } else {
                 cat.setStatus(status);
             }
             food.setCategory(cat);
@@ -113,12 +116,12 @@ public class FoodService {
                     mineralRepo.findByFood_id(id).get(),
                     acidsRepo.findByFood_id(id).get());
             double sugarsSum = 0;
-            if(food.getSugars()==0){
-                sugarsSum+=food.getGlucose()+food.getFructose();
-                sugarsSum+=ingredient.getAcid().getGalactose()
-                        +ingredient.getAcid().getLactose()+ingredient.getAcid().getSaccharose();
+            if (food.getSugars() == 0) {
+                sugarsSum += food.getGlucose() + food.getFructose();
+                sugarsSum += ingredient.getAcid().getGalactose()
+                        + ingredient.getAcid().getLactose() + ingredient.getAcid().getSaccharose();
             }
-            food.setSugars((float)sugarsSum);
+            food.setSugars((float) sugarsSum);
             ingredient.setFood(food);
 
             ingredients.add(ingredient);
@@ -127,10 +130,10 @@ public class FoodService {
     }
 
     //Возвращаем список еды, с прикреплёнными значениями кислоты, минералов, витаминов и БЖУ
-    public HashMap<Long, HashMap<String, Object>> getListOfFoodsNutrients(List<Food> foodList){
+    public HashMap<Long, HashMap<String, Object>> getListOfFoodsNutrients(List<Food> foodList) {
         HashMap<Long, HashMap<String, Object>> foodNutrients = new HashMap<Long, HashMap<String, Object>>();
 
-        for(Food food : foodList){
+        for (Food food : foodList) {
             Long id = food.getId();
             HashMap<String, Object> tmp = new HashMap<String, Object>();
 
@@ -138,10 +141,10 @@ public class FoodService {
             Pattern p = Pattern.compile("\\((.*)\\)");
             Matcher match = p.matcher(cat.getName());
             String status = "-";
-            if(match.find()){
+            if (match.find()) {
                 status = match.group();
                 cat.setStatus(status.split("[\\(||//)]")[1]);
-            } else{
+            } else {
                 cat.setStatus(status);
             }
             food.setCategory(cat);
@@ -156,17 +159,16 @@ public class FoodService {
     }
 
 
-
-    public List<Food> getAllFood(){
+    public List<Food> getAllFood() {
         return foodRepo.findAll();
     }
 
-    public FoodAndCategoriesLimitationTable getLimitations(){
+    public FoodAndCategoriesLimitationTable getLimitations() {
         return this.limitationTable;
     }
 
     //переделать
-    public List<Ingredient> getProductsForCustomCombination(List<Long> ids){
+    public List<Ingredient> getProductsForCustomCombination(List<Long> ids) {
         List<Food> foods = foodRepo.findByIdIn(ids);
         List<FoodLimit> foodLimits = foodLimitRepo.findByFood_IdIn(ids);
         List<CategoryLimit> categoryLimits = categoryLimitRepo.findByCategory_IdIn(
@@ -176,7 +178,7 @@ public class FoodService {
                         .collect(Collectors.toList()));
 
         List<Ingredient> products = new ArrayList<>();
-        for(Food f: foods){
+        for (Food f : foods) {
             /*if(f.getGeneral()==null || f.getGeneral()==0){
                 continue;
             }*/
@@ -184,11 +186,11 @@ public class FoodService {
             Pattern p = Pattern.compile("\\((.*)\\)");
             Matcher match = p.matcher(cat.getName());
             String status = "-";
-            if(match.find()){
+            if (match.find()) {
                 status = match.group();
 
                 cat.setStatus(status.split("[(||//)]")[1]);
-            } else{
+            } else {
                 cat.setStatus(status);
             }
             f.setCategory(cat);
@@ -200,23 +202,45 @@ public class FoodService {
             products.add(ingredient);
         }
         limitationTable = new FoodAndCategoriesLimitationTable(foodLimits, categoryLimits);
-        return  products;
+        return products;
     }
-    public List<Recipe> getAvailableRecipes(){
+
+    public List<Recipe> getAllRecipes() {
         List<Recipe> recipes = new ArrayList<>();
         List<Object[]> futureRecipes = this.recipesRepo.extractAvailableRecipes();
-        for(Object[] rm: futureRecipes){
-            List<Long> tmpIngrIds = Stream.of(((String)rm[2]).split(","))
+        for (Object[] rm : futureRecipes) {
+            List<Long> tmpIngrIds = Stream.of(((String) rm[2]).split(","))
                     .map(String::strip)
                     .map(Long::parseLong)
                     .collect(Collectors.toList());
-            List<Double> tmpIngrWeights = Stream.of(((String)rm[3]).split(","))
+            List<Double> tmpIngrWeights = Stream.of(((String) rm[3]).split(","))
                     .map(String::strip)
                     .map(Double::parseDouble)
                     .collect(Collectors.toList());
-            recipes.add(new Recipe(((BigInteger)rm[0]).longValue(), ((String)rm[1]), tmpIngrIds, tmpIngrWeights));
+            recipes.add(new Recipe(((BigInteger) rm[0]).longValue(), ((String) rm[1]), tmpIngrIds, tmpIngrWeights));
         }
         return recipes;
+    }
+
+    public List<Ingredient> getRecipesOfCertainType(int dishType) {
+        List<Ingredient> recipes = new ArrayList<>();
+
+        List<RecipesComposition> rcList = this.recipeCompositionRepo.getBestRecipesOfType(dishType);
+        for (RecipesComposition rc : rcList) {
+            recipes.add(new Ingredient(
+                    rc.getFood(),
+                    rc.getVitamin(),
+                    rc.getMineral(),
+                    rc.getAcid(),
+                    rc.getId(),
+                    100
+            ));
+        }
+        return recipes;
+    }
+
+    public List<Recipes> getRecipeObjects(Collection<Long> ids){
+        return this.recipesRepo.findByIdIn(ids);
     }
 
 
