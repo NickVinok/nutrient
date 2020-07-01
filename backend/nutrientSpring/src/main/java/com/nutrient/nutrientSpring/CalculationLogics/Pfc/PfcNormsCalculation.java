@@ -68,7 +68,7 @@ public class PfcNormsCalculation extends PfcNorms {
 
         this.sugar = 100;
         this.cholesterol = 300;
-        this.starch = carbohydrates-this.sugar;
+        this.starch = 390;
         this.fiber = 38;
         this.omega3 = calories*0.01f/9;
         this.omega6 = calories*0.04f/9;

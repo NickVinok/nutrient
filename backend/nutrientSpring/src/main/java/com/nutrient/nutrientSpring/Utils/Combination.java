@@ -12,9 +12,7 @@ import java.util.stream.Stream;
 @Data
 public class Combination{
     private boolean isRecipe=false;
-    private List<Combination> recipes = null;
-    private String name="Общая комбинация";
-    private Recipes recipe;
+    private List<Recipe> recipeList = null;
     private List<Ingredient> products = new ArrayList<>();
     private Ingredient overallNutrientsAndEfficiency;
     private Float combinationEfficiency = 0f;
@@ -32,7 +30,7 @@ public class Combination{
         return products;
     }
 
-    public boolean isInCombination(Ingredient ingredient){
+    public boolean isProductInCombination(Ingredient ingredient){
         if(products.contains(ingredient)){
             return true;
         }
@@ -91,8 +89,7 @@ public class Combination{
         this.acidOverallEfficiency -= product.calculateOverallAcidEfficiency();
         this.mineralOverallEfficiency -=product.calculateOverallMineralEfficiency();
         this.vitaminOverallEfficiency -=product.calculateOverallVitaminEfficiency();
-        this.combinationEfficiency = (pfcOverallEfficiency+acidOverallEfficiency+
-                mineralOverallEfficiency+vitaminOverallEfficiency)/4;
+        this.combinationEfficiency -= product.calculateOverallIngredientEfficiency();
 
         this.limitationTable.updateCategoryLimit(product.getFood().getCategory().getId(), 1);
         this.limitationTable.updateFoodLimit(product.getId(), 1);
@@ -154,5 +151,31 @@ public class Combination{
             }
         }
         return comb;
+    }
+
+    public void setIsRecipe(boolean isRecipe) {
+        this.isRecipe=isRecipe;
+    }
+
+    public void addRecipe(Recipe r){
+        this.recipeList.add(r);
+        overallNutrientsAndEfficiency.sum(r.getOverallNutrientsAndEfficiency());
+
+        this.pfcOverallEfficiency += r.getPfcOverallEfficiency();
+        this.acidOverallEfficiency += r.getAcidOverallEfficiency();
+        this.mineralOverallEfficiency+=r.getMineralOverallEfficiency();
+        this.vitaminOverallEfficiency+=r.getVitaminOverallEfficiency();
+        this.combinationEfficiency += r.getCombinationEfficiency();
+    }
+
+    public void removeRecipe(Recipe r){
+        this.recipeList.remove(r);
+        overallNutrientsAndEfficiency.subtract(r.getOverallNutrientsAndEfficiency());
+
+        this.pfcOverallEfficiency -= r.getPfcOverallEfficiency();
+        this.acidOverallEfficiency -= r.getAcidOverallEfficiency();
+        this.mineralOverallEfficiency-=r.getMineralOverallEfficiency();
+        this.vitaminOverallEfficiency-=r.getVitaminOverallEfficiency();
+        this.combinationEfficiency -= r.getCombinationEfficiency();
     }
 }

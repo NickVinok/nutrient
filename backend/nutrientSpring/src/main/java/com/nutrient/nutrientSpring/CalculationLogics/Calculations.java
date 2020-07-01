@@ -10,6 +10,7 @@ import com.nutrient.nutrientSpring.Utils.Combination;
 import com.nutrient.nutrientSpring.Utils.FoodAndCategoriesLimitationTable;
 import com.nutrient.nutrientSpring.Utils.Ingredient;
 import com.nutrient.nutrientSpring.Utils.Ration.Ration;
+import com.nutrient.nutrientSpring.Utils.Recipe;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class Calculations {
@@ -80,7 +82,7 @@ public class Calculations {
     private List<Ingredient> productOverallEfficiency(List<Ingredient> ingredients, Food pfcNorms,
                                                       Vitamin vitaminNorms, Mineral mineralNorms, Acid acidNorms, boolean isCustom) {
         List<Ingredient> tmp = new ArrayList<>();
-        if(isCustom){
+        if (isCustom) {
             for (Ingredient in : ingredients) {
                 Mineral m = in.getMineral();
                 Acid a = in.getAcid();
@@ -144,9 +146,9 @@ public class Calculations {
         for (Ingredient i : tmp) {
             double overall = i.calculateOverallIngredientEfficiency();
             if (overall < interval) {
-                i.multiply(6f);
+                i.multiply(3f);
             } else if (overall > interval && overall < 2 * interval) {
-                i.multiply(4f);
+                i.multiply(2.5f);
             } else if (overall > 2 * interval && overall < 3 * interval) {
                 i.multiply(2f);
             } else if (overall > 3 * interval && overall < 4 * interval) {
@@ -245,6 +247,48 @@ public class Calculations {
         }
         return finalCombinations;
     }
+    private List<Ingredient> findLeastEfficientNutrientsSatisfier(Ingredient combinationsOverall, List<Ingredient> products){
+        int leastAcid = combinationsOverall.getAcidEfficiency().getLeastOverflowingNutrient();
+        int leastFood = combinationsOverall.getFoodEfficiency().getLeastOverflowingNutrient();
+        int leastMineral = combinationsOverall.getMineralEfficiency().getLeastOverflowingNutrient();
+        int leastVitamin = combinationsOverall.getVitaminEfficiency().getLeastOverflowingNutrient();
+
+        double aValue = combinationsOverall.getAcidEfficiency().getValues().get(leastAcid);
+        double fValue = combinationsOverall.getFoodEfficiency().getValues().get(leastFood);
+        double mValue = combinationsOverall.getMineralEfficiency().getValues().get(leastMineral);
+        double vValue = combinationsOverall.getVitaminEfficiency().getValues().get(leastVitamin);
+        if (aValue > fValue && aValue > mValue && aValue > vValue) {
+            return new ArrayList<>(products.stream()
+                    .sorted((x, y) -> Float.compare(
+                            y.getAcidEfficiency().getValues().get(leastAcid),
+                            x.getAcidEfficiency().getValues().get(leastAcid)
+                    ))
+                    .collect(Collectors.toList()));
+        } else if (fValue > aValue && fValue > mValue && fValue > vValue) {
+            return new ArrayList<>(products.stream()
+                    .sorted((x, y) -> Float.compare(
+                            y.getFoodEfficiency().getValues().get(leastFood),
+                            x.getFoodEfficiency().getValues().get(leastFood)
+                    ))
+                    .collect(Collectors.toList()));
+        } else if (mValue > aValue && mValue > fValue && mValue > vValue) {
+            return  new ArrayList<>(products.stream()
+                    .sorted((x, y) -> Float.compare(
+                            y.getMineralEfficiency().getValues().get(leastMineral),
+                            x.getMineralEfficiency().getValues().get(leastMineral)
+                    ))
+                    .collect(Collectors.toList()));
+        } else if (vValue > aValue && vValue > fValue && vValue > mValue) {
+            return new ArrayList<>(products.stream()
+                    .sorted((x, y) -> Float.compare(
+                            y.getVitaminEfficiency().getValues().get(leastVitamin),
+                            x.getVitaminEfficiency().getValues().get(leastVitamin)
+                    ))
+                    .collect(Collectors.toList()));
+        } else{
+            return null;
+        }
+    }
 
     private Combinations addFoodToOptimizedCombination(
             Combinations combs, List<Ingredient> products) {
@@ -252,51 +296,15 @@ public class Calculations {
         HashMap<Long, Long> usedIds2 = new HashMap<>();
         for (Combination c : combs.getCombinationList()) {
             Ingredient combinationsOverall = c.getOverallNutrientsAndEfficiency();
-            int leastAcid = combinationsOverall.getAcidEfficiency().getLeastOverflowingNutrient();
-            int leastFood = combinationsOverall.getFoodEfficiency().getLeastOverflowingNutrient();
-            int leastMineral = combinationsOverall.getMineralEfficiency().getLeastOverflowingNutrient();
-            int leastVitamin = combinationsOverall.getVitaminEfficiency().getLeastOverflowingNutrient();
-
-            double aValue = combinationsOverall.getAcidEfficiency().getValues().get(leastAcid);
-            double fValue = combinationsOverall.getFoodEfficiency().getValues().get(leastFood);
-            double mValue = combinationsOverall.getMineralEfficiency().getValues().get(leastMineral);
-            double vValue = combinationsOverall.getVitaminEfficiency().getValues().get(leastVitamin);
-            if (aValue > fValue && aValue > mValue && aValue > vValue) {
-                localProducts = products.stream()
-                        .sorted((x, y) -> Float.compare(
-                                y.getAcidEfficiency().getValues().get(leastAcid),
-                                x.getAcidEfficiency().getValues().get(leastAcid)
-                        ))
-                        .collect(Collectors.toList());
-            } else if (fValue > aValue && fValue > mValue && fValue > vValue) {
-                localProducts = products.stream()
-                        .sorted((x, y) -> Float.compare(
-                                y.getFoodEfficiency().getValues().get(leastFood),
-                                x.getFoodEfficiency().getValues().get(leastFood)
-                        ))
-                        .collect(Collectors.toList());
-            } else if (mValue > aValue && mValue > fValue && mValue > vValue) {
-                localProducts = products.stream()
-                        .sorted((x, y) -> Float.compare(
-                                y.getMineralEfficiency().getValues().get(leastMineral),
-                                x.getMineralEfficiency().getValues().get(leastMineral)
-                        ))
-                        .collect(Collectors.toList());
-            } else if (vValue > aValue && vValue > fValue && vValue > mValue) {
-                localProducts = products.stream()
-                        .sorted((x, y) -> Float.compare(
-                                y.getVitaminEfficiency().getValues().get(leastVitamin),
-                                x.getVitaminEfficiency().getValues().get(leastVitamin)
-                        ))
-                        .collect(Collectors.toList());
-            } else {
+            localProducts=findLeastEfficientNutrientsSatisfier(combinationsOverall, products);
+            if(localProducts==null){
                 break;
             }
 
             FoodAndCategoriesLimitationTable limits = c.getLimitationTable();
 
             for (Ingredient i : localProducts) {
-                if (c.isInCombination(i)) {
+                if (c.isProductInCombination(i)) {
                     continue;
                 }
 
@@ -333,14 +341,14 @@ public class Calculations {
             for (int i = 0; i < counter; i++) {
 
                 Ingredient productTobeModified = comb.getMostOverflowingProduct();
-                if(productTobeModified==null){
+                if (productTobeModified == null) {
                     break;
                 }
                 comb.deleteFoodFromCombination(productTobeModified);
                 Float gramFixCoef = 0.5f;
                 productTobeModified.multiply(gramFixCoef);
                 //Если продукта, который мы уменьшали сатло слишком мало - не возвращаем его в комбинацию
-                if (productTobeModified.getGram() <  10f) {
+                if (productTobeModified.getGram() < 10f) {
                     break;
                 }
                 comb.addFoodToCustomCombination(productTobeModified);
@@ -415,18 +423,18 @@ public class Calculations {
 
     public List<Ration> calculateRationForPerson(String gender, int workingGroup, float age, float weight, float height,
                                                  String dietType, int dietRestrictions, boolean pregnancy,
-                                                 int days, int meals){
+                                                 int days, int meals) {
         Combinations combinations = this.getEfficientCombinations(gender, workingGroup, age, weight, height,
                 dietType, dietRestrictions, pregnancy);
         List<Ration> results = new ArrayList<>();
-        int j=0; //Счётчик, с помощью которого мы достаём комбинации из списка
-        for(int i = 0; i<days;i++){
-            if(j>combinations.getCombinationList().size()-1){
-                j=0;
+        int j = 0; //Счётчик, с помощью которого мы достаём комбинации из списка
+        for (int i = 0; i < days; i++) {
+            if (j > combinations.getCombinationList().size() - 1) {
+                j = 0;
             }
             Combination combWhichWillBePartitionedIntoMeals = combinations.getCombinationList().get(j);
 
-            Ration newRation=new Ration(i);
+            Ration newRation = new Ration(i);
 
             newRation.combinationPartitioning(combWhichWillBePartitionedIntoMeals, meals);
             results.add(newRation);
@@ -435,31 +443,100 @@ public class Calculations {
         return results;
     }
 
-    public void actionsWithRecipes(String gender, int workingGroup, float age, float weight, float height,
-                                   String dietType, int dietRestrictions, boolean pregnancy){
+    public List<Combination> actionsWithRecipes(String gender, int workingGroup, float age, float weight, float height,
+                                   String dietType, int dietRestrictions, boolean pregnancy) {
         this.calculateNormsForPerson(gender, workingGroup, age, weight, height, dietType, dietRestrictions, pregnancy);
+
+        List<Recipe> recipeList = new ArrayList<>();
         int first = 1;
         int second = 2;
         int lunch = 3;
         int salad = 4;
-        List<Ingredient> futureFirstRecipes = this.foodService.getRecipesOfCertainType(first);
-        List<Ingredient> futureSecondRecipes = this.foodService.getRecipesOfCertainType(second);
-        List<Ingredient> futureLunchRecipes = this.foodService.getRecipesOfCertainType(lunch);
-        List<Ingredient> futureSaladRecipes = this.foodService.getRecipesOfCertainType(salad);
-        futureFirstRecipes = productOverallEfficiency(futureFirstRecipes, this.foodNorms, this.vitaminNorms,
+        List<Ingredient> sortedFirsts = productOverallEfficiency(this.foodService.getRecipesOfCertainType(first), this.foodNorms, this.vitaminNorms,
                 this.mineralNorms, this.acidNorms, true);
-        futureSecondRecipes = productOverallEfficiency(futureSecondRecipes, this.foodNorms, this.vitaminNorms,
+        List<Ingredient> sortedSeconds = productOverallEfficiency(this.foodService.getRecipesOfCertainType(second), this.foodNorms, this.vitaminNorms,
                 this.mineralNorms, this.acidNorms, true);
-        futureLunchRecipes = productOverallEfficiency(futureLunchRecipes, this.foodNorms, this.vitaminNorms,
+        List<Ingredient> sortedLunches = productOverallEfficiency(this.foodService.getRecipesOfCertainType(lunch), this.foodNorms, this.vitaminNorms,
                 this.mineralNorms, this.acidNorms, true);
-        futureSaladRecipes = productOverallEfficiency(futureSaladRecipes, this.foodNorms, this.vitaminNorms,
+        List<Ingredient> sortedSalads = productOverallEfficiency(this.foodService.getRecipesOfCertainType(salad), this.foodNorms, this.vitaminNorms,
                 this.mineralNorms, this.acidNorms, true);
-        List<Recipes> recipesTobIntegrated = foodService.getRecipeObjects(futureFirstRecipes.stream().
-                map(Ingredient::getId).collect(Collectors.toList()));
-        List<Combination> recipeList = new ArrayList<>();
-        for(Ingredient recipeCore: futureFirstRecipes){
-            Combination recipe = new Combination();
-            recipe.set
+        List<List<Ingredient>> formedRecipes = new ArrayList<>();
+        //Формирууем по 4 "рациона" за цикл
+        for (int i = 0; i < 4; i++) {
+           formedRecipes.addAll(getNearOptimalCombinationsOfRecipes(sortedFirsts, sortedSeconds, sortedLunches, sortedSalads));
         }
+        List<Long> recipesIds = new ArrayList<>();
+        recipesIds.addAll(sortedFirsts.stream().map(Ingredient::getId).collect(Collectors.toList()));
+        recipesIds.addAll(sortedSeconds.stream().map(Ingredient::getId).collect(Collectors.toList()));
+        recipesIds.addAll(sortedLunches.stream().map(Ingredient::getId).collect(Collectors.toList()));
+        recipesIds.addAll(sortedSalads.stream().map(Ingredient::getId).collect(Collectors.toList()));
+        Map<Long, Recipes> recipesList = this.foodService.getRecipeObjects(recipesIds);
+
+        //Проходим по всем комбинациям из рецептов
+        //Превращаем их в реальные комбинации из рецептов
+        List<Combination> combinationList = new ArrayList<>();
+        for(int i = 0; i<formedRecipes.size();i++){
+            Combination combination = new Combination();
+            for(int j = 0;j<formedRecipes.get(i).size();j++){
+                Recipe recipe = new Recipe(formedRecipes.get(i).get(j));
+                recipe.setRecipeInfo(recipesList.get(formedRecipes.get(i).get(j).getId()));
+                combination.addRecipe(recipe);
+            }
+            combinationList.add(combination);
+        }
+        return combinationList;
+    }
+
+    public List<List<Ingredient>> getNearOptimalCombinationsOfRecipes(List<Ingredient> sortedFirsts, List<Ingredient> sortedSeconds,
+                                                          List<Ingredient> sortedLunches, List<Ingredient> sortedSalads) {
+        Ingredient mostEfficientFirst, mostEfficientSecond, mostEfficientLunch, mostEfficientSalad;
+        List<List<Ingredient>> rations = new ArrayList<>();
+
+        mostEfficientFirst = sortedFirsts.get(0);
+        sortedFirsts.remove(0);
+        List<Ingredient> mostEfficientWithFirst = getEfficientCombinationOfRecipes(Stream.of(
+                sortedSeconds, sortedLunches, sortedSalads
+        ).collect(Collectors.toList()), mostEfficientFirst);
+        //Не забыть удалить использованные объекты из sorted массивов
+
+        mostEfficientSecond = sortedSeconds.get(0);
+        sortedSeconds.remove(0);
+        List<Ingredient> mostEfficientWithSecond = getEfficientCombinationOfRecipes(Stream.of(
+                sortedFirsts, sortedLunches, sortedSalads
+        ).collect(Collectors.toList()), mostEfficientSecond);
+
+        mostEfficientLunch = sortedLunches.get(0);
+        List<Ingredient> mostEfficientWithLunch= getEfficientCombinationOfRecipes(Stream.of(
+                sortedFirsts, sortedSeconds, sortedSalads
+        ).collect(Collectors.toList()), mostEfficientLunch);
+
+        mostEfficientSalad = sortedSalads.get(0);
+        List<Ingredient> mostEfficientWithSalad = getEfficientCombinationOfRecipes(Stream.of(
+                sortedFirsts, sortedSeconds, sortedLunches
+        ).collect(Collectors.toList()), mostEfficientSalad);
+
+        rations.add(mostEfficientWithFirst);
+        rations.add(mostEfficientWithSecond);
+        rations.add(mostEfficientWithLunch);
+        rations.add(mostEfficientWithSalad);
+
+        return rations;
+    }
+
+    private List<Ingredient> getEfficientCombinationOfRecipes(List<List<Ingredient>> sorted, Ingredient mostEfficient){
+        List<Ingredient> mostEfficientList = new ArrayList<>();
+
+        Ingredient sum = new Ingredient();
+        mostEfficientList.add(mostEfficient);
+        sum.sum(mostEfficient);
+
+        List<Ingredient> list;
+        for(List<Ingredient> sortedOfType: sorted){
+            list = findLeastEfficientNutrientsSatisfier(sum, sortedOfType);
+            mostEfficientList.add(list.get(0));
+            sum.sum(list.get(0));
+            sortedOfType.remove(0);
+        }
+        return mostEfficientList;
     }
 }

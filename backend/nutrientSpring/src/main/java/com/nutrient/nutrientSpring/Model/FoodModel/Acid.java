@@ -177,12 +177,12 @@ public class Acid implements NutrientGroup {
         //Четвёртая группа - не должно превышать
         //Пятая группа - не должно первышать
         List<Float> omegaPoints = new ArrayList<>();
+        omegaPoints.add(omega3*300);
         if((int)(omega6*100)>115){
             omegaPoints.add(2*115f-((int)(omega6*100)-115)*10f);
         }else{
             omegaPoints.add(omega6*200);
         }
-        omegaPoints.add(omega3*300);
         omegaPoints.add(omega9*200);
         return omegaPoints;
     }

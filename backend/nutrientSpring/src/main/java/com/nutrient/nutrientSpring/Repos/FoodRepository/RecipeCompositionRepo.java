@@ -9,6 +9,6 @@ import java.util.List;
 
 @Repository
 public interface RecipeCompositionRepo extends JpaRepository<RecipesComposition, Long> {
-    @Query(value="from recipes_composition where recipe_id in (Select id from recipes where dish_type=?1) order by coef_for_men desc limit 136")
+    @Query(value="select * from recipes_composition where recipe_id in (Select id from recipes where dish_type=?1) order by coef_for_men desc limit 136", nativeQuery = true)
     List<RecipesComposition> getBestRecipesOfType(long dishId);
 }

@@ -69,6 +69,7 @@ public class RecipesComposition {
     private double phenylalanineTyrosine;
     @Column(name = "cystine_hydroxyproline")
     private double cystineHydroxyproline;
+    @Column(name = "trans_fat")
     private double transFat;
     private double linoleic;
     private double linolenic;
@@ -125,7 +126,7 @@ public class RecipesComposition {
     private double vitamin_h;
     private double vitamin_pp;
     private double lycopene;
-    @Column(name = "luthein_zeaxnthin")
+    @Column(name = "lutein_zeaxanthin")
     private double luteinZeaxnthin;
     @Column(name = "gamma_tocopherol")
     private double gammaTocopherol;
@@ -133,9 +134,12 @@ public class RecipesComposition {
     private double deltaTocopherol;
     private double betaine;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @Column(name = "recipe_id")
+    private long recipeId;
+
+    /*@ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="recipe_id", referencedColumnName = "id")
-    private Recipes recipes;
+    private Recipes recipes;*/
 
     @JsonIgnore
     public Food getFood(){

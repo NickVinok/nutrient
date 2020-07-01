@@ -5,14 +5,13 @@ import com.nutrient.nutrientSpring.Repos.FoodRepository.*;
 import com.nutrient.nutrientSpring.Utils.FoodAndCategoriesLimitationTable;
 import com.nutrient.nutrientSpring.Utils.Ingredient;
 import com.nutrient.nutrientSpring.Utils.Recipe;
+import com.nutrient.nutrientSpring.Utils.TEST_FILE_FOR_GETTING_ALL_RECIPES;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -205,8 +204,8 @@ public class FoodService {
         return products;
     }
 
-    public List<Recipe> getAllRecipes() {
-        List<Recipe> recipes = new ArrayList<>();
+    public List<TEST_FILE_FOR_GETTING_ALL_RECIPES> getAllRecipes() {
+        List<TEST_FILE_FOR_GETTING_ALL_RECIPES> recipes = new ArrayList<>();
         List<Object[]> futureRecipes = this.recipesRepo.extractAvailableRecipes();
         for (Object[] rm : futureRecipes) {
             List<Long> tmpIngrIds = Stream.of(((String) rm[2]).split(","))
@@ -217,7 +216,7 @@ public class FoodService {
                     .map(String::strip)
                     .map(Double::parseDouble)
                     .collect(Collectors.toList());
-            recipes.add(new Recipe(((BigInteger) rm[0]).longValue(), ((String) rm[1]), tmpIngrIds, tmpIngrWeights));
+            recipes.add(new TEST_FILE_FOR_GETTING_ALL_RECIPES(((BigInteger) rm[0]).longValue(), ((String) rm[1]), tmpIngrIds, tmpIngrWeights));
         }
         return recipes;
     }
@@ -233,14 +232,15 @@ public class FoodService {
                     rc.getMineral(),
                     rc.getAcid(),
                     rc.getId(),
-                    100
+                    0
             ));
         }
         return recipes;
     }
 
-    public List<Recipes> getRecipeObjects(Collection<Long> ids){
-        return this.recipesRepo.findByIdIn(ids);
+    public Map<Long, Recipes> getRecipeObjects(Collection<Long> ids){
+        List<Recipes> tmp = this.recipesRepo.findByIdIn(ids);
+        return tmp.stream().collect(Collectors.toMap(Recipes::getId, Function.identity()));
     }
 
 

@@ -1,20 +1,28 @@
 package com.nutrient.nutrientSpring.Utils;
 
+import com.nutrient.nutrientSpring.Model.FoodModel.Recipes;
 import lombok.Data;
 
-import java.util.List;
-
 @Data
-public class Recipe {
+public class Recipe extends Combination{
     private long id;
     private String name;
-    private List<Long> ingredientIds;
-    private List<Double> ingredientWeights;
+    private long dishType;
 
-    public Recipe(long id, String name, List<Long> ingredientIds, List<Double> ingredientWeights){
-        this.id=id;
-        this.name=name;
-        this.ingredientIds=ingredientIds;
-        this.ingredientWeights=ingredientWeights;
+    public Recipe(Ingredient overallOfRecipe){
+        super();
+        this.setRecipeList(null);
+        this.setOverallNutrientsAndEfficiency(overallOfRecipe);
+        this.setIsRecipe(true);
+        this.setPfcOverallEfficiency(overallOfRecipe.calculateOverallFoodEfficiency());
+        this.setVitaminOverallEfficiency(overallOfRecipe.calculateOverallVitaminEfficiency());
+        this.setMineralOverallEfficiency(overallOfRecipe.calculateOverallMineralEfficiency());
+        this.setAcidOverallEfficiency(overallOfRecipe.calculateOverallAcidEfficiency());
+    }
+
+    public void setRecipeInfo(Recipes recipeInfo){
+        this.name = recipeInfo.getName();
+        this.id = recipeInfo.getId();
+        this.dishType = recipeInfo.getDishType();
     }
 }
