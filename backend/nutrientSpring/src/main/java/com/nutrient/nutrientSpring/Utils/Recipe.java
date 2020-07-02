@@ -18,6 +18,7 @@ public class Recipe extends Combination{
         this.setVitaminOverallEfficiency(overallOfRecipe.calculateOverallVitaminEfficiency());
         this.setMineralOverallEfficiency(overallOfRecipe.calculateOverallMineralEfficiency());
         this.setAcidOverallEfficiency(overallOfRecipe.calculateOverallAcidEfficiency());
+        this.setCombinationEfficiency(overallOfRecipe.calculateOverallIngredientEfficiency());
     }
 
     public void setRecipeInfo(Recipes recipeInfo){

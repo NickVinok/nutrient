@@ -5,6 +5,7 @@ import com.nutrient.nutrientSpring.Model.FoodModel.Food;
 import com.nutrient.nutrientSpring.Model.FoodModel.Recipes;
 import lombok.Data;
 
+import java.sql.SQLOutput;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -96,6 +97,8 @@ public class Combination{
     }
 
     public Combination(){
+        this.isRecipe=false;
+        this.recipeList=new ArrayList<>();
         this.limitationTable = new FoodAndCategoriesLimitationTable();
         this.overallNutrientsAndEfficiency = new Ingredient();
     }
@@ -108,17 +111,26 @@ public class Combination{
     @JsonIgnore
     public Ingredient getMostOverflowingProduct(){
         //получаем здесь самые оверфлоувящие нутриенты (точнее их индексы из getValue)
-        int foodIndex = this.overallNutrientsAndEfficiency.getFoodEfficiency().getMostOverflowingIndex(); //foodEfficiency.getMostOverflowing; ВОЗМОЖНО СТОИТ ВОЗВРАЩАТЬ МАССИВ
+        /*int foodIndex = this.overallNutrientsAndEfficiency.getFoodEfficiency().getMostOverflowingIndex(); //foodEfficiency.getMostOverflowing; ВОЗМОЖНО СТОИТ ВОЗВРАЩАТЬ МАССИВ
         int vitaminIndex = this.overallNutrientsAndEfficiency.getVitaminEfficiency().getMostOverflowingIndex();
         int mineralIndex=this.overallNutrientsAndEfficiency.getMineralEfficiency().getMostOverflowingIndex();
-        int acidIndex=this.overallNutrientsAndEfficiency.getAcidEfficiency().getMostOverflowingIndex();
+        int acidIndex=this.overallNutrientsAndEfficiency.getAcidEfficiency().getMostOverflowingIndex();*/
         //Если нет оверфлоувящих продуктов
-        Ingredient tmp = this.products.stream()
+         /*tmp = this.products.stream()
                 .max(Comparator.comparingDouble(x -> x.getMostOverFlowingNutrient(foodIndex, mineralIndex, vitaminIndex, acidIndex))).get();
         if(tmp.getMostOverFlowingNutrient(foodIndex, mineralIndex, vitaminIndex, acidIndex) < 1.05){
             return null;
+        }*/
+        List<Ingredient> tmp = this.products.stream()
+                .sorted((x,y)-> Float.compare(y.calculateOverallIngredientEfficiency(), x.calculateOverallIngredientEfficiency()))
+                .collect(Collectors.toList());
+        if(tmp.size()==0){
+            return null;
         }
-        return tmp;
+        if(tmp.get(0).compare(1.05f)){
+            return null;
+        }
+        return tmp.get(0);
     }
 
     //Mutable, удаляет продукты, которые запихнули в приём пищи из себя
@@ -126,28 +138,42 @@ public class Combination{
     public Combination getCombinationForMeal(double ratio){
         Combination comb = new Combination();
         comb.setLimitationTable(this.limitationTable);
-        if(ratio==1){
-            return this;
-        } else if(ratio==-1){
-            comb.addFoodToCustomCombination(this.products.get(0));
-            this.deleteFoodFromCombination(this.products.get(0));
-            return comb;
-        }
-        
-        float energy = this.overallNutrientsAndEfficiency.getFoodEfficiency().getEnergy();
-        while(true) {
-            List<Ingredient> tmp = this.products.stream()
-                    .sorted((x, y) -> Float.compare(
-                            Math.abs(x.getFoodEfficiency().getEnergy() / energy - (float) ratio),
-                            Math.abs(y.getFoodEfficiency().getEnergy() / energy - (float) ratio)
-                    )).collect(Collectors.toList());
 
-            Ingredient inMeal = tmp.get(0);
-            comb.addFoodToCustomCombination(inMeal);
-            this.deleteFoodFromCombination(inMeal);
-
-            if (Math.abs(comb.getOverallNutrientsAndEfficiency().getFoodEfficiency().getEnergy() / energy - ratio)<0.05 || this.products.size()==1) {
-                break;
+        while(recipeList.size()!=0) {
+            Recipe toAddToMeal = this.recipeList.get(0);
+            //В случае, если попадается тип блюда "первое"
+            if(ratio==0.2){
+                toAddToMeal = this.recipeList.stream()
+                        .filter(x->x.getDishType()==3).collect(Collectors.toList())
+                        .get(0);
+                comb.addRecipe(toAddToMeal);
+                this.removeRecipe(toAddToMeal);
+                return comb;
+            }else if(toAddToMeal.getDishType()==1){
+                comb.addRecipe(toAddToMeal);
+                this.removeRecipe(toAddToMeal);
+                toAddToMeal = this.recipeList.stream()
+                        .filter(x->x.getDishType()==2).collect(Collectors.toList())
+                        .get(0);
+                comb.addRecipe(toAddToMeal);
+                this.removeRecipe(toAddToMeal);
+                return comb;
+            }
+            //В случае, если попадается тип блюда "второе"
+            else if(toAddToMeal.getDishType()==2){
+                comb.addRecipe(toAddToMeal);
+                this.removeRecipe(toAddToMeal);
+                toAddToMeal = this.recipeList.stream()
+                        .filter(x->x.getDishType()==1).collect(Collectors.toList())
+                        .get(0);
+                comb.addRecipe(toAddToMeal);
+                this.removeRecipe(toAddToMeal);
+                return comb;
+            }
+            else{
+                comb.addRecipe(toAddToMeal);
+                this.removeRecipe(toAddToMeal);
+                return comb;
             }
         }
         return comb;
