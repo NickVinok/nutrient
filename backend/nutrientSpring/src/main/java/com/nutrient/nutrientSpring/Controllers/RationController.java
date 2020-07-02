@@ -36,6 +36,7 @@ public class RationController {
                 ));
         rationResponse.setNutrientNorms(new NutrientNorms(calculations.getPfcNorms(),
                 calculations.getVitaminNorms(), calculations.getAcidNorms(), calculations.getMineralNorms()));
+        rationResponse.calculateRationAvg();
         return rationResponse;
     }
 }

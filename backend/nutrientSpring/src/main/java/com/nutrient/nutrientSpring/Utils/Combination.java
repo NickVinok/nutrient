@@ -31,6 +31,19 @@ public class Combination{
         return products;
     }
 
+    public Combination(Combination c){
+        this.isRecipe=false;
+        this.recipeList=new ArrayList<>(c.getRecipeList());
+        this.products = new ArrayList<>(c.getProducts());
+        this.limitationTable = c.getLimitationTable();
+        this.overallNutrientsAndEfficiency = c.getOverallNutrientsAndEfficiency();
+        this.pfcOverallEfficiency = c.getPfcOverallEfficiency();
+        this.vitaminOverallEfficiency = c.getVitaminOverallEfficiency();
+        this.mineralOverallEfficiency = c.getMineralOverallEfficiency();
+        this.acidOverallEfficiency = c.getAcidOverallEfficiency();
+        this.combinationEfficiency = c.getCombinationEfficiency();
+    }
+
     public boolean isProductInCombination(Ingredient ingredient){
         if(products.contains(ingredient)){
             return true;

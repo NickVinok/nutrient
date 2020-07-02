@@ -445,7 +445,7 @@ public class Calculations {
             if (j > combinations.size() - 1) {
                 j = 0;
             }
-            Combination combWhichWillBePartitionedIntoMeals = combinations.get(j);
+            Combination combWhichWillBePartitionedIntoMeals = new Combination(combinations.get(j));
 
             Ration newRation = new Ration(i);
             newRation.combinationPartitioning(combWhichWillBePartitionedIntoMeals, meals);
