@@ -217,4 +217,13 @@ public class Combination{
         this.vitaminOverallEfficiency-=r.getVitaminOverallEfficiency();
         this.combinationEfficiency -= r.getCombinationEfficiency();
     }
+
+    public boolean isCombinationCpfcInCorridor(){
+        boolean isInCorridor = true;
+        List<Float> tmp = this.overallNutrientsAndEfficiency.getCpfcPercentages();
+        for(int i = 0; i<tmp.size();i++){
+            isInCorridor = isInCorridor && (tmp.get(i)>0.95);
+        }
+        return isInCorridor;
+    }
 }

@@ -559,36 +559,196 @@ public class Calculations {
 
     private List<Combination> addProductsToCombinationsWithRecipes(int dietRestrictions, List<Combination> combsWithRecipes) {
         List<Ingredient> ingredients = foodService.getListOfIngredients(foodService.getFoodWOProhibitedCategories(dietRestrictions));
-        List<Ingredient> foodWithEfficiency = productOverallEfficiency(ingredients, foodNorms, vitaminNorms,
-                mineralNorms, acidNorms, false);
-        foodWithEfficiency = foodWithEfficiency.stream()
-                .filter(x->x.calculateOverallIngredientEfficiency()<0.15)
-                .collect(Collectors.toList());
+        List<Ingredient> foodWithEfficiency = productOverallEfficiencyForRations(ingredients, foodNorms, vitaminNorms,
+                mineralNorms, acidNorms);
+       /* foodWithEfficiency = foodWithEfficiency.stream()
+                .filter(x -> x.calculateOverallIngredientEfficiency() < 0.15)
+                .collect(Collectors.toList());*/
         //Получаем список категорий, превращаем в словарь, где значение - допустимое количество оставшихся использований
         //Делаем 2 списка: один локальный, другой глобальный для выполнения требований к максимальному количеству продуктов из одной группы внутри комбинации
         //и во всех комбинациях
         FoodAndCategoriesLimitationTable limitationTable = foodService.getLimitations();
 
         //Непосредственный расчёт: передаём список допустимой еды, нормы БЖУ, нормы нутриентов
-        combsWithRecipes = calculateEfficientCombinations(limitationTable, foodWithEfficiency, combsWithRecipes).getCombinationList();
+        //combsWithRecipes = calculateEfficientCombinations(limitationTable, foodWithEfficiency, combsWithRecipes).getCombinationList();
 
         /*combsWithRecipes = combsWithRecipes.stream()
                 .filter(x -> x.getProducts().size() == 0)
                 .collect(Collectors.toList()
                 );*/
 
+        List<Combination> finalCombinations = new ArrayList<>();
+
         Combinations cs = new Combinations();
         cs.setCombinationList(combsWithRecipes);
         for (int i = 0; i < 10; i++) {
-            cs = optimizeCombinations(ingredients, cs);
-            cs = addFoodToOptimizedCombination(cs, ingredients);
+            cs = addFoodToRation(cs, foodWithEfficiency, limitationTable);
+            finalCombinations.addAll(cs.getCombinationsInCpfcCorridor());
+            /*cs = optimizeCombinations(foodWithEfficiency, cs);
+            finalCombinations.addAll(cs.getCombinationsInCpfcCorridor());*/
         }
-        combsWithRecipes = cs.getCombinationList();
+        finalCombinations.addAll(cs.getCombinationList());
 
-        combsWithRecipes = combsWithRecipes.stream()
-                        .sorted((x, y) -> Float.compare(y.getCombinationEfficiency(), x.getCombinationEfficiency()))
-                        .collect(Collectors.toList()
-        );
-        return combsWithRecipes;
+        finalCombinations = finalCombinations.stream()
+                .sorted((x, y) -> Float.compare(y.getCombinationEfficiency(), x.getCombinationEfficiency()))
+                .collect(Collectors.toList()
+                );
+        return finalCombinations;
+    }
+
+    private List<Ingredient> productOverallEfficiencyForRations(List<Ingredient> ingredients, Food pfcNorms,
+                                                                Vitamin vitaminNorms, Mineral mineralNorms, Acid acidNorms) {
+        List<Ingredient> tmp = new ArrayList<>();
+        List<Ingredient> productsWithNegativePoints = new ArrayList<>();
+        for (Ingredient in : ingredients) {
+            Mineral m = in.getMineral();
+            Acid a = in.getAcid();
+            Vitamin v = in.getVitamin();
+            Food f = in.getFood();
+
+            Mineral mEf = new Mineral(m, mineralNorms);
+            Acid aEf = new Acid(a, acidNorms);
+            Vitamin vEf = new Vitamin(v, vitaminNorms);
+            Food fEf = new Food(f, pfcNorms);
+
+            in.setEfficiency(fEf, vEf, mEf, aEf);
+
+            //Если у нас получились неотрицательные баллы добавляем в список продуктов
+            if (in.calculateOverallIngredientEfficiency() > 0) {
+                tmp.add(in);
+            }
+            //Если получились отрицательные баллы добавляем в список,
+            //который потом будем корректировать, уменьшая граммовку
+            else {
+                productsWithNegativePoints.add(in);
+            }
+
+        }
+        //сортируем полученный список элементов
+        List<Double> tmp2 = tmp.stream()
+                .map(Ingredient::calculateOverallIngredientEfficiency) //нужно сортировать исходя из кбжу
+                .sorted((x, y) -> Float.compare(y, x))
+                .map(Float::doubleValue)
+                .collect(Collectors.toList());
+        //Смотрим на самый ээфективный продукт на 100г. и на самый неэффективный на 100г.
+        double mostEffective = tmp2.get(0);
+        double leastEffective = tmp2.get(tmp.size() - 1);
+        //Делим интервал между ними на 6 частей
+        //И в зависмости от нахождения продукта в интервале
+        //умножаем на тот или иной коэффициент
+        //Добавляем в итоговый массив
+        double interval = (mostEffective - leastEffective) / 5;
+        List<Ingredient> listOfAdjustedIngredients = new ArrayList<>();
+        for (Ingredient i : tmp) {
+            double overall = i.calculateOverallIngredientEfficiency();
+            if (overall < interval) {
+                i.multiply(3f);
+            } else if (overall > interval && overall < 2 * interval) {
+                i.multiply(2.5f);
+            } else if (overall > 2 * interval && overall < 3 * interval) {
+                i.multiply(2f);
+            } else if (overall > 3 * interval && overall < 4 * interval) {
+                i.multiply(1.5f);
+            } else if (overall > 4 * interval && overall < 5 * interval) {
+                i.multiply(1f);
+            } else {
+                i.multiply(0.5f);
+            }
+
+            if (i.calculateOverallIngredientEfficiency() > 0) {
+                listOfAdjustedIngredients.add(i);
+            } else {
+                productsWithNegativePoints.add(i);
+            }
+
+        }
+        //Проходим по продуктам с отрицательными баллами
+        //Уменьшаем их вес
+        //Если после двойного уменьшения веса, баллы всё ещё отрицательные,
+        //то не добавляем в итоговый массив
+        for (Ingredient i : productsWithNegativePoints) {
+            i.multiply(0.5f);
+            if (i.calculateOverallIngredientEfficiency() > 0) {
+                listOfAdjustedIngredients.add(i);
+            } else {
+                i.multiply(0.5f);
+                if (i.calculateOverallIngredientEfficiency() > 0) {
+                    listOfAdjustedIngredients.add(i);
+                }
+            }
+        }
+        //Возвращаем отсортированный массив, от большего к меньшему
+        return listOfAdjustedIngredients;
+    }
+
+    private Combinations addFoodToRation(Combinations combs, List<Ingredient> products, FoodAndCategoriesLimitationTable table) {
+        List<Ingredient> localProducts;
+        for (Combination c : combs.getCombinationList()) {
+            List<Float> reference = c.getOverallNutrientsAndEfficiency().getCpfcPercentages().stream()
+                    .map(x -> x = 1 - x)
+                    .collect(Collectors.toList());
+
+            localProducts = products;
+            if (localProducts == null) {
+                break;
+            }
+
+            FoodAndCategoriesLimitationTable limits;
+            if (c.getLimitationTable().getSingleCategoryLimit() == null) {
+                c.setLimitationTable(table);
+                limits = table;
+            } else {
+                limits = c.getLimitationTable();
+            }
+
+            //Применяем метод наименьших квадратов и сортируем
+            //Первый ингридиент - самый подходящий
+            //Также замеряем время работы сортировки (на всякий случай)
+
+            //Уверен, что в будущем это можно распараллелить
+            long time = System.currentTimeMillis();
+            localProducts = localProducts.stream()
+                    .sorted((i1, i2) -> Float.compare(
+                            leastSquares(reference, i1.getCpfcPercentages()),
+                            leastSquares(reference, i2.getCpfcPercentages())
+                    ))
+                    .collect(Collectors.toList());
+
+            //Пытаемся добавить ингредиент в комбинацию
+            for (Ingredient i : localProducts) {
+                if (c.isProductInCombination(i)) {
+                    continue;
+                }
+
+                Long productId = i.getId();
+                Long categoryId = i.getFood().getCategory().getId();
+
+                if (limits.isCategoryAllowed(categoryId)) {
+                    if (limits.getCategoryLimitInAllCombs(categoryId) > 0 && limits.getCategoryLimitInComb(categoryId) > 0) {
+                        if (limits.getFoodLimit(productId) > 0) {
+                            /*if (c.addProductToCombination(i, limits)) {
+                                limits.updateCategoryLimit(categoryId, -1);
+                                limits.updateFoodLimit(productId, -1);
+                                c.setLimitationTable(limits);
+                            }*/
+                            c.addFoodToCustomCombination(i);
+                            limits.updateCategoryLimit(categoryId, -1);
+                            limits.updateFoodLimit(productId, -1);
+                            c.setLimitationTable(limits);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return combs;
+    }
+
+    private float leastSquares(List<Float> reference, List<Float> parameters) {
+        float sum = 0;
+        for (int i = 0; i < reference.size(); i++) {
+            sum += Math.pow(reference.get(i) - parameters.get(i), 2);
+        }
+        return sum;
     }
 }

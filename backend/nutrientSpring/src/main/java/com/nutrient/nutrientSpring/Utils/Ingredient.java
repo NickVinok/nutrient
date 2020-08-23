@@ -7,6 +7,9 @@ import com.nutrient.nutrientSpring.Model.FoodModel.Mineral;
 import com.nutrient.nutrientSpring.Model.FoodModel.Vitamin;
 import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Data
@@ -176,5 +179,12 @@ public class Ingredient {
         return Stream.of(this.foodEfficiency.getValues().get(fi), this.mineralEfficiency.getValues().get(mi),
                 this.vitaminEfficiency.getValues().get(vi), this.acidEfficiency.getValues().get(ai))
                 .max(Float::compare).get();
+    }
+
+    @JsonIgnore
+    public List<Float> getCpfcPercentages(){
+        return Stream.of(this.foodEfficiency.getEnergy(), this.foodEfficiency.getProtein(),
+                this.foodEfficiency.getFat(), this.foodEfficiency.getCarbohydrate())
+                .collect(Collectors.toList());
     }
 }
