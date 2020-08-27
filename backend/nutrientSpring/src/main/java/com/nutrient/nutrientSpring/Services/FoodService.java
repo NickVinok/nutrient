@@ -4,7 +4,6 @@ import com.nutrient.nutrientSpring.Model.FoodModel.*;
 import com.nutrient.nutrientSpring.Repos.FoodRepository.*;
 import com.nutrient.nutrientSpring.Utils.FoodAndCategoriesLimitationTable;
 import com.nutrient.nutrientSpring.Utils.Ingredient;
-import com.nutrient.nutrientSpring.Utils.Recipe;
 import com.nutrient.nutrientSpring.Utils.TEST_FILE_FOR_GETTING_ALL_RECIPES;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,6 +42,10 @@ public class FoodService {
     private RecipesRepo recipesRepo;
     @Autowired
     private RecipeCompositionRepo recipeCompositionRepo;
+    @Autowired
+    private DietTypesTagsRepo dietTypesTagsRepo;
+    @Autowired
+    private FoodTagRepo foodTagRepo;
 
     private FoodAndCategoriesLimitationTable limitationTable;
 
@@ -63,9 +66,16 @@ public class FoodService {
 
     //Возвращаем список еды, которая пододит под требования к категории
     public List<Food> getFoodWOProhibitedCategories(int dietRestrictions) {
-        List<Food> foodList;
+        List<Tags> tagsForDietType = this.dietTypesTagsRepo.findByDietTypes(dietRestrictions).stream()
+                .map(DietTypesTags::getTags)
+                .collect(Collectors.toList());
 
-        List<EnabledCategories> tmp1 = enabledCategoriesRepo.findByDietAndEnable(dietTypesRepo.getOne((long) dietRestrictions), true);
+        List<Food> foodSatisfyingTags = new ArrayList<>(this.foodTagRepo.findByTagsIn(tagsForDietType).stream()
+                .map(FoodTag::getFood)
+                .collect(Collectors.toSet()));
+
+        return foodSatisfyingTags;
+        /*List<EnabledCategories> tmp1 = enabledCategoriesRepo.findByDietAndEnable(dietTypesRepo.getOne((long) dietRestrictions), true);
         List<EnabledProducts> tmp2 = enabledProductsRepo.findByDietAndEnable(dietTypesRepo.getOne((long) dietRestrictions), true);
         List<Long> enabledC = tmp1
                 .stream()
@@ -83,9 +93,7 @@ public class FoodService {
 
         List<CategoryLimit> categoryLimits = categoryLimitRepo.findByCategory_IdIn(enabledC);
         List<FoodLimit> foodLimits = foodLimitRepo.findByFood_IdIn(enabledF);
-        limitationTable = new FoodAndCategoriesLimitationTable(foodLimits, categoryLimits);
-
-        return foodList;
+        limitationTable = new FoodAndCategoriesLimitationTable(foodLimits, categoryLimits);*/
     }
 
     public List<Ingredient> getListOfIngredients(List<Food> foodList) {
