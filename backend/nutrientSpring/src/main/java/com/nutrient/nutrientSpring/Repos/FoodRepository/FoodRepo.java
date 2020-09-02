@@ -3,7 +3,6 @@ package com.nutrient.nutrientSpring.Repos.FoodRepository;
 
 import com.nutrient.nutrientSpring.Model.FoodModel.Category;
 import com.nutrient.nutrientSpring.Model.FoodModel.Food;
-import com.nutrient.nutrientSpring.Model.FoodModel.RecipeMock;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

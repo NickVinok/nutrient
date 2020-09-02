@@ -46,6 +46,10 @@ public class FoodService {
     private DietTypesTagsRepo dietTypesTagsRepo;
     @Autowired
     private FoodTagRepo foodTagRepo;
+    @Autowired
+    private RecipeTagRepo recipeTagRepo;
+    @Autowired
+    private TagsRepo tagsRepo;
 
     private FoodAndCategoriesLimitationTable limitationTable;
 
@@ -212,27 +216,27 @@ public class FoodService {
         return products;
     }
 
-    public List<TEST_FILE_FOR_GETTING_ALL_RECIPES> getAllRecipes() {
-        List<TEST_FILE_FOR_GETTING_ALL_RECIPES> recipes = new ArrayList<>();
-        List<Object[]> futureRecipes = this.recipesRepo.extractAvailableRecipes();
-        for (Object[] rm : futureRecipes) {
-            List<Long> tmpIngrIds = Stream.of(((String) rm[2]).split(","))
-                    .map(String::strip)
-                    .map(Long::parseLong)
-                    .collect(Collectors.toList());
-            List<Double> tmpIngrWeights = Stream.of(((String) rm[3]).split(","))
-                    .map(String::strip)
-                    .map(Double::parseDouble)
-                    .collect(Collectors.toList());
-            recipes.add(new TEST_FILE_FOR_GETTING_ALL_RECIPES(((BigInteger) rm[0]).longValue(), ((String) rm[1]), tmpIngrIds, tmpIngrWeights));
-        }
-        return recipes;
-    }
-
     public List<Ingredient> getRecipesOfCertainType(int dishType) {
         List<Ingredient> recipes = new ArrayList<>();
 
-        List<RecipesComposition> rcList = this.recipeCompositionRepo.getBestRecipesOfType(dishType);
+        List<String> mealNames = Stream.of("завтрак", "обед", "ужин").collect(Collectors.toList());
+        List<Tags> mealObjects = mealNames.stream()
+                .map(x->tagsRepo.findByName(x).get())
+                .collect(Collectors.toList());
+        List<List<RecipesComposition>> differentMealRecipes = new ArrayList<>();
+        for(Tags meal: mealObjects){
+            List<Long> recipesList = recipeTagRepo.findByRecipeTagKey_TagsId(meal.getId())
+                    .stream()
+                    .map(RecipeTag::getRecipe)
+                    .map(Recipes::getId)
+                    .collect(Collectors.toList());
+            differentMealRecipes.add(
+                    this.recipeCompositionRepo.getBestRecipesByTag(recipesList)
+            );
+        }
+
+
+/*        List<RecipesComposition> rcList = this.recipeCompositionRepo.getBestRecipesOfType(dishType);
         for (RecipesComposition rc : rcList) {
             recipes.add(new Ingredient(
                     rc.getFood(),
@@ -242,7 +246,7 @@ public class FoodService {
                     rc.getId(),
                     0
             ));
-        }
+        }*/
         return recipes;
     }
 

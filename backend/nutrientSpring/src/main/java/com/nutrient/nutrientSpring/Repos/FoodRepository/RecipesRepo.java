@@ -1,6 +1,5 @@
 package com.nutrient.nutrientSpring.Repos.FoodRepository;
 
-import com.nutrient.nutrientSpring.Model.FoodModel.RecipeMock;
 import com.nutrient.nutrientSpring.Model.FoodModel.Recipes;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
